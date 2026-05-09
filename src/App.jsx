@@ -1,122 +1,85 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
+import CustomerTable from './components/CustomerTable';
+import RegistrationModal from './components/RegistrationModal';
+import BillingPage from './components/BillingPage'; // Import the new billing page
+import { Plus, Zap } from 'lucide-react';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [customers, setCustomers] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [view, setView] = useState('dashboard'); // 'dashboard' or 'billing'
+  const [activeCustomer, setActiveCustomer] = useState(null);
+
+  // Function to register a new customer
+  const addCustomer = (newCustomer) => {
+    const customerWithId = { 
+      ...newCustomer, 
+      id: Date.now(), 
+      status: 'in progress' 
+    };
+    setCustomers([...customers, customerWithId]);
+    setIsModalOpen(false);
+  };
+
+  // Switch to billing view for a specific customer
+  const handleCreateBill = (customer) => {
+    setActiveCustomer(customer);
+    setView('billing');
+  };
+
+  // Return to dashboard
+  const handleBackToDashboard = () => {
+    setView('dashboard');
+    setActiveCustomer(null);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+    <div className="min-h-screen bg-slate-50">
+      {/* Navbar - Only show "Register" button when on dashboard */}
+      <nav className="bg-white border-b px-8 py-4 flex justify-between items-center sticky top-0 z-40">
+        <div 
+          className="flex items-center gap-2 text-brand-dark font-bold text-xl cursor-pointer"
+          onClick={handleBackToDashboard}
         >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          <Zap className="fill-brand-primary text-brand-primary" />
+          <span>Electrolyte Solutions</span>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        
+        {view === 'dashboard' && (
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-brand-primary hover:bg-brand-dark text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-sm"
+          >
+            <Plus size={20} /> Register Customer
+          </button>
+        )}
+      </nav>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* Main Content Area */}
+      <main className="p-8">
+        {view === 'dashboard' ? (
+          <CustomerTable 
+            customers={customers} 
+            setCustomers={setCustomers} 
+            handleCreateBill={handleCreateBill} 
+          />
+        ) : (
+          <BillingPage 
+            customer={activeCustomer} 
+            onBack={handleBackToDashboard} 
+          />
+        )}
+      </main>
+
+      {/* Modals */}
+      {isModalOpen && (
+        <RegistrationModal 
+          onClose={() => setIsModalOpen(false)} 
+          onSubmit={addCustomer} 
+        />
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
