@@ -48,7 +48,7 @@ const RegistrationModal = ({ onClose, onSubmit }) => {
 
           <div className="flex justify-end gap-3 pt-4">
             <button type="button" onClick={onClose} className="px-4 py-2 text-slate-600">Cancel</button>
-            <button type="submit" className="bg-brand-primary text-white px-6 py-2 rounded-lg font-medium">Save Customer</button>
+            <button type="submit" className="bg-brand-primary text-BLACK px-6 py-2 rounded-lg font-medium">Save Customer</button>
           </div>
         </form>
       </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Monitor, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Search, Monitor, ShoppingBag, ArrowRight, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const CustomerTable = ({ customers, setCustomers,handleCreateBill }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -101,13 +102,24 @@ const CustomerTable = ({ customers, setCustomers,handleCreateBill }) => {
                       <option value="rejected">Rejected</option>
                     </select>
                   </td>
-                  <td className="px-6 py-4">
-                    {cust.status === 'resolved' && (
-                      <button onClick={handleCreateBill} className="text-brand-primary flex items-center gap-1 text-sm font-semibold hover:underline">
-                        Create Bill <ArrowRight size={16}/>
-                      </button>
-                    )}
-                  </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        {cust.status === 'resolved' && (
+                          <Link 
+                            to={`/billing/${cust.id}`}
+                            className="text-brand-primary hover:text-brand-dark font-semibold text-sm flex items-center gap-1"
+                          >
+                            Create Bill
+                          </Link>
+                        )}
+                        <button 
+                          onClick={() => onRemove(cust.id)}
+                          className="text-slate-300 hover:text-red-500 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
                 </tr>
               ))
             )}
