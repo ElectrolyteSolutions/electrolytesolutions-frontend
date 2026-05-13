@@ -1,23 +1,28 @@
-import { Routes, Route } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import Dashboard from './pages/Dashboard';
-import Inventory from './pages/Inventory';
-import Customers from './pages/Customers';
-import POS from './pages/POS';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+
+// Lazy loading the page
+const ProductsPage = lazy(() => import('./pages/ProductsPage'));
+
+const Navbar = () => (
+    <nav style={{ background: '#1e293b', padding: '15px 30px', display: 'flex', gap: '20px' }}>
+        <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontWeight: 'bold' }}>Inventory OS</Link>
+        <Link to="/products" style={{ color: '#cbd5e1', textDecoration: 'none' }}>Products</Link>
+    </nav>
+);
 
 function App() {
-  return (
-    <div className="flex min-h-screen bg-slate-100">
-      <Sidebar />
-      <div className="flex-1 ml-64 p-8"> {/* ml-64 for sidebar space */}
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/pos" element={<POS />} />
-        </Routes>
-      </div>
-    </div>
-  );
+    return (
+        <Router>
+            <Navbar />
+            <Suspense fallback={<div style={{padding: '20px'}}>Loading Modules...</div>}>
+                <Routes>
+                    <Route path="/" element={<div style={{padding: '40px'}}><h1>Welcome to System Dashboard</h1></div>} />
+                    <Route path="/products" element={<ProductsPage />} />
+                </Routes>
+            </Suspense>
+        </Router>
+    );
 }
-export default App
+
+export default App;
