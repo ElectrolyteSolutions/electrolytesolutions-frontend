@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProducts, addProduct, deleteProduct, updateProduct } from '../features/productSlice';
+// Optional: import { Plus, Edit2, Trash2, X } from 'lucide-react'; 
 
 const ProductsPage = () => {
   const dispatch = useDispatch();
@@ -8,11 +9,7 @@ const ProductsPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({
-    name: '',
-    price: '',
-    quantity: '',
-  });
+  const [form, setForm] = useState({ name: '', price: '', quantity: '' });
 
   useEffect(() => {
     dispatch(getProducts());
@@ -23,7 +20,7 @@ const ProductsPage = () => {
       setForm(product);
       setEditId(product._id);
     } else {
-      setForm({ name: '', price: '', quantity: ''});
+      setForm({ name: '', price: '', quantity: '' });
       setEditId(null);
     }
     setIsModalOpen(true);
@@ -41,84 +38,141 @@ const ProductsPage = () => {
     handleCloseModal();
   };
 
-  // --- Styled Components (Internal) ---
-  const styles = {
-    container: { padding: '40px', maxWidth: '1200px', margin: '0 auto', fontFamily: '"Inter", sans-serif' },
-    header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' },
-    addBtn: { padding: '10px 20px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' },
-    table: { width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px' },
-    th: { textAlign: 'left', padding: '15px', color: '#64748b', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' },
-    tr: { background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', transition: 'transform 0.2s' },
-    td: { padding: '15px', backgroundColor: '#fff', borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' },
-    modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
-    modalContent: { background: 'white', padding: '30px', borderRadius: '12px', width: '500px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' },
-    inputGroup: { display: 'flex', flexDirection: 'column', gap: '15px' },
-    input: { padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '14px' },
-    badge: { padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold', background: '#f1f5f9', color: '#475569' }
-  };
-
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Header Section */}
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 style={{ margin: 0, fontSize: '24px', color: '#0f172a' }}>Product Inventory</h1>
-          <p style={{ color: '#64748b', margin: '5px 0 0 0' }}>Manage and track your electrolyte solutions stock.</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Product Inventory</h1>
         </div>
-        <button style={styles.addBtn} onClick={() => handleOpenModal()}>+ Add Product</button>
+        <button 
+          onClick={() => handleOpenModal()}
+          className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-lg shadow-indigo-500/20"
+        >
+          <span>+</span> Add Product
+        </button>
       </header>
 
-      {status === 'loading' ? (
-        <p>Synchronizing data...</p>
-      ) : (
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>S.No</th>
-              <th style={styles.th}>Product Name</th>
-              <th style={styles.th}>Price</th>
-              <th style={styles.th}>Quantity</th>
-              <th style={styles.th}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((p,i) => (
-              <tr key={p._id} style={styles.tr}>
-                <td style={{ ...styles.td, borderLeft: '1px solid #f1f5f9', borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>
-                  <div style={{ fontWeight: '600', color: '#1e293b' }}>{i+1}</div>
-                  {/* <div style={{ fontSize: '12px', color: '#94a3b8' }}>{p.name}</div> */}
-                </td>
-                <td style={styles.td}>{p.name}</td>
-                <td style={styles.td}>${p.price}</td>
-                <td style={styles.td}>
-                  <span style={{ color: p.quantity < 10 ? '#ef4444' : '#10b981', fontWeight: 'bold' }}>
-                    {p.quantity}
-                  </span>
-                </td>
-                <td style={{ ...styles.td, borderRight: '1px solid #f1f5f9', borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}>
-                  <button onClick={() => handleOpenModal(p)} style={{ border: 'none', background: 'none', color: '#2563eb', cursor: 'pointer', marginRight: '10px' }}>Edit</button>
-                  <button onClick={() => { if(window.confirm('Delete this item?')) dispatch(deleteProduct(p._id)) }} style={{ border: 'none', background: 'none', color: '#ef4444', cursor: 'pointer' }}>Delete</button>
-                </td>
+      {/* Table Section */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-zinc-800/50">
+                <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">S.No</th>
+                <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Product Name</th>
+                <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Price (In Rupees)</th>
+                <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Quantity</th>
+                <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
+            <tbody className="divide-y divide-zinc-800">
+              {status === 'loading' ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-12 text-center text-zinc-500 italic">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                      Synchronizing data...
+                    </div>
+                  </td>
+                </tr>
+              ) : items.map((p, i) => (
+                <tr key={p._id} className="hover:bg-zinc-800/30 transition-colors group">
+                  <td className="px-6 py-4 text-sm font-medium text-zinc-500">{i + 1}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-zinc-100">{p.name}</td>
+                  <td className="px-6 py-4 text-sm text-zinc-300 font-mono">{Number(p.price).toLocaleString()}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      p.quantity < 10 
+                        ? 'bg-red-500/10 text-red-400 border border-red-500/20' 
+                        : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                    }`}>
+                      {p.quantity} in stock
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right text-sm font-medium">
+                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => handleOpenModal(p)}
+                        className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => { if(window.confirm('Delete this item?')) dispatch(deleteProduct(p._id)) }}
+                        className="text-red-400 hover:text-red-300 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      {/* --- CRUD MODAL --- */}
+      {/* Modern Modal Overlay */}
       {isModalOpen && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modalContent}>
-            <h3 style={{ marginTop: 0 }}>{editId ? 'Edit Product' : 'Add New Product'}</h3>
-            <form onSubmit={handleSave} style={styles.inputGroup}>
-              <input style={styles.input} placeholder="Product Name" value={form.brand} onChange={e => setForm({...form, name: e.target.value})} required />
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <input style={{ ...styles.input, flex: 1 }} type="number" placeholder="Price" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
-                <input style={{ ...styles.input, flex: 1 }} type="number" placeholder="Quantity" value={form.quantity} onChange={e => setForm({...form, quantity: e.target.value})} required />
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30">
+              <h3 className="text-lg font-bold text-white">{editId ? 'Edit Product' : 'Add New Product'}</h3>
+              <button onClick={handleCloseModal} className="text-zinc-500 hover:text-white transition-colors text-xl">&times;</button>
+            </div>
+            
+            <form onSubmit={handleSave} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Product Name</label>
+                <input 
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                  placeholder="e.g. Magnesium Complex" 
+                  value={form.name} 
+                  onChange={e => setForm({...form, name: e.target.value})} 
+                  required 
+                />
               </div>
               
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                <button type="button" onClick={handleCloseModal} style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ ...styles.addBtn, flex: 1 }}>{editId ? 'Save Changes' : 'Create Product'}</button>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Price ($)</label>
+                  <input 
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                    type="number" 
+                    placeholder="0.00"
+                    value={form.price} 
+                    onChange={e => setForm({...form, price: e.target.value})} 
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Quantity</label>
+                  <input 
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                    type="number" 
+                    placeholder="0"
+                    value={form.quantity} 
+                    onChange={e => setForm({...form, quantity: e.target.value})} 
+                    required 
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-3 mt-8">
+                <button 
+                  type="button" 
+                  onClick={handleCloseModal} 
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-zinc-700 text-zinc-300 font-semibold hover:bg-zinc-800 transition-colors text-sm"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all text-sm shadow-lg shadow-indigo-500/20"
+                >
+                  {editId ? 'Update Product' : 'Create Product'}
+                </button>
               </div>
             </form>
           </div>
