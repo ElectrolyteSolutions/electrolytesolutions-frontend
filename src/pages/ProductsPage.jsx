@@ -9,13 +9,9 @@ const ProductsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({
-    type: 'Electronics',
-    brand: '',
-    modelName: '',
     name: '',
     price: '',
     quantity: '',
-    description: '',
   });
 
   useEffect(() => {
@@ -27,7 +23,7 @@ const ProductsPage = () => {
       setForm(product);
       setEditId(product._id);
     } else {
-      setForm({ type: 'Electronics', brand: '', modelName: '', name: '', price: '', quantity: '', description: '' });
+      setForm({ name: '', price: '', quantity: ''});
       setEditId(null);
     }
     setIsModalOpen(true);
@@ -77,21 +73,21 @@ const ProductsPage = () => {
         <table style={styles.table}>
           <thead>
             <tr>
-              <th style={styles.th}>Product Details</th>
-              <th style={styles.th}>Category</th>
+              <th style={styles.th}>S.No</th>
+              <th style={styles.th}>Product Name</th>
               <th style={styles.th}>Price</th>
-              <th style={styles.th}>Stock</th>
+              <th style={styles.th}>Quantity</th>
               <th style={styles.th}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {items.map((p) => (
+            {items.map((p,i) => (
               <tr key={p._id} style={styles.tr}>
                 <td style={{ ...styles.td, borderLeft: '1px solid #f1f5f9', borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>
-                  <div style={{ fontWeight: '600', color: '#1e293b' }}>{p.brand} {p.modelName}</div>
-                  <div style={{ fontSize: '12px', color: '#94a3b8' }}>{p.name}</div>
+                  <div style={{ fontWeight: '600', color: '#1e293b' }}>{i+1}</div>
+                  {/* <div style={{ fontSize: '12px', color: '#94a3b8' }}>{p.name}</div> */}
                 </td>
-                <td style={styles.td}><span style={styles.badge}>{p.type}</span></td>
+                <td style={styles.td}>{p.name}</td>
                 <td style={styles.td}>${p.price}</td>
                 <td style={styles.td}>
                   <span style={{ color: p.quantity < 10 ? '#ef4444' : '#10b981', fontWeight: 'bold' }}>
@@ -114,18 +110,11 @@ const ProductsPage = () => {
           <div style={styles.modalContent}>
             <h3 style={{ marginTop: 0 }}>{editId ? 'Edit Product' : 'Add New Product'}</h3>
             <form onSubmit={handleSave} style={styles.inputGroup}>
-              <select style={styles.input} value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
-                <option value="Electronics">Electronics</option>
-                <option value="Industrial">Industrial</option>
-                <option value="Chemical">Chemical</option>
-              </select>
-              <input style={styles.input} placeholder="Brand" value={form.brand} onChange={e => setForm({...form, brand: e.target.value})} required />
-              <input style={styles.input} placeholder="Model Name" value={form.modelName} onChange={e => setForm({...form, modelName: e.target.value})} required />
+              <input style={styles.input} placeholder="Product Name" value={form.brand} onChange={e => setForm({...form, name: e.target.value})} required />
               <div style={{ display: 'flex', gap: '10px' }}>
                 <input style={{ ...styles.input, flex: 1 }} type="number" placeholder="Price" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required />
-                <input style={{ ...styles.input, flex: 1 }} type="number" placeholder="Stock" value={form.quantity} onChange={e => setForm({...form, quantity: e.target.value})} required />
+                <input style={{ ...styles.input, flex: 1 }} type="number" placeholder="Quantity" value={form.quantity} onChange={e => setForm({...form, quantity: e.target.value})} required />
               </div>
-              <textarea style={{ ...styles.input, minHeight: '80px' }} placeholder="Description" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
               
               <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                 <button type="button" onClick={handleCloseModal} style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', cursor: 'pointer' }}>Cancel</button>
