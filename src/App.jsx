@@ -2,8 +2,9 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
-
-const ProductsPage = lazy(() => import('./pages/ProductsPage'));
+const DevicesPage = lazy(() => import('./pages/Devices'));
+const CustomersPage = lazy(() => import('./pages/Customers'));
+const ProductsPage = lazy(() => import('./pages/Products'));
 
 function App() {
     return (
@@ -38,6 +39,8 @@ function App() {
                                     } 
                                 />
                                 <Route path="/products" element={<ProductsPage />} />
+                                <Route path="/customers" element={<CustomersPage />} />
+                                <Route path="/devices" element={<DevicesPage />} />
                             </Routes>
                         </div>
                     </Suspense>
