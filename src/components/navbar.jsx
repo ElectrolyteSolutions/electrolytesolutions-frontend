@@ -10,6 +10,8 @@ const Navbar = () => {
     { name: 'Products', path: '/products' },
     { name: 'Customers', path: '/customers' },
     { name: 'Devices', path: '/devices' },
+    { name: 'Billing', path: '/billing' },
+    { name: 'Returns', path: '/returns' },
   ];
 
   return (

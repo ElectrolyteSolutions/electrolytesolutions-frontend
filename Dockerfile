@@ -6,11 +6,9 @@ RUN npm install
 COPY . .
 # Accept the arguments from docker-compose
 ARG REACT_APP_API_URL
-ARG REACT_APP_WEBSOCKET_URL
 
 # Set them as ENV so the React build script can see them
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
-ENV REACT_APP_WEBSOCKET_URL=$REACT_APP_WEBSOCKET_URL
 
 RUN npm run build
 # DEBUG: This will show us if the files actually exist here

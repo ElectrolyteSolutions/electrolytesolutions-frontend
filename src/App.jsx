@@ -2,6 +2,10 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
+import InvoiceTemplate from './components/InvoiceTemplate';
+import ReturnsPage from './pages/Returns';
+const DashboardPage = lazy(()=> import("./pages/Dashboard"))
+const BillingPage =lazy(()=> import('./pages/Billing'));
 const DevicesPage = lazy(() => import('./pages/Devices'));
 const CustomersPage = lazy(() => import('./pages/Customers'));
 const ProductsPage = lazy(() => import('./pages/Products'));
@@ -28,19 +32,15 @@ function App() {
                                 <Route 
                                     path="/" 
                                     element={
-                                        <div className="py-10">
-                                            <h1 className="text-3xl font-bold text-white">
-                                                Welcome to System Dashboard
-                                            </h1>
-                                            <p className="mt-4 text-zinc-400">
-                                                Select a module from the navigation to get started.
-                                            </p>
-                                        </div>
+                                        <DashboardPage/>
                                     } 
                                 />
                                 <Route path="/products" element={<ProductsPage />} />
                                 <Route path="/customers" element={<CustomersPage />} />
                                 <Route path="/devices" element={<DevicesPage />} />
+                                <Route path="/billing" element={<BillingPage />} />
+                                <Route path="/invoice" element={<InvoiceTemplate />} />
+                                <Route path="/returns" element={<ReturnsPage />} />
                             </Routes>
                         </div>
                     </Suspense>

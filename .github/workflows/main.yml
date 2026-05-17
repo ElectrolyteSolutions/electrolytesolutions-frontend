@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v3
         # We pull to the defa ult  workspace first to prep the files
       
-      - name: Sync Files to E Drive
+      - name: Sync Files to F Drive
         run: |
           # /MIR: Mirrorss the directory (deletes files in F: that were deleted in Git)
           # /XD: Excludes folders we don't want to overwridte (like .git or existing node_modules)

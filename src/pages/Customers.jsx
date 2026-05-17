@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCustomers, addCustomer, deleteCustomer, updateCustomer } from '../features/customerSlice';
+import RegisterDeviceModal from '../components/addDevice'; // Mount our decoupled modal
 
 const CustomersPage = () => {
   const dispatch = useDispatch();
   const { items, status } = useSelector((state) => state.customers);
   
+  // Standard profile modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ 
@@ -14,6 +16,10 @@ const CustomersPage = () => {
     customerType: 'Individual', 
     address: '' 
   });
+
+  // ⚡ Device Registration states
+  const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
+  const [targetedCustomerId, setTargetedCustomerId] = useState('');
 
   useEffect(() => {
     dispatch(getCustomers());
@@ -28,6 +34,12 @@ const CustomersPage = () => {
       setEditId(null);
     }
     setIsModalOpen(true);
+  };
+
+  // ⚡ Explicitly trigger the device generation wizard per customer
+  const handleOpenDeviceModal = (customerId) => {
+    setTargetedCustomerId(customerId);
+    setIsDeviceModalOpen(true);
   };
 
   const handleSave = (e) => {
@@ -47,7 +59,6 @@ const CustomersPage = () => {
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Customer Management</h1>
-          <p className="text-zinc-400 text-sm mt-1">Manage client profiles, addresses, and relationship types.</p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
@@ -111,12 +122,11 @@ const CustomersPage = () => {
                       </span>
                     </td>
                     
-                    {/* Updated Devices Data Display */}
+                    {/* Devices Data Display */}
                     <td className="px-6 py-4 text-sm">
                       {c.devices && c.devices.length > 0 ? (
                         <div className="flex flex-wrap gap-1.5 max-w-[300px]">
                           {c.devices.map((device, idx) => {
-                            // Check if deep populating object or string id array fallback
                             const isPopulated = typeof device === 'object' && device !== null;
                             const displayName = isPopulated ? device.deviceName : `Device ID: ...${device.slice(-4)}`;
                             const repairStatus = isPopulated ? device.deviceRepairingStatus : 'unknown';
@@ -145,6 +155,13 @@ const CustomersPage = () => {
 
                     <td className="px-6 py-4 text-right text-sm font-medium">
                       <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {/* ⚡ Inline Add Device feature connector */}
+                        <button 
+                          onClick={() => handleOpenDeviceModal(c._id)}
+                          className="text-blue-400 hover:text-blue-300 transition-colors"
+                        >
+                          + Add Device
+                        </button>
                         <button 
                           onClick={() => handleOpenModal(c)}
                           className="text-emerald-400 hover:text-emerald-300 transition-colors"
@@ -167,7 +184,7 @@ const CustomersPage = () => {
         </div>
       </div>
 
-      {/* Modal Overlay */}
+      {/* Customer Profile Modal Overlay */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
@@ -179,7 +196,19 @@ const CustomersPage = () => {
             <form onSubmit={handleSave} className="p-6 space-y-4">
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Full Name</label>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Customer Category</label>
+                  <select 
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all appearance-none cursor-pointer"
+                    value={form.customerType} 
+                    onChange={e => setForm({...form, customerType: e.target.value})}
+                  >
+                    <option value="Individual">Individual</option>
+                    <option value="Corporate">Corporate</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">{form.customerType ==="Individual" ?"Full":"Corporate"} Name</label>
                   <input 
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
                     value={form.name} 
@@ -210,18 +239,6 @@ const CustomersPage = () => {
                     required 
                   />
                 </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Customer Category</label>
-                  <select 
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all appearance-none cursor-pointer"
-                    value={form.customerType} 
-                    onChange={e => setForm({...form, customerType: e.target.value})}
-                  >
-                    <option value="Individual">Individual</option>
-                    <option value="Corporate">Corporate</option>
-                  </select>
-                </div>
               </div>
 
               <div className="flex gap-3 mt-8">
@@ -243,6 +260,17 @@ const CustomersPage = () => {
           </div>
         </div>
       )}
+
+      {/* ⚡ DYNAMIC INTEGRATED REUSABLE DEVICE REGISTRATION MODAL */}
+      <RegisterDeviceModal
+        isOpen={isDeviceModalOpen}
+        onClose={() => {
+          setIsDeviceModalOpen(false);
+          setTargetedCustomerId('');
+          dispatch(getCustomers()); // Refetch profile map to instantly show the new device bubble badge row
+        }}
+        preSelectedCustomerId={targetedCustomerId}
+      />
     </div>
   );
 };
