@@ -32,5 +32,5 @@ jobs:
           docker-compose stop erp-frontend
           docker-compose rm erp-frontend
 
-          # Rebuild and cstart ONLY the frontend without touching dependencies
+          # Rebuild and cstart ONfLY the frontend without touching dependencies
           docker-compose up --build -d --no-deps erp-frontend
