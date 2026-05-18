@@ -13,7 +13,6 @@ const ProductsPage = lazy(() => import('./pages/Products'));
 function App() {
     return (
         <BrowserRouter basename="/erp/console">
-        <Router>
             {/* 1. The wrapper ensures the footer is pushed to the bottom */}
             <div className="flex flex-col min-h-screen bg-zinc-950">
                 
@@ -49,7 +48,6 @@ function App() {
 
                 <Footer />
             </div>
-        </Router>
         </BrowserRouter>
     );
 }
