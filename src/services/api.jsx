@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'http://localhost:5000/api/products' });
+const API = axios.create({ baseURL: `${process.env.VITE_API_URL}products` });
 
 export const fetchProducts = () => API.get('/');
 export const createProduct = (data) => API.post('/', data);

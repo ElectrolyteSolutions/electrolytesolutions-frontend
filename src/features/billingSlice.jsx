@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/billings';
+const API_URL = `${process.env.VITE_API_URL}billings`;
 
 // --- Asynchronous Thunks ---
 
