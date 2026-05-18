@@ -6,8 +6,8 @@ RUN npm install
 COPY . .
 
 # Vite requires the VITE_ prefix for environment variables to be bundled
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+# ARG VITE_API_URL
+# ENV VITE_API_URL=$VITE_API_URL
 
 RUN npm run build
 
