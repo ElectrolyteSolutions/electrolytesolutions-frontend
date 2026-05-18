@@ -17,16 +17,9 @@ RUN ls -la /app/dist
 # Stage 2: Production
 FROM docker.io/library/nginx:stable-alpine
 
-# Create the nested directory structure required for your routing
-RUN mkdir -p /usr/share/nginx/html/erp/console
+# Clean default Nginx files and copy directly to the root html folder
+RUN rm -rf /usr/share/nginx/html/*
+COPY --from=build /app/dist /usr/share/nginx/html/
 
-# Copy the build artifacts from the Vite 'dist' folder
-COPY --from=build /app/dist /usr/share/nginx/html/erp/console/
-
-# DEBUG: Confirm files made it to the final stage
-RUN ls -la /usr/share/nginx/html/erp/console
-
-# Copy custom Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
 EXPOSE 4800
