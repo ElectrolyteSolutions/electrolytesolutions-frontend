@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-router-dom';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import InvoiceTemplate from './components/InvoiceTemplate';
@@ -12,6 +12,7 @@ const ProductsPage = lazy(() => import('./pages/Products'));
 
 function App() {
     return (
+        <BrowserRouter basename="/erp/console">
         <Router>
             {/* 1. The wrapper ensures the footer is pushed to the bottom */}
             <div className="flex flex-col min-h-screen bg-zinc-950">
@@ -49,6 +50,7 @@ function App() {
                 <Footer />
             </div>
         </Router>
+        </BrowserRouter>
     );
 }
 
