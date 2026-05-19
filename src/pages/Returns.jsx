@@ -18,7 +18,7 @@ const ReturnsPage = () => {
     e.preventDefault();
     if (!searchBillId.trim()) return alert("Please type a valid Invoice/Bill ID");
 
-    axios.get(`${process.env.VITE_API_URL}billings/${searchBillId.trim()}`)
+    axios.get(`${import.meta.env.VITE_API_URL}billings/${searchBillId.trim()}`)
       .then((res) => {
         if (!res.data) return alert("No transaction record matched this ID.");
         if (res.data.purpose === 'quotation') return alert("Quotations cannot be processed for item returns.");
@@ -58,7 +58,7 @@ const ReturnsPage = () => {
     }));
 
     if (window.confirm("Verify cash refund dispersion and process item intake?")) {
-      axios.post(`${process.env.VITE_API_URL}billings/${activeBill._id}/return-bill`, { itemsToReturn })
+      axios.post(`${import.meta.env.VITE_API_URL}billings/${activeBill._id}/return-bill`, { itemsToReturn })
         .then((res) => {
           setFinalizedReturnRecord(res.data);
           setViewState('print');
