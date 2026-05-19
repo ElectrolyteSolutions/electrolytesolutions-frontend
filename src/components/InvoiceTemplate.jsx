@@ -9,17 +9,22 @@ const InvoiceTemplate = ({ billData }) => {
   const storeCustomers = useSelector((state) => state.customers.items);
   const storeDevices = useSelector((state) => state.devices.items);
 
-  
-  
-  // Fallback structural mock data configuration matching structural database schemas perfectly
-  const invoice = billData ;
+  // Structural fallback data if component mounts with dead properties context
+  const invoice = billData || {
+    _id: "6a0617fe2fca22443dd500d8",
+    purpose: "purchase",
+    lastUpdated: new Date().toLocaleString(),
+    serviceCharge: 0,
+    totalAmount: 0,
+    items: []
+  };
 
   // --- DYNAMIC LINKING DEEP-RESOLVER LOGIC ---
   
   // Resolve Billed Customer details (handles populated object or plain string reference ID)
   const resolvedCustomer = typeof invoice.customer === 'object' && invoice.customer !== null
     ? invoice.customer
-    : storeCustomers.find(c => c._id === invoice.customer) || {
+    : storeCustomers.find(c => c._id?.toString() === invoice.customer?.toString()) || {
         name: "Walk-in Client",
         phone: "N/A",
         address: "Counter Sale Transaction Log",
@@ -32,14 +37,14 @@ const InvoiceTemplate = ({ billData }) => {
     if (typeof invoice.device === 'object' && invoice.device !== null) {
       resolvedDevice = invoice.device;
     } else {
-      resolvedDevice = storeDevices.find(d => d._id === invoice.device) || null;
+      resolvedDevice = storeDevices.find(d => d._id?.toString() === invoice.device?.toString()) || null;
     }
   }
 
   // Cross-reference customer fields if device payload structure dropped active issue arrays
   if (invoice.purpose === 'repair' && resolvedCustomer?.devices && !resolvedDevice?.issues) {
     const targetId = typeof invoice.device === 'object' ? invoice.device?._id : invoice.device;
-    const directMatch = resolvedCustomer.devices.find(d => d._id === targetId);
+    const directMatch = resolvedCustomer.devices.find(d => d._id?.toString() === targetId?.toString());
     if (directMatch && typeof directMatch === 'object') {
       resolvedDevice = { ...resolvedDevice, ...directMatch };
     }
@@ -54,7 +59,8 @@ const InvoiceTemplate = ({ billData }) => {
     window.location.reload(); 
   };
 
-  const baseAmount = (invoice.items || []).reduce((sum, item) => sum + item.subTotal, 0) + (invoice.serviceCharge || 0);
+  // Base total calculation uses post-discount line subtotals + service fees
+  const baseAmount = (invoice.items || []).reduce((sum, item) => sum + (item.subTotal || 0), 0) + (invoice.serviceCharge || 0);
   const grossTotal = baseAmount;
 
   return (
@@ -76,7 +82,7 @@ const InvoiceTemplate = ({ billData }) => {
         
         <style dangerouslySetInnerHTML={{__html: `
           @media print {
-            @page { size: A4 portrait; margin: 4mm; }
+            @page { size: A5 landscape; margin: 4mm; }
             body { color: #000000 !important; background: #ffffff !important; padding: 0; margin: 0; }
             .print\\:bg-zinc-100 { background-color: #f4f4f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .no-print { display: none !important; }
@@ -166,10 +172,11 @@ const InvoiceTemplate = ({ billData }) => {
           <thead>
             <tr className="bg-zinc-100 text-zinc-700 font-semibold border-b border-zinc-300">
               <th className="px-2 py-1.5 w-6">#</th>
-              <th className="px-2 py-1.5">Item Description / Variant Details</th>
-              <th className="px-2 py-1.5 text-right w-20">Rate</th>
-              <th className="px-2 py-1.5 text-center w-12">Qty</th>
-              <th className="px-2 py-1.5 text-right w-24">Subtotal</th>
+              <th className="px-2 py-1.5">Item Description</th>
+              <th className="px-2 py-1.5 text-right w-16">Rate</th>
+              <th className="px-2 py-1.5 text-right w-14 text-amber-600">Discount</th>
+              <th className="px-2 py-1.5 text-center w-10">Quantity</th>
+              <th className="px-2 py-1.5 text-right w-20">Total</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100 text-zinc-800">
@@ -184,9 +191,12 @@ const InvoiceTemplate = ({ billData }) => {
                     <div className="text-[9px] text-zinc-400 font-mono mt-0.5">Model ref: {item.modelName}</div>
                   )}
                 </td>
-                <td className="px-2 py-2 text-right font-mono">Rs.{item.price.toFixed(2)}</td>
+                <td className="px-2 py-2 text-right font-mono">Rs.{Number(item.price).toFixed(2)}</td>
+                <td className={`px-2 py-2 text-right font-mono font-medium ${item.discount > 0 ? 'text-amber-600 bg-amber-50/40 print:bg-amber-50' : 'text-zinc-400'}`}>
+                  {item.discount > 0 ? `-Rs.${Number(item.discount).toFixed(2)}` : '0.00'}
+                </td>
                 <td className="px-2 py-2 text-center font-mono">{item.orderedQuantity}</td>
-                <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{item.subTotal.toFixed(2)}</td>
+                <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{Number(item.subTotal).toFixed(2)}</td>
               </tr>
             ))}
 
@@ -197,9 +207,10 @@ const InvoiceTemplate = ({ billData }) => {
                   <div>Technical Service Labor / Diagnostic Fee</div>
                   <div className="text-[8px] text-zinc-400 italic">Non-refundable labor line charge</div>
                 </td>
-                <td className="px-2 py-2 text-right font-mono">Rs.{invoice.serviceCharge.toFixed(2)}</td>
+                <td className="px-2 py-2 text-right font-mono">Rs.{Number(invoice.serviceCharge).toFixed(2)}</td>
+                <td className="px-2 py-2 text-right font-mono text-zinc-400">0.00</td>
                 <td className="px-2 py-2 text-center font-mono">1</td>
-                <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{invoice.serviceCharge.toFixed(2)}</td>
+                <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{Number(invoice.serviceCharge).toFixed(2)}</td>
               </tr>
             )}
           </tbody>

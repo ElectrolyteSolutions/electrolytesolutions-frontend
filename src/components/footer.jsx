@@ -50,7 +50,7 @@ const Footer = () => {
               <span className="text-white font-bold text-xl">Electrolyte Solutions</span>
             </Link>
             <p className="text-sm leading-6 max-w-xs">
-              Making professional dashboard management seamless and intuitive for teams worldwide.
+              At Electrolyte Solutions, we provide fast, reliable, and professional IT and electronics services — right to your doorstep. Whether you need repairs, setup, or support, we’re here to power your tech life.
             </p>
             <div className="flex space-x-5">
               {/* Replace with actual social icons */}
