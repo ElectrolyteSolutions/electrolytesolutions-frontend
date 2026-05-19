@@ -1,12 +1,21 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import iconUrl from '../assets/icon.png'
+import { useEffect } from 'react';
 
 const Navbar = () => {
   // Optional: Use location to highlight the 'active' link
   const location = useLocation();
+  const navigate = useNavigate()
+
+
+    useEffect(()=>{
+        if (location.pathname === "/"){
+            navigate("/dashboard")
+        }
+    },[location])
 
   const navLinks = [
-    { name: 'Dashboard', path: '/' },
+    { name: 'Dashboard', path: '/dashboard' },
     { name: 'Products', path: '/products' },
     { name: 'Customers', path: '/customers' },
     { name: 'Devices', path: '/devices' },

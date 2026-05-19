@@ -1,5 +1,5 @@
-import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-router-dom';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import InvoiceTemplate from './components/InvoiceTemplate';
@@ -11,6 +11,8 @@ const CustomersPage = lazy(() => import('./pages/Customers'));
 const ProductsPage = lazy(() => import('./pages/Products'));
 
 function App() {
+    
+
     return (
         <BrowserRouter basename="/erp/console">
             {/* 1. The wrapper ensures the footer is pushed to the bottom */}
@@ -30,7 +32,7 @@ function App() {
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                             <Routes>
                                 <Route 
-                                    path="/" 
+                                    path="/dashboard" 
                                     element={
                                         <DashboardPage/>
                                     } 
