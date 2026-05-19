@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom'; 
-import axios from 'axios'; // Used directly for appending line items to existing DB records securely
+import axios from 'axios'; // Used directly for updating existing DB records securely
 import { getCustomers } from '../features/customerSlice';
 import { getProducts } from '../features/productSlice';
 import { createInvoice, getBills, deleteBill } from '../features/billingSlice';
@@ -35,7 +35,7 @@ const BillingPage = () => {
   // State lock mechanism to make sure duplicate notification logic fires strictly once upon router loading
   const [isInitialIncomingCheckDone, setIsInitialIncomingCheckDone] = useState(false);
 
-  // ⚡ Tracker state controlling if we are actively appending lines to an existing target bill
+  // Tracker state controlling if we are actively editing an existing target bill
   const [editingBillId, setEditingBillId] = useState(null);
 
   // Modals
@@ -48,23 +48,22 @@ const BillingPage = () => {
     dispatch(getBills());
   }, [dispatch]);
 
-  // Intercept incoming routing context and verify duplicate billing actions (Fires ONCE on redirection mount)
+  // Intercept incoming routing context and verify duplicate billing actions safely
   useEffect(() => {
-    if (location.state?.autoCustomerId && !isInitialIncomingCheckDone ) {
+    if (location.state?.autoCustomerId && !isInitialIncomingCheckDone && bills.length > 0) {
       const targetCustomerId = location.state.autoCustomerId;
       const targetPurpose = location.state.autoPurpose || 'repair';
       const targetDeviceId = location.state.autoDeviceId || '';
 
-
-      setSelectedCustomerId(targetCustomerId);
+      setSelectedCustomerId(targetCustomerId.toString());
       setPurpose(targetPurpose);
-      setSelectedDeviceId(targetDeviceId);
+      setSelectedDeviceId(targetDeviceId.toString());
       setActiveTab('checkout'); 
 
       // Look up if an existing matching invoice has already been generated for this device asset
       if (targetPurpose === 'repair' && targetDeviceId) {
         const structuralMatch = bills.find(
-          (bill) => bill.purpose === 'repair' && bill.device?._id === targetDeviceId
+          (bill) => bill.purpose === 'repair' && bill.device?._id?.toString() === targetDeviceId.toString()
         );
 
         if (structuralMatch) {
@@ -77,9 +76,10 @@ const BillingPage = () => {
     }
   }, [location.state, bills, isInitialIncomingCheckDone]);
 
-  const currentCustomer = customers.find(c => c._id === selectedCustomerId);
+  // Safe string translation deep-resolver selector to trace profiles instantly
+  const currentCustomer = customers.find(c => c._id?.toString() === selectedCustomerId?.toString());
 
-  // ⚡ Activates the Append Items workflow context mode
+  // Activates the Edit Items workflow context mode
   const handleLoadExistingBillToEdit = (bill) => {
     setEditingBillId(bill._id);
     setSelectedCustomerId(bill.customer?._id || bill.customer);
@@ -96,7 +96,7 @@ const BillingPage = () => {
     setDuplicateBillMatch(null);
   };
 
-  // ⚡ Cancel append items workflow cleanly back to fresh slate state
+  // Cancel edit mode workflow cleanly back to fresh slate state
   const handleCancelEditMode = () => {
     setEditingBillId(null);
     setCart([]);
@@ -123,7 +123,7 @@ const BillingPage = () => {
         price: targetProd.price, 
         orderedQuantity: 1,
         isCustomLineItem: false,
-        isNewAppendItem: !!editingBillId // Mark as new only if appending to an existing saved bill
+        isNewAppendItem: !!editingBillId 
       }]);
     }
   };
@@ -173,11 +173,11 @@ const BillingPage = () => {
       items: cart
     };
 
-    // ⚡ PUT request handles appending/modifying, POST handles brand new records
+    // PUT request handles appending/modifying, POST handles brand new records
     if (editingBillId) {
       axios.put(`http://localhost:5000/api/bills/${editingBillId}`, completePayload)
         .then((res) => {
-          alert("Invoice updated and products appended successfully!");
+          alert("Invoice updated and changes saved successfully!");
           handlePostSubmitCleanup(res.data);
         })
         .catch(err => alert(`Failed to update bill record: ${err.response?.data?.message || err.message}`));
@@ -198,10 +198,10 @@ const BillingPage = () => {
     const inlinePrintObject = {
       ...populatedInvoicePayload,
       customer: {
-        name: currentCustomer.name,
-        phone: currentCustomer.phone,
-        address: currentCustomer.address,
-        customerType: currentCustomer.customerType
+        name: currentCustomer?.name || "Walk-in Customer",
+        phone: currentCustomer?.phone || "N/A",
+        address: currentCustomer?.address || "",
+        customerType: currentCustomer?.customerType || "Individual"
       },
       device: targetDeviceObj || null
     };
@@ -212,7 +212,7 @@ const BillingPage = () => {
     setServiceCharge(0);
     setDuplicateBillMatch(null); 
     setEditingBillId(null);
-    setIsInitialIncomingCheckDone(false); // Reset state check variables for subsequent runs
+    setIsInitialIncomingCheckDone(false); 
     dispatch(getProducts());
     dispatch(getBills());
 
@@ -282,7 +282,7 @@ const BillingPage = () => {
                   onClick={() => handleLoadExistingBillToEdit(duplicateBillMatch)}
                   className="bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs px-4 py-2 rounded-lg transition-colors shadow-md"
                 >
-                  Modify / Add Products to this Bill
+                  Edit Bill
                 </button>
                 <button
                   onClick={() => setDuplicateBillMatch(null)}
@@ -298,8 +298,8 @@ const BillingPage = () => {
           {editingBillId && (
             <div className="bg-blue-600/10 border border-blue-500/30 p-4 rounded-xl flex items-center justify-between animate-in fade-in duration-200">
               <div className="text-xs text-blue-400">
-                <span className="font-bold uppercase tracking-wider bg-blue-500/20 px-2 py-0.5 rounded mr-2">Append Mode Active</span>
-                You are pushing new items onto saved invoice record <span className="font-mono text-white">ID: {editingBillId}</span>.
+                <span className="font-bold uppercase tracking-wider bg-blue-500/20 px-2 py-0.5 rounded mr-2">Edit Mode Active</span>
+                You are pushing updates onto saved invoice record <span className="font-mono text-white">ID: {editingBillId}</span>.
               </div>
               <button 
                 onClick={handleCancelEditMode}
@@ -350,12 +350,12 @@ const BillingPage = () => {
                   <div>
                     <label className="block text-xs font-semibold text-amber-400 uppercase mb-2">Linked Hardware Target</label>
                     <select 
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-200 focus:outline-none focus:ring-2 focus:ring-amber-500/40 disabled:opacity-50"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50"
                       value={selectedDeviceId}
                       disabled={!!editingBillId}
                       onChange={(e) => {
                         setSelectedDeviceId(e.target.value);
-                        const structuralMatch = bills.find((b) => b.purpose === 'repair' && b.device?._id === e.target.value);
+                        const structuralMatch = bills.find((b) => b.purpose === 'repair' && b.device?._id?.toString() === e.target.value.toString());
                         setDuplicateBillMatch(structuralMatch || null);
                       }}
                       required
@@ -410,21 +410,35 @@ const BillingPage = () => {
               <div>
                 <label className="block text-xs font-semibold text-zinc-400 uppercase mb-3">Inventory Matrix Catalog</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[250px] overflow-y-auto pr-2">
-                  {products.map(p => (
-                    <div key={p._id} className="bg-zinc-950 border border-zinc-800 p-3 rounded-lg flex justify-between items-center group hover:border-emerald-500/30 transition-all">
-                      <div>
-                        <div className="text-sm font-semibold text-zinc-200">{p.name} </div>
-                        <div className="text-xs text-zinc-500">Rs.{p.price} • Stock: {p.quantity}</div>
+                {products.map(p => {
+                    // ⚡ Find if this item already exists in the checkout cart
+                    const cartItem = cart.find(item => item.productId === p._id && !item.isCustomLineItem);
+                    const currentCartQty = cartItem ? cartItem.orderedQuantity : 0;
+
+                    // ⚡ For Edit/Append mode, we calculate stock availability based on remaining units
+                    // If the item was already "Saved" in the bill before, it shouldn't block adding more units if stock allows
+                    const isOutOfStock = purpose !== 'quotation' && (p.quantity <= 0 || currentCartQty >= p.quantity);
+
+                    return (
+                      <div key={p._id} className="bg-zinc-950 border border-zinc-800 p-3 rounded-lg flex justify-between items-center group hover:border-emerald-500/30 transition-all">
+                        <div>
+                          <div className="text-sm font-semibold text-zinc-200">{p.name}</div>
+                          <div className="text-xs text-zinc-500">
+                            Rs.{p.price} • Stock: {p.quantity} 
+                            {currentCartQty > 0 && <span className="text-emerald-500 font-medium ml-2">({currentCartQty} in cart)</span>}
+                          </div>
+                        </div>
+                        
+                        <button 
+                          onClick={() => handleAddItem(p._id)}
+                          disabled={isOutOfStock}
+                          className="bg-zinc-800 hover:bg-emerald-600 disabled:bg-zinc-900 disabled:text-zinc-700 disabled:hover:bg-zinc-900 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors"
+                        >
+                          {isOutOfStock && purpose !== 'quotation' ? 'Maxed Out' : '+ Add'}
+                        </button>
                       </div>
-                      <button 
-                        onClick={() => handleAddItem(p._id)}
-                        disabled={p.quantity <= 0 && purpose !== 'quotation'}
-                        className="bg-zinc-800 hover:bg-emerald-600 disabled:bg-zinc-900 disabled:text-zinc-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors"
-                      >
-                        + Add
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -531,7 +545,7 @@ const BillingPage = () => {
                             onClick={() => handleLoadExistingBillToEdit(bill)}
                             className="text-blue-400 hover:text-blue-300 transition-colors"
                           >
-                            Add Items
+                            Edit Bill
                           </button>
                           <button 
                             onClick={() => handleOpenInspect(bill)}
