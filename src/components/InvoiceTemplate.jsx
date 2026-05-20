@@ -82,7 +82,7 @@ const InvoiceTemplate = ({ billData }) => {
         
         <style dangerouslySetInnerHTML={{__html: `
           @media print {
-            @page { size: A5 landscape; margin: 4mm; }
+            @page { size: A4 portrait; margin: 8mm; }
             body { color: #000000 !important; background: #ffffff !important; padding: 0; margin: 0; }
             .print\\:bg-zinc-100 { background-color: #f4f4f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .no-print { display: none !important; }
