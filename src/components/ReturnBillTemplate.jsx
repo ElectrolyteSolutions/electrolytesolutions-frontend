@@ -36,7 +36,7 @@ const RefundVoucherTemplate = ({ refundData }) => {
       <div ref={printRef} className="bg-white text-zinc-900 p-5 rounded-md font-sans tracking-tight text-[11px]">
         <style dangerouslySetInnerHTML={{__html: `
           @media print { 
-            @page { size: A5 landscape; margin: 4mm; } 
+            @page { size: A4 portrait; margin: 6mm; } 
             body { color: #000000 !important; background: #ffffff !important; padding: 0; margin: 0; } 
             .print\\:bg-red-50 { background-color: #fef2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           }
