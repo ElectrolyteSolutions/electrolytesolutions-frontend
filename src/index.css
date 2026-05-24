@@ -1,1 +1,51 @@
 @import "tailwindcss";
+
+/* ==========================================
+   1. STANDARD W3C & FIREFOX COMPATIBILITY
+   ========================================== */
+html, 
+body,
+.scrollbar-thin,
+select,
+div {
+  /* Thin width for modern standards and Firefox */
+  scrollbar-width:auto; 
+  /* Format: thumb-color track-color (Zinc-800 to blend with container borders) */
+  scrollbar-color: #27272a #09090b; 
+}
+
+/* ==========================================
+   2. REFINED CHROMIUM & SAFARI STYLING
+   ========================================== */
+@supports selector(::-webkit-scrollbar) {
+  /* Set explicit custom sizing dimensions */
+  ::-webkit-scrollbar {
+    width: 8px;     /* Sleeker width for vertical sliders */
+    height: 8px;    /* Sleeker height for horizontal layouts */
+  }
+
+  /* Style the background track (Zinc-950/Black background theme blend) */
+  ::-webkit-scrollbar-track {
+    background: #09090b; 
+    border-radius: 9999px;
+  }
+
+  /* Style the draggable thumb handle (Zinc-800 subtle default border blend) */
+  ::-webkit-scrollbar-thumb {
+    background: #27272a; 
+    border-radius: 9999px;
+    /* Artificial inline padding gap spacing */
+    border: 2px solid #09090b; 
+  }
+
+  /* Hot feedback state response on hover (Highlights to Emerald-600) */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #059669; 
+    border-color: #09090b;
+  }
+  
+  /* Hot feedback state response when clicked/dragged (Highlights to Emerald-500) */
+  ::-webkit-scrollbar-thumb:active {
+    background: #10b981;
+  }
+}
