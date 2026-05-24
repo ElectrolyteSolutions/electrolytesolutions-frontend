@@ -25,8 +25,11 @@ const BillingPage = () => {
   const [serviceCharge, setServiceCharge] = useState(0);
   const [cart, setCart] = useState([]);
   
-  // ⚡ NEW: Paid Flag State (true = Paid, false = Unpaid)
+  // Paid Flag State (true = Paid, false = Unpaid)
   const [isPaid, setIsPaid] = useState(true);
+
+  // ⚡ NEW: Local Product Catalog Filter/Search Input State Parameter Token
+  const [productSearchKeyword, setProductSearchKeyword] = useState('');
 
   // Local states for on-the-fly Custom Charges
   const [customItemName, setCustomItemName] = useState('');
@@ -72,6 +75,13 @@ const BillingPage = () => {
 
   const currentCustomer = customers.find(c => c._id?.toString() === selectedCustomerId?.toString());
 
+  // ⚡ NEW: Performance optimized text search match mapper array filter block
+  const filteredProductsList = products.filter(product => 
+    product.name?.toLowerCase().includes(productSearchKeyword.toLowerCase()) ||
+    product.brand?.toLowerCase().includes(productSearchKeyword.toLowerCase()) ||
+    product.modelName?.toLowerCase().includes(productSearchKeyword.toLowerCase())
+  );
+
   const handleLoadExistingBillToEdit = (bill) => {
     setEditingBillId(bill._id);
     setSelectedCustomerId(bill.customer?._id || bill.customer);
@@ -79,7 +89,7 @@ const BillingPage = () => {
     setSelectedDeviceId(bill.device?._id || bill.device || '');
     setServiceCharge(bill.serviceCharge || 0);
     setCart(bill.items.map(item => ({ ...item, isExistingLineItem: true, discount: item.discount || 0 })));
-    setIsPaid(bill.isPaid !== undefined ? bill.isPaid : true); // Load existing status
+    setIsPaid(bill.isPaid !== undefined ? bill.isPaid : true);
     setDuplicateBillMatch(null);
     setActiveTab('checkout');
   };
@@ -90,7 +100,7 @@ const BillingPage = () => {
     setSelectedCustomerId('');
     setSelectedDeviceId('');
     setServiceCharge(0);
-    setIsPaid(true); // Reset back to true
+    setIsPaid(true);
     setDuplicateBillMatch(null);
   };
 
@@ -178,7 +188,7 @@ const BillingPage = () => {
       device: purpose === 'repair' ? selectedDeviceId : undefined,
       serviceCharge: purpose === 'repair' ? Number(serviceCharge) : 0,
       items: finalizedProcessedItems,
-      isPaid: isPaid // ⚡ Pushed inline payload
+      isPaid: isPaid
     };
 
     if (editingBillId) {
@@ -217,6 +227,7 @@ const BillingPage = () => {
     setSelectedDeviceId('');
     setServiceCharge(0);
     setIsPaid(true);
+    setProductSearchKeyword(''); // Clear lookups
     setDuplicateBillMatch(null); 
     setEditingBillId(null);
     setIsInitialIncomingCheckDone(false); 
@@ -325,25 +336,54 @@ const BillingPage = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase mb-3">Inventory Matrix Catalog</label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[250px] overflow-y-auto pr-2">
-                  {products.map(p => {
-                    const cartItem = cart.find(item => item.productId === p._id && !item.isCustomLineItem);
-                    const currentCartQty = cartItem ? cartItem.orderedQuantity : 0;
-                    const isOutOfStock = purpose !== 'quotation' && (p.quantity <= 0 || currentCartQty >= p.quantity);
-                    return (
-                      <div key={p._id} className="bg-zinc-950 border border-zinc-800 p-3 rounded-lg flex justify-between items-center group hover:border-emerald-500/30 transition-all">
-                        <div>
-                          <div className="text-sm font-semibold text-zinc-200">{p.name} </div>
-                          <div className="text-xs text-zinc-500">Rs.{p.price} • Stock: {p.quantity} {currentCartQty > 0 && <span className="text-emerald-500 font-medium ml-1">({currentCartQty} added)</span>}</div>
+              {/* ⚡ Inventory Matrix Segment with Integrated Search Input Layout */}
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center border-t border-zinc-800/80 pt-4 gap-3">
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider">Inventory Matrix Catalog</label>
+                  
+                  {/* ⚡ NEW: Local Client Side Filter Search Box Container */}
+                  <div className="relative w-full sm:max-w-xs">
+                    <input 
+                      type="text"
+                      placeholder="🔍 Search catalog components..."
+                      value={productSearchKeyword}
+                      onChange={(e) => setProductSearchKeyword(e.target.value)}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    />
+                    {productSearchKeyword && (
+                      <button 
+                        onClick={() => setProductSearchKeyword('')} 
+                        className="absolute right-2.5 top-1.5 text-zinc-500 hover:text-zinc-300 font-bold text-sm"
+                      >
+                        &times;
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800">
+                  {filteredProductsList.length === 0 ? (
+                    <div className="col-span-full py-8 text-center text-zinc-500 text-xs italic bg-zinc-950/40 border border-zinc-900 rounded-lg">
+                      No inventory components found matching "{productSearchKeyword}".
+                    </div>
+                  ) : (
+                    filteredProductsList.map(p => {
+                      const cartItem = cart.find(item => item.productId === p._id && !item.isCustomLineItem);
+                      const currentCartQty = cartItem ? cartItem.orderedQuantity : 0;
+                      const isOutOfStock = purpose !== 'quotation' && (p.quantity <= 0 || currentCartQty >= p.quantity);
+                      return (
+                        <div key={p._id} className="bg-zinc-950 border border-zinc-800 p-3 rounded-lg flex justify-between items-center group hover:border-emerald-500/30 transition-all">
+                          <div>
+                            <div className="text-sm font-semibold text-zinc-200">{p.name} </div>
+                            <div className="text-xs text-zinc-500">Rs.{p.price} • Stock: {p.quantity} {currentCartQty > 0 && <span className="text-emerald-500 font-medium ml-1">({currentCartQty} added)</span>}</div>
+                          </div>
+                          <button onClick={() => handleAddItem(p._id)} disabled={isOutOfStock} className="bg-zinc-800 hover:bg-emerald-600 disabled:bg-zinc-900 disabled:text-zinc-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors">
+                            {isOutOfStock ? 'Maxed Out' : '+ Add'}
+                          </button>
                         </div>
-                        <button onClick={() => handleAddItem(p._id)} disabled={isOutOfStock} className="bg-zinc-800 hover:bg-emerald-600 disabled:bg-zinc-900 disabled:text-zinc-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors">
-                          {isOutOfStock ? 'Maxed Out' : '+ Add'}
-                        </button>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>
@@ -393,7 +433,6 @@ const BillingPage = () => {
                 </div>
               </div>
 
-              {/* ⚡ NEW: Paid status flag selection segment */}
               <div className="border-t border-zinc-800 pt-4 mt-auto space-y-4">
                 <div className="flex items-center justify-between bg-zinc-950 p-3 border border-zinc-800 rounded-xl">
                   <div className="flex flex-col">
@@ -441,7 +480,7 @@ const BillingPage = () => {
                   <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Invoice ID</th>
                   <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Account Profile</th>
                   <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Workflow Intent</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Payment Status</th> {/* ⚡ New Header Column */}
+                  <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Payment Status</th>
                   <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Timestamp</th>
                   <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Gross Amount</th>
                   <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Records Management</th>
@@ -463,8 +502,6 @@ const BillingPage = () => {
                       <td className="px-6 py-4 text-sm">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border uppercase ${bill.purpose === 'repair' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : bill.purpose === 'quotation' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'}`}>{bill.purpose}</span>
                       </td>
-                      
-                      {/* ⚡ NEW: Status Flag rendering layout block */}
                       <td className="px-6 py-4 text-sm">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
                           bill.isPaid 
@@ -474,7 +511,6 @@ const BillingPage = () => {
                           {bill.isPaid ? '● Paid' : '○ Unpaid'}
                         </span>
                       </td>
-
                       <td className="px-6 py-4 text-sm text-zinc-400">{bill.lastUpdated}</td>
                       <td className="px-6 py-4 text-sm font-bold text-emerald-400 font-mono">Rs.{bill.totalAmount}</td>
                       <td className="px-6 py-4 text-right text-sm font-medium">
