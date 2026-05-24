@@ -3,10 +3,35 @@ import axios from 'axios';
 
 const API_URL = `${import.meta.env.VITE_API_URL}products`;
 
-export const getProducts = createAsyncThunk('products/get', async () => {
-    const res = await axios.get(API_URL);
-    return res.data;
-});
+
+
+// ⚡ Updated: Dynamic async thunk supporting search, filters, and matrix sorting layouts
+export const getProducts = createAsyncThunk(
+  'products/get',
+  async (filterParams = {}, { rejectWithValue }) => {
+    try {
+      // Destructure expected variables out to track configurations cleanly
+      const { alert, search, sortBy, sortOrder, brand, modelName } = filterParams;
+      
+      const queryPayload = {};
+
+      // Hot-append active state parameters dynamically onto the URL query payload
+      if (alert) queryPayload.alert = alert;
+      if (search) queryPayload.search = search;
+      if (sortBy) queryPayload.sortBy = sortBy;
+      if (sortOrder) queryPayload.sortOrder = sortOrder;
+      if (brand) queryPayload.brand = brand;
+      if (modelName) queryPayload.modelName = modelName;
+
+      // Pass the query dictionary configuration parameters into the config payload block
+      const res = await axios.get(API_URL, { params: queryPayload });
+      return res.data;
+    } catch (err) {
+      // Gracefully catch pipeline drops or connection timeouts safely
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
 
 export const addProduct = createAsyncThunk('products/add', async (item) => {
     const res = await axios.post(API_URL, item);
