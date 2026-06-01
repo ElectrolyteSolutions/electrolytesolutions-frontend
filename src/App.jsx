@@ -14,7 +14,7 @@ function App() {
     
 
     return (
-        <BrowserRouter basename="/erp/console">
+        <BrowserRouter >
             {/* 1. The wrapper ensures the footer is pushed to the bottom */}
             <div className="flex flex-col min-h-screen bg-zinc-950">
                 
