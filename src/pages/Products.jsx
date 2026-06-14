@@ -8,7 +8,7 @@ const ProductsPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ name: '', price: '', quantity: '' });
+  const [form, setForm] = useState({ name: '', price: '', quantity: '' ,baseRate:''});
 
   // ⚡ NEW: Core Staging State Controls for Lookups, Filtering & Matrix Sorting
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,7 +45,7 @@ const ProductsPage = () => {
       setForm(product);
       setEditId(product._id);
     } else {
-      setForm({ name: '', price: '', quantity: '' });
+      setForm({ name: '', price: '', quantity: '',baseRate:'' });
       setEditId(null);
     }
     setIsModalOpen(true);
@@ -141,7 +141,7 @@ const ProductsPage = () => {
                   onClick={() => handleSortToggle('price')}
                   className="px-6 py-4 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors"
                 >
-                  <div className="flex items-center justify-end pr-4">Price Rate {renderSortIndicatorArrow('price')}</div>
+                  <div className="flex items-center justify-end pr-4">MRP {renderSortIndicatorArrow('price')}</div>
                 </th>
                 
                 <th 
@@ -174,8 +174,8 @@ const ProductsPage = () => {
                 items.map((p, i) => (
                   <tr key={p._id} className="hover:bg-zinc-800/20 transition-colors group">
                     <td className="px-6 py-4 text-sm font-mono text-zinc-500">{i + 1}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-zinc-100">{p.name}</td>
-                    <td className="px-6 py-4 text-sm text-zinc-300 font-mono text-right pr-10">Rs.{Number(p.price).toFixed(2)}</td>
+                    <td className="px-6 py-4 text-sm font-semibold text-zinc-100">{p.name} <span className='text-zinc-700'>- {Number(p.baseRate).toFixed(2)}</span> </td>
+                    <td className="px-6 py-4 text-sm text-zinc-300 font-mono text-right pr-10">Rs. {Number(p.price).toFixed(2)}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold font-mono border ${
                         p.quantity <= 0 
@@ -234,13 +234,24 @@ const ProductsPage = () => {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Base Price Rate (Rs.)</label>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">MRP (Rs.)</label>
                   <input 
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
                     type="number" 
                     placeholder="0.00"
                     value={form.price} 
                     onChange={e => setForm({...form, price: e.target.value})} 
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Base Rate (Rs.)</label>
+                  <input 
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
+                    type="number" 
+                    placeholder="0.00"
+                    value={form.baseRate} 
+                    onChange={e => setForm({...form, baseRate: e.target.value})} 
                     required 
                   />
                 </div>
