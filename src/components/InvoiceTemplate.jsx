@@ -111,6 +111,7 @@ const InvoiceTemplate = ({ billData }) => {
           </div>
           
           <div className="text-right">
+            <p className="font-bold font-mono text-zinc-900 text-[11px] uppercase">GSTIN: 09EYOPR0179F1ZV</p>
             <h2 className="text-xs font-black text-zinc-950 uppercase tracking-wider bg-zinc-100 px-2 py-0.5 rounded inline-block">Tax Invoice</h2>
             <div className="text-[10px] text-zinc-600 space-y-0.5 mt-1.5 font-mono">
               <div className="text-[9px] text-zinc-900 bg-zinc-100 font-bold px-1.5 py-0.5 rounded uppercase tracking-wide inline-block mb-1">Purpose: {invoice.purpose}</div>
@@ -173,7 +174,10 @@ const InvoiceTemplate = ({ billData }) => {
             <tr className="bg-zinc-100 text-zinc-700 font-semibold border-b border-zinc-300">
               <th className="px-2 py-1.5 w-6">#</th>
               <th className="px-2 py-1.5">Item Description</th>
-              <th className="px-2 py-1.5 text-right w-16">Rate</th>
+              <th className="px-2 py-1.5 text-right w-16">
+                <div>Rate</div>
+                <div className="text-[7px] text-zinc-400 font-normal tracking-normal leading-none mt-0.5">(GST Incl.)</div>
+              </th>
               <th className="px-2 py-1.5 text-right w-14 text-amber-600">Discount</th>
               <th className="px-2 py-1.5 text-center w-10">Quantity</th>
               <th className="px-2 py-1.5 text-right w-20">Total</th>
@@ -220,7 +224,7 @@ const InvoiceTemplate = ({ billData }) => {
         <div className="flex justify-between items-end mt-4 pt-3 border-t border-zinc-200">
           <div className="w-1/2 text-[9px] text-zinc-400 pr-4 leading-normal">
             <span className="font-bold text-zinc-600 block mb-0.5">Terms & Conditions:</span>
-            Computer generated system document. Valid for processing item-return requests over reverse POS counters when full Token reference ID is supplied.
+            <span className="block text-zinc-400">Computer generated system document. Valid for processing item-return requests over reverse POS counters when full Token reference ID is supplied.</span>
           </div>
 
           <div className="w-1/2 space-y-1 font-medium text-zinc-600 text-right">

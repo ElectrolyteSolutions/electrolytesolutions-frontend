@@ -51,6 +51,12 @@ const RefundVoucherTemplate = ({ refundData }) => {
               <p className="text-[9px] text-zinc-500 mt-1 leading-tight">
                 Nahar Bala Ganj, Balrampur, UP, 271201<br />
                 <span className="font-semibold font-mono text-zinc-700 text-[8px]">Contact No.: 9648146167, 8081111867</span>
+                {(refundData.gstNo || true) && (
+                  <>
+                    <br />
+                    <span className="font-bold font-mono text-red-700 text-[8px] uppercase">GSTIN: {refundData.gstNo || '09EYOPR0179F1ZV'}</span>
+                  </>
+                )}
               </p>
             </div>
           </div>
@@ -92,7 +98,10 @@ const RefundVoucherTemplate = ({ refundData }) => {
             <tr className="bg-red-50 text-red-800 font-bold border-b border-red-200 print:bg-red-50">
               <th className="px-2 py-1.5 w-6">#</th>
               <th className="px-2 py-1.5">Returned Item / Component Manifest</th>
-              <th className="px-2 py-1.5 text-right w-20">Price Rate</th>
+              <th className="px-2 py-1.5 text-right w-20">
+                <div>Price Rate</div>
+                <div className="text-[6.5px] text-red-600 font-normal tracking-normal leading-none mt-0.5">(GST Incl.)</div>
+              </th>
               <th className="px-2 py-1.5 text-center w-16">Qty Returned</th>
               <th className="px-2 py-1.5 text-right w-24">Refund Subtotal</th>
             </tr>
