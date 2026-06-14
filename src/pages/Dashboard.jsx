@@ -82,6 +82,7 @@ const DashboardPage = () => {
           <div className="space-y-1">
             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Settled Revenue</span>
             <div className="text-2xl font-black text-emerald-400 font-mono">Rs.{grossPaidRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-black text-emerald-400 font-mono">Rs.0</div>
             <p className="text-[11px] text-zinc-500">
               Outstanding Unpaid: <span className="text-red-400 font-semibold font-mono">Rs.{outstandingUnpaidRevenue.toLocaleString()}</span>
             </p>
