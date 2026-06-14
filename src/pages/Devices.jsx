@@ -60,31 +60,32 @@ const DevicesPage = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 p-4 max-w-[1400px] mx-auto">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full">
+      
       {/* Header */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <header className="flex items-center justify-between gap-4 w-full">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Device Repair Tracking</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Device Repair Tracking</h1>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-lg shadow-blue-500/20"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-blue-500/20"
         >
           <span>+</span> Register Device
         </button>
       </header>
 
       {/* Table Section */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+      <div className="bg-zinc-900  rounded-xl overflow-hidden shadow-xl w-full">
+        <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
+          <table className="w-full text-left border-collapse min-w-[850px]">
             <thead>
               <tr className="bg-zinc-800/50 border-b border-zinc-800">
-                <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Device / HWID</th>
-                <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Customer</th>
-                <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Issue Matrix Faults</th>
-                <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Status Flow</th>
-                <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Workflow Actions</th>
+                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Device / HWID</th>
+                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Customer</th>
+                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Issue Matrix Faults</th>
+                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Status Flow</th>
+                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Workflow Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800">
@@ -104,27 +105,29 @@ const DevicesPage = () => {
               ) : (
                 items.map((device) => (
                   <tr key={device._id} className="hover:bg-zinc-800/30 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-semibold text-zinc-100">{device.deviceName}</div>
-                      <div className="text-xs font-mono text-zinc-500 mt-0.5">{device.deviceHardwareId}</div>
+                    <td className="px-4 sm:px-6 py-2">
+                      <div className="text-xs sm:text-sm font-semibold text-zinc-100">{device.deviceName}</div>
+                      <div className="text-[11px] sm:text-xs font-mono text-zinc-500 mt-0.5">{device.deviceHardwareId}</div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-zinc-300">
+                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm text-zinc-300">
                       {device.owner?.name || <span className="text-zinc-600 italic">No Owner Assigned</span>}
                     </td>
-                    <td className="px-6 py-4 text-sm text-zinc-400">
+                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm text-zinc-400">
                       {device.issues && device.issues.length > 0 ? (
-                        device.issues.slice(0, 3).join(", ") + (device.issues.length > 3 ? "..." : "")
+                        <div className="truncate max-w-[180px] sm:max-w-[250px]" title={device.issues.join(", ")}>
+                          {device.issues.slice(0, 3).join(", ") + (device.issues.length > 3 ? "..." : "")}
+                        </div>
                       ) : (
                         <span className="text-zinc-600 italic">No issues reported</span>
                       )}
                     </td>
                     
                     {/* Dynamic Status Dropdown Selector Cell */}
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-2">
                       <select
                         value={device.deviceRepairingStatus}
                         onChange={(e) => handleStatusChange(device, e.target.value)}
-                        className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border bg-zinc-950 focus:outline-none focus:ring-2 cursor-pointer transition-all ${getStatusStyles(device.deviceRepairingStatus)}`}
+                        className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 sm:py-1.5 rounded-full border bg-zinc-950 focus:outline-none focus:ring-2 cursor-pointer transition-all ${getStatusStyles(device.deviceRepairingStatus)}`}
                       >
                         <option value="in-progress" className="bg-zinc-900 text-amber-400">In Progress</option>
                         <option value="resolved" className="bg-zinc-900 text-emerald-400">Resolved</option>
@@ -133,19 +136,19 @@ const DevicesPage = () => {
                     </td>
 
                     {/* Conditional Action Actions Layout Cell */}
-                    <td className="px-6 py-4 text-right text-sm font-medium">
-                      <div className="flex justify-end items-center gap-4 min-h-[32px]">
+                    <td className="px-4 sm:px-6 py-2 text-right text-xs sm:text-sm font-medium">
+                      <div className="flex justify-end items-center gap-3 min-h-[32px] flex-wrap lg:flex-nowrap">
                         {device.deviceRepairingStatus === 'resolved' && (
                           <button 
                             onClick={() => handleProceedToBilling(device)}
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg shadow-md shadow-emerald-600/10 animate-in fade-in zoom-in-95 duration-200 transition-all"
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] sm:text-xs px-3 py-1.5 rounded-lg shadow-md shadow-emerald-600/10 animate-in fade-in zoom-in-95 duration-200 transition-all shrink-0"
                           >
                             Proceed to Billing →
                           </button>
                         )}
                         <button
                           onClick={() => handleDeleteRecord(device._id)}
-                          className="text-red-400 hover:text-red-300 transition-colors opacity-0 group-hover:opacity-100 duration-150"
+                          className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 lg:bg-transparent px-2 py-1.5 lg:p-0 rounded text-[11px] sm:text-xs font-semibold lg:opacity-0 lg:group-hover:opacity-100 duration-150 shrink-0"
                         >
                           Delete
                         </button>

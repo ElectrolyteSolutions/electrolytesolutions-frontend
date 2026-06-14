@@ -8,9 +8,9 @@ const ProductsPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ name: '', price: '', quantity: '' ,baseRate:''});
+  const [form, setForm] = useState({ name: '', price: '', quantity: '', baseRate: '' });
 
-  // ⚡ NEW: Core Staging State Controls for Lookups, Filtering & Matrix Sorting
+  // Core Staging State Controls for Lookups, Filtering & Matrix Sorting
   const [searchTerm, setSearchTerm] = useState('');
   const [stockFilter, setStockFilter] = useState('all'); // options: 'all' | 'low-stock'
   const [currentSortBy, setCurrentSortBy] = useState('name'); // options: 'name' | 'price' | 'qty'
@@ -28,7 +28,7 @@ const ProductsPage = () => {
     dispatch(getProducts(payloadQueryOptions));
   }, [dispatch, searchTerm, stockFilter, currentSortBy, currentSortOrder]);
 
-  // ⚡ NEW: Automatically toggles or updates active matrix column parameters
+  // Automatically toggles or updates active matrix column parameters
   const handleSortToggle = (targetField) => {
     if (currentSortBy === targetField) {
       // If the field is already active, flip the order direction
@@ -45,7 +45,7 @@ const ProductsPage = () => {
       setForm(product);
       setEditId(product._id);
     } else {
-      setForm({ name: '', price: '', quantity: '',baseRate:'' });
+      setForm({ name: '', price: '', quantity: '', baseRate: '' });
       setEditId(null);
     }
     setIsModalOpen(true);
@@ -79,33 +79,34 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-2 sm:space-y-6 animate-in fade-in duration-500 w-full max-w-[1400px] mx-auto">
+      
       {/* Header Section */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
+      <header className="flex items-center justify-between gap-4 pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Product Inventory</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight ">Product Inventory</h1>
         </div>
         <button 
           onClick={() => handleOpenModal()}
-          className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-lg shadow-indigo-500/20 self-start sm:self-center"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-indigo-500/20"
         >
           <span>+</span> Add Product
         </button>
       </header>
 
-      {/* ⚡ NEW: Interactive Filtering Control Subbar Panel Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-zinc-900/40 p-4 border border-zinc-800 rounded-xl">
-        <div className="sm:col-span-2 relative">
+      {/* Interactive Filtering Control Subbar Panel Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4  border-zinc-700 p-3 sm:p-4 rounded-xl bg-zinc-900 shadow">
+        <div className="lg:col-span-2 relative">
           <label className="block text-[10px] uppercase font-bold tracking-wider text-zinc-500 mb-1.5 ml-0.5">Component Text Search</label>
           <input 
             type="text"
             placeholder="Type component hardware name to query catalog..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3.5 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+            className="w-full bg-zinc-950  rounded-lg px-3.5 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors pr-12"
           />
           {searchTerm && (
-            <button onClick={() => setSearchTerm('')} className="absolute right-3 top-7 text-zinc-500 hover:text-white font-bold text-xs">&times; Clear</button>
+            <button onClick={() => setSearchTerm('')} className="absolute right-3 top-7 sm:top-8 text-zinc-500 hover:text-white font-bold text-xs">&times; Clear</button>
           )}
         </div>
         <div>
@@ -113,7 +114,7 @@ const ProductsPage = () => {
           <select
             value={stockFilter}
             onChange={(e) => setStockFilter(e.target.value)}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="w-full bg-zinc-950  rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           >
             <option value="all">All Products</option>
             <option value="low-stock">🚨 Out of Stock / Depleted Only</option>
@@ -122,36 +123,36 @@ const ProductsPage = () => {
       </div>
 
       {/* Table Section */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+      <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-xl w-full">
+        <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
-              <tr className="bg-zinc-800/40 border-b border-zinc-800 text-xs font-semibold text-zinc-400 uppercase tracking-wider select-none">
-                <th className="px-6 py-4 w-16">S.No</th>
+              <tr className="bg-zinc-900 border-b border-zinc-800 text-xs font-semibold text-zinc-400 uppercase tracking-wider select-none">
+                <th className="px-4 sm:px-6 py-1 w-12 sm:w-16">S.No</th>
                 
-                {/* ⚡ SORTABLE TOGGLE COLUMNS BUTTON HEADERS MAPS HERE */}
+                {/* SORTABLE TOGGLE COLUMNS BUTTON HEADERS MAPS HERE */}
                 <th 
                   onClick={() => handleSortToggle('name')}
-                  className="px-6 py-4 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors"
+                  className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors"
                 >
                   <div className="flex items-center">Product Name {renderSortIndicatorArrow('name')}</div>
                 </th>
                 
                 <th 
                   onClick={() => handleSortToggle('price')}
-                  className="px-6 py-4 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors"
+                  className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors"
                 >
                   <div className="flex items-center justify-end pr-4">MRP {renderSortIndicatorArrow('price')}</div>
                 </th>
                 
                 <th 
                   onClick={() => handleSortToggle('qty')}
-                  className="px-6 py-4 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors"
+                  className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors"
                 >
                   <div className="flex items-center">Stock Volume {renderSortIndicatorArrow('qty')}</div>
                 </th>
                 
-                <th className="px-6 py-4 text-right w-36">Actions</th>
+                <th className="px-4 sm:px-6 sm:py-6 text-right w-36">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60">
@@ -173,31 +174,34 @@ const ProductsPage = () => {
               ) : (
                 items.map((p, i) => (
                   <tr key={p._id} className="hover:bg-zinc-800/20 transition-colors group">
-                    <td className="px-6 py-4 text-sm font-mono text-zinc-500">{i + 1}</td>
-                    <td className="px-6 py-4 text-sm font-semibold text-zinc-100">{p.name} <span className='text-zinc-700'>- {Number(p.baseRate).toFixed(2)}</span> </td>
-                    <td className="px-6 py-4 text-sm text-zinc-300 font-mono text-right pr-10">Rs. {Number(p.price).toFixed(2)}</td>
-                    <td className="px-6 py-4 text-sm">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold font-mono border ${
+                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm font-mono text-zinc-500">{i + 1}</td>
+                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
+                      <span className="font-semibold text-zinc-100">{p.name}</span> 
+                      <span className='text-zinc-500 ml-1'>- {Number(p.baseRate).toFixed(2)}</span>
+                    </td>
+                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm text-zinc-300 font-mono text-right pr-10">Rs. {Number(p.price).toFixed(2)}</td>
+                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-bold font-mono justify-center ${
                         p.quantity <= 0 
-                          ? 'bg-red-500/10 text-red-400 border-red-500/20' 
+                          ? ' text-red-400 ' 
                           : p.quantity < 10
-                          ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                          : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                          ? ' text-amber-400 '
+                          : ' text-emerald-400 '
                       }`}>
-                        {p.quantity <= 0 ? '● Depleted' : `${p.quantity} units`}
+                        {p.quantity}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right text-sm font-medium">
-                      <div className="flex justify-end gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <td className="px-4 sm:px-6 py-2 text-right text-xs sm:text-sm font-medium">
+                      <div className="flex justify-end gap-2.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-wrap lg:flex-nowrap">
                         <button 
                           onClick={() => handleOpenModal(p)}
-                          className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                          className="text-indigo-400 hover:text-indigo-300 transition-colors bg-indigo-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
                         >
                           Edit
                         </button>
                         <button 
                           onClick={() => { if(window.confirm(`Delete ${p.name} from records permanently?`)) dispatch(deleteProduct(p._id)).then(() => refreshDataLogs()) }}
-                          className="text-red-400 hover:text-red-300 transition-colors"
+                          className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
                         >
                           Delete
                         </button>
@@ -213,18 +217,18 @@ const ProductsPage = () => {
 
       {/* Modern Form Input Edit Modal Overlay Component */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30">
-              <h3 className="text-lg font-bold text-white">{editId ? 'Edit Inventory Product' : 'Add New Product'}</h3>
-              <button onClick={handleCloseModal} className="text-zinc-500 hover:text-white transition-colors text-xl">&times;</button>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-zinc-900  w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
+            <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30 shrink-0">
+              <h3 className="text-base sm:text-lg font-bold text-white">{editId ? 'Edit Inventory Product' : 'Add New Product'}</h3>
+              <button onClick={handleCloseModal} className="text-zinc-500 hover:text-white transition-colors text-2xl leading-none">&times;</button>
             </div>
             
-            <form onSubmit={handleSave} className="p-6 space-y-4">
+            <form onSubmit={handleSave} className="p-3 sm:p-6 space-y-4 overflow-y-auto flex-1 scrollbar-thin">
               <div>
                 <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Product Description Title</label>
                 <input 
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                  className="w-full bg-zinc-950  rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
                   placeholder="e.g. iPhone 13 Premium OLED Panel" 
                   value={form.name} 
                   onChange={e => setForm({...form, name: e.target.value})} 
@@ -232,11 +236,11 @@ const ProductsPage = () => {
                 />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">MRP (Rs.)</label>
                   <input 
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
+                    className="w-full bg-zinc-950  rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
                     type="number" 
                     placeholder="0.00"
                     value={form.price} 
@@ -247,7 +251,7 @@ const ProductsPage = () => {
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Base Rate (Rs.)</label>
                   <input 
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
+                    className="w-full bg-zinc-950  rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
                     type="number" 
                     placeholder="0.00"
                     value={form.baseRate} 
@@ -255,10 +259,10 @@ const ProductsPage = () => {
                     required 
                   />
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Stock Quantity</label>
                   <input 
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
+                    className="w-full bg-zinc-950  rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
                     type="number" 
                     placeholder="0"
                     value={form.quantity} 
@@ -268,17 +272,17 @@ const ProductsPage = () => {
                 </div>
               </div>
               
-              <div className="flex gap-3 mt-8">
+              <div className="flex gap-3 pt-4 sm:pt-6">
                 <button 
                   type="button" 
                   onClick={handleCloseModal} 
-                  className="flex-1 px-4 py-2.5 rounded-lg border border-zinc-700 text-zinc-300 font-semibold hover:bg-zinc-800 transition-colors text-sm"
+                  className="flex-1 px-4 py-2.5 rounded-lg text-zinc-300 font-semibold hover:bg-zinc-800 transition-colors text-xs sm:text-sm"
                 >
                   Cancel
                 </button>
                 <button 
                   type="submit" 
-                  className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all text-sm shadow-lg shadow-indigo-500/20"
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all text-xs sm:text-sm shadow-lg shadow-indigo-500/20"
                 >
                   {editId ? 'Commit Variations' : 'Create Record'}
                 </button>
