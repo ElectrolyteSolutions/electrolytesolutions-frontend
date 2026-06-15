@@ -31,9 +31,11 @@ const BillingPage = () => {
   // Local Product Catalog Filter/Search Input State Parameter Token
   const [productSearchKeyword, setProductSearchKeyword] = useState('');
 
-  // Local states for on-the-fly Custom Charges
+  // Local states for expanded Custom Charges (Name, Sell Price, Base Cost, Quantity)
   const [customItemName, setCustomItemName] = useState('');
   const [customItemPrice, setCustomItemPrice] = useState('');
+  const [customItemBaseRate, setCustomItemBaseRate] = useState('');
+  const [customItemQuantity, setCustomItemQuantity] = useState(1);
 
   // Tracking states
   const [duplicateBillMatch, setDuplicateBillMatch] = useState(null);
@@ -117,6 +119,7 @@ const BillingPage = () => {
         productId, 
         name: targetProd.name, 
         price: targetProd.price, 
+        baseRate: targetProd.baseRate || 0,
         discount: 0, 
         orderedQuantity: 1,
         isCustomLineItem: false,
@@ -139,23 +142,29 @@ const BillingPage = () => {
     }));
   };
 
+  // Inject Quantity and BaseRate into custom lines payload
   const handleAddCustomCharge = (e) => {
     e.preventDefault();
-    if (!customItemName.trim() || !customItemPrice) return alert("Enter charge description and rate value");
+    if (!customItemName.trim() || !customItemPrice) return alert("Enter charge description and selling price");
 
     const newCustomField = {
       productId: `CUSTOM-${Date.now()}`, 
       name: customItemName.trim(),
       price: Number(customItemPrice),
+      baseRate: Number(customItemBaseRate || 0),
       discount: 0, 
-      orderedQuantity: 1,
+      orderedQuantity: Number(customItemQuantity) || 1,
       isCustomLineItem: true,
       isNewAppendItem: !!editingBillId
     };
 
     setCart([...cart, newCustomField]);
+    
+    // Reset local custom charge states
     setCustomItemName('');
     setCustomItemPrice('');
+    setCustomItemBaseRate('');
+    setCustomItemQuantity(1);
   };
 
   const handleRemoveItem = (uniqueId) => {
@@ -328,12 +337,34 @@ const BillingPage = () => {
                 </div>
               )}
 
-              <div className=" bg-zinc-950/40 p-4 rounded-xl space-y-3">
-                <h4 className="text-xs font-bold uppercase text-blue-400 tracking-wider">Add Custom Charge / Extra Services</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <input type="text" placeholder="e.g. PCB Repair Cost" value={customItemName} onChange={e => setCustomItemName(e.target.value)} className="bg-zinc-950  rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full" />
-                  <input type="number" placeholder="Price (Rs.)" value={customItemPrice} onChange={e => setCustomItemPrice(e.target.value)} className="bg-zinc-950  rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono w-full" />
-                  <button type="button" onClick={handleAddCustomCharge} className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-4 py-2 font-semibold text-xs uppercase tracking-wider transition-colors w-full h-full min-h-[36px] sm:min-h-0">+ Add Custom</button>
+              {/* ⚡ UPDATED: Custom Elements form now has explicit <label> titles mapping over each input */}
+              <div className="bg-zinc-950/40 p-4 rounded-xl space-y-4">
+                <h4 className="text-xs font-bold uppercase text-blue-400 tracking-wider border-b border-zinc-800/50 pb-2">Add Custom Charge / Extra Services</h4>
+                
+                <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+                  <div className="col-span-2 lg:col-span-2">
+                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 ml-0.5">Description</label>
+                    <input type="text" placeholder="e.g. Diagnostics" value={customItemName} onChange={e => setCustomItemName(e.target.value)} className="bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 w-full" />
+                  </div>
+                  
+                  <div className="col-span-1">
+                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 ml-0.5">Base Cost</label>
+                    <input type="number" placeholder="Rs. 0" value={customItemBaseRate} onChange={e => setCustomItemBaseRate(e.target.value)} className="bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono w-full" />
+                  </div>
+                  
+                  <div className="col-span-1">
+                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 ml-0.5">Sell Price</label>
+                    <input type="number" placeholder="Rs. 0" value={customItemPrice} onChange={e => setCustomItemPrice(e.target.value)} className="bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono w-full" />
+                  </div>
+                  
+                  <div className="col-span-1">
+                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 ml-0.5">Quantity</label>
+                    <input type="number" placeholder="1" min="1" value={customItemQuantity} onChange={e => setCustomItemQuantity(e.target.value)} className="bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono w-full" />
+                  </div>
+                  
+                  <div className="col-span-1 flex items-end">
+                    <button type="button" onClick={handleAddCustomCharge} className="bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-2 py-2 font-semibold text-xs uppercase tracking-wider transition-colors w-full h-full min-h-[36px] sm:min-h-0">+ Add</button>
+                  </div>
                 </div>
               </div>
 
@@ -405,7 +436,7 @@ const BillingPage = () => {
                               {item.isCustomLineItem && <span className="inline-block text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Custom</span>}
                               {editingBillId && item.isExistingLineItem && <span className="inline-block text-[9px] bg-zinc-800 text-zinc-400 border border-zinc-700 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Saved Line</span>}
                             </div>
-                            <div className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">Base Rate: Rs.{item.price} • Qty: {item.orderedQuantity}</div>
+                            <div className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">Sell Price: Rs.{item.price} • Qty: {item.orderedQuantity}</div>
                           </div>
                           <div className="text-right flex flex-col items-end shrink-0">
                             <span className="text-xs sm:text-sm font-black text-emerald-400">Rs.{(item.price - (item.discount || 0)) * item.orderedQuantity}</span>
@@ -430,7 +461,7 @@ const BillingPage = () => {
                     ))
                   )}
 
-                  {purpose === 'repair' && AppendingBillId >= 0 && Number(serviceCharge) > 0 && (
+                  {purpose === 'repair' && Number(serviceCharge) > 0 && (
                     <div className="flex justify-between items-center bg-amber-500/5 border border-amber-500/20 p-3 rounded-lg text-xs sm:text-sm text-amber-400">
                       <span>General Base Service Charges</span><span className="font-bold font-mono">Rs.{serviceCharge}</span>
                     </div>
@@ -519,7 +550,6 @@ const BillingPage = () => {
                       <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm text-zinc-400 font-mono">{bill.lastUpdated}</td>
                       <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm font-bold text-emerald-400 font-mono">Rs.{bill.totalAmount}</td>
                       <td className="px-4 sm:px-6 py-2 text-right text-xs sm:text-sm font-medium">
-                        {/* Modified for mobile touch accessibility: persistent display on layout flow instead of pure opacity-0 on hover */}
                         <div className="flex justify-end gap-2.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-wrap lg:flex-nowrap">
                           <button onClick={() => handleLoadExistingBillToEdit(bill)} className="text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold">Edit</button>
                           <button onClick={() => handleOpenInspect(bill)} className="text-emerald-400 hover:text-emerald-300 transition-colors bg-emerald-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold">Inspect</button>
