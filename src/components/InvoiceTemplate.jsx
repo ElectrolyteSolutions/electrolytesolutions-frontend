@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { useSelector } from 'react-redux';
 import logourl from '../assets/icon.png';
+import signUrl from '../assets/sign.png';
 
 const InvoiceTemplate = ({ billData }) => {
   const printRef = useRef();
@@ -97,15 +98,15 @@ const InvoiceTemplate = ({ billData }) => {
           <div className="flex justify-between items-start border-b border-zinc-300 pb-3">
             <div className="flex items-center gap-3">
               {/* Embedded Company Logo Container */}
-              <div className="w-12 h-12 rounded bg-zinc-100 border border-zinc-200 overflow-hidden flex items-center justify-center p-0.5 shrink-0">
+              <div className="w-16 h-16 rounded bg-zinc-100 border border-zinc-200 overflow-hidden flex items-center justify-center p-0.5 shrink-0">
                 <img 
                   src={logourl} 
                   alt="Company Identity Logo" 
-                  className="w-full h-full object-contain mix-blend-multiply" 
+                  className="w-full h-full object-contain mix-blend-multiply rounded" 
                 />
               </div>
               <div>
-                <h1 className="text-base font-black text-zinc-950 tracking-tighter leading-none">ELECTROLYTE SOLUTIONS</h1>
+                <h1 className="text-lg font-black text-zinc-950 tracking-tighter leading-none">ELECTROLYTE SOLUTIONS</h1>
                 <p className="text-[10px] text-zinc-500 leading-tight mt-1">
                   Nahar Bala Ganj, Balrampur, UP, 271201<br />
                   <span className="font-semibold font-mono text-zinc-700 text-[9px]">Contact No.: 9648146167, 8081111867</span><br/>
@@ -232,14 +233,20 @@ const InvoiceTemplate = ({ billData }) => {
             </div>
 
             <div className="w-1/2 space-y-1 font-medium text-zinc-600 text-right">
-              <div className="flex justify-between items-center bg-zinc-950 text-white print:bg-zinc-100 print:text-zinc-950 px-3 py-1.5 rounded text-[11px] font-bold mt-2">
+              <div className="flex justify-between items-center bg-zinc-950 text-white px-3 py-1.5 rounded text-[11px] font-bold mt-2">
                 <span>Grand Net Total:</span>
                 <span className="font-black font-mono text-xs">Rs.{grossTotal.toFixed(2)}</span>
               </div>
 
               {/* Signature space */}
               <div className="pt-5 flex flex-col items-end">
-                <div className="w-28 h-0.5 bg-zinc-300 mb-0.5"></div>
+                {/* Embedded Signature Image */}
+                <img 
+                  src={signUrl} 
+                  alt="Authorized Signature" 
+                  className="h-12 w-28 object-contain mix-blend-multiply mb-1 mr-2" 
+                />
+                <div className="w-36 h-0.5 bg-zinc-300 mb-0.5"></div>
                 <div className="text-[8px] uppercase font-bold text-zinc-400 tracking-wider">Authorized Signature</div>
               </div>
             </div>

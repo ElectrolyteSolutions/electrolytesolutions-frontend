@@ -1,5 +1,7 @@
 import React, { useRef } from 'react';
 import logourl from '../assets/icon.png';
+import signUrl from '../assets/sign.png';
+
 
 const RefundVoucherTemplate = ({ refundData }) => {
   const printRef = useRef();
@@ -36,7 +38,7 @@ const RefundVoucherTemplate = ({ refundData }) => {
       <div ref={printRef} className="bg-white text-zinc-900 p-5 rounded-md font-sans tracking-tight text-[11px]">
         <style dangerouslySetInnerHTML={{__html: `
           @media print { 
-            @page { size: A4 portrait; margin: 6mm; } 
+            @page { size: A4 portrait; margin: 8mm; } 
             body { color: #000000 !important; background: #ffffff !important; padding: 0; margin: 0; } 
             .print\\:bg-red-50 { background-color: #fef2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           }
@@ -135,9 +137,15 @@ const RefundVoucherTemplate = ({ refundData }) => {
             </div>
 
             {/* Signature Block space boundary layout line components */}
-            <div className="pt-4 flex flex-col items-end">
-              <div className="w-24 h-0.5 bg-zinc-300 mb-0.5"></div>
-              <div className="text-[7px] uppercase font-bold text-zinc-400 tracking-wider">Store Disbursment Stamp</div>
+            <div className="pt-5 flex flex-col items-end">
+              {/* Embedded Signature Image */}
+              <img 
+                src={signUrl} 
+                alt="Authorized Signature" 
+                className="h-12 w-28 object-contain mix-blend-multiply mb-1 mr-2" 
+              />
+              <div className="w-36 h-0.5 bg-zinc-300 mb-0.5"></div>
+              <div className="text-[8px] uppercase font-bold text-zinc-400 tracking-wider">Authorized Signature</div>
             </div>
           </div>
         </div>
