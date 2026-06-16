@@ -5,6 +5,10 @@ import { getProducts, addProduct, deleteProduct, updateProduct } from '../featur
 const ProductsPage = () => {
   const dispatch = useDispatch();
   const { items, status } = useSelector((state) => state.products);
+  
+  // ⚡ Get the user's role to hide sensitive info from customers
+  const { user } = useSelector((state) => state.auth);
+  const isCustomer = user?.role === 'customer';
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -12,11 +16,10 @@ const ProductsPage = () => {
 
   // Core Staging State Controls for Lookups, Filtering & Matrix Sorting
   const [searchTerm, setSearchTerm] = useState('');
-  const [stockFilter, setStockFilter] = useState('all'); // options: 'all' | 'low-stock'
-  const [currentSortBy, setCurrentSortBy] = useState('name'); // options: 'name' | 'price' | 'qty'
-  const [currentSortOrder, setCurrentSortOrder] = useState('asc'); // options: 'asc' | 'desc'
+  const [stockFilter, setStockFilter] = useState('all'); 
+  const [currentSortBy, setCurrentSortBy] = useState('name'); 
+  const [currentSortOrder, setCurrentSortOrder] = useState('asc'); 
 
-  // Trigger network dispatches automatically upon query modifier mutations
   useEffect(() => {
     const payloadQueryOptions = {
       search: searchTerm,
@@ -28,13 +31,10 @@ const ProductsPage = () => {
     dispatch(getProducts(payloadQueryOptions));
   }, [dispatch, searchTerm, stockFilter, currentSortBy, currentSortOrder]);
 
-  // Automatically toggles or updates active matrix column parameters
   const handleSortToggle = (targetField) => {
     if (currentSortBy === targetField) {
-      // If the field is already active, flip the order direction
       setCurrentSortOrder(currentSortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      // If switching to a new field, initialize it with ascending order
       setCurrentSortBy(targetField);
       setCurrentSortOrder('asc');
     }
@@ -72,7 +72,6 @@ const ProductsPage = () => {
     }));
   };
 
-  // Internal visual helper string mapping indicator status labels
   const renderSortIndicatorArrow = (targetField) => {
     if (currentSortBy !== targetField) return <span className="text-zinc-600 ml-1">⇅</span>;
     return currentSortOrder === 'asc' ? <span className="text-indigo-400 ml-1">▲</span> : <span className="text-indigo-400 ml-1">▼</span>;
@@ -86,16 +85,20 @@ const ProductsPage = () => {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight ">Product Inventory</h1>
         </div>
-        <button 
-          onClick={() => handleOpenModal()}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-indigo-500/20"
-        >
-          <span>+</span> Add Product
-        </button>
+        
+        {/* ⚡ Hides Add Product button if the user is a customer */}
+        {!isCustomer && (
+          <button 
+            onClick={() => handleOpenModal()}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-indigo-500/20"
+          >
+            <span>+</span> Add Product
+          </button>
+        )}
       </header>
 
       {/* Interactive Filtering Control Subbar Panel Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4  border-zinc-700 p-3 sm:p-4 rounded-xl bg-zinc-900 shadow">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 border-zinc-700 p-3 sm:p-4 rounded-xl bg-zinc-900 shadow">
         <div className="lg:col-span-2 relative">
           <label className="block text-[10px] uppercase font-bold tracking-wider text-zinc-500 mb-1.5 ml-0.5">Component Text Search</label>
           <input 
@@ -103,7 +106,7 @@ const ProductsPage = () => {
             placeholder="Type component hardware name to query catalog..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-zinc-950  rounded-lg px-3.5 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors pr-12"
+            className="w-full bg-zinc-950 rounded-lg px-3.5 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors pr-12"
           />
           {searchTerm && (
             <button onClick={() => setSearchTerm('')} className="absolute right-3 top-7 sm:top-8 text-zinc-500 hover:text-white font-bold text-xs">&times; Clear</button>
@@ -114,7 +117,7 @@ const ProductsPage = () => {
           <select
             value={stockFilter}
             onChange={(e) => setStockFilter(e.target.value)}
-            className="w-full bg-zinc-950  rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="w-full bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           >
             <option value="all">All Products</option>
             <option value="low-stock">🚨 Out of Stock / Depleted Only</option>
@@ -130,35 +133,26 @@ const ProductsPage = () => {
               <tr className="bg-zinc-900 border-b border-zinc-800 text-xs font-semibold text-zinc-400 uppercase tracking-wider select-none">
                 <th className="px-4 sm:px-6 py-1 w-12 sm:w-16">S.No</th>
                 
-                {/* SORTABLE TOGGLE COLUMNS BUTTON HEADERS MAPS HERE */}
-                <th 
-                  onClick={() => handleSortToggle('name')}
-                  className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors"
-                >
+                <th onClick={() => handleSortToggle('name')} className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors">
                   <div className="flex items-center">Product Name {renderSortIndicatorArrow('name')}</div>
                 </th>
                 
-                <th 
-                  onClick={() => handleSortToggle('price')}
-                  className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors"
-                >
+                <th onClick={() => handleSortToggle('price')} className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors">
                   <div className="flex items-center justify-end pr-4">MRP {renderSortIndicatorArrow('price')}</div>
                 </th>
                 
-                <th 
-                  onClick={() => handleSortToggle('qty')}
-                  className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors"
-                >
+                <th onClick={() => handleSortToggle('qty')} className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors">
                   <div className="flex items-center">Stock Volume {renderSortIndicatorArrow('qty')}</div>
                 </th>
                 
-                <th className="px-4 sm:px-6 sm:py-6 text-right w-36">Actions</th>
+                {/* ⚡ Hides Actions column for customers */}
+                {!isCustomer && <th className="px-4 sm:px-6 sm:py-6 text-right w-36">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60">
-              {status === 'loading' ? (
+             {status === 'loading' ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-16 text-center text-zinc-500 italic">
+                  <td colSpan={isCustomer ? "4" : "5"} className="px-6 py-16 text-center text-zinc-500 italic">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
                       Synchronizing active ledger matrices...
@@ -167,20 +161,34 @@ const ProductsPage = () => {
                 </tr>
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-16 text-center text-zinc-500 text-sm">
+                  <td colSpan={isCustomer ? "4" : "5"} className="px-6 py-16 text-center text-zinc-500 text-sm">
                     No components found matching current search criteria parameters.
                   </td>
                 </tr>
               ) : (
                 items.map((p, i) => (
+                  // ⚡ The 'group' class tracks when the mouse enters the row
                   <tr key={p._id} className="hover:bg-zinc-800/20 transition-colors group">
-                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm font-mono text-zinc-500">{i + 1}</td>
-                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
-                      <span className="font-semibold text-zinc-100">{p.name}</span> 
-                      <span className='text-zinc-500 ml-1'>- {Number(p.baseRate).toFixed(2)}</span>
+                    <td className="px-4 sm:px-6 py-1 text-xs sm:text-sm font-mono text-zinc-500">{i + 1}</td>
+                    
+                    <td className="px-4 sm:px-6 py-1 text-xs sm:text-sm">
+                      <div className="flex items-center gap-3">
+                        <span className="font-semibold text-zinc-100">{p.name}</span> 
+                        
+                        {/* ⚡ THE BULLETPROOF FIX: 
+                            Uses 'hidden' by default, switches to 'inline-flex' on row hover.
+                            It pops in cleanly next to the text and cannot be clipped! 
+                        */}
+                        {!isCustomer && (
+                          <span className="hidden group-hover:inline-flex animate-in fade-in zoom-in-95 duration-200 items-center px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 whitespace-nowrap">
+                            {Number(p.baseRate || 0).toFixed(2)}
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm text-zinc-300 font-mono text-right pr-10">Rs. {Number(p.price).toFixed(2)}</td>
-                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
+                    
+                    <td className="px-4 sm:px-6 py-1 text-xs sm:text-sm text-zinc-300 font-mono text-right pr-10">Rs. {Number(p.price).toFixed(2)}</td>
+                    <td className="px-4 sm:px-6 py-1 text-xs sm:text-sm">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-bold font-mono justify-center ${
                         p.quantity <= 0 
                           ? ' text-red-400 ' 
@@ -191,22 +199,26 @@ const ProductsPage = () => {
                         {p.quantity}
                       </span>
                     </td>
-                    <td className="px-4 sm:px-6 py-2 text-right text-xs sm:text-sm font-medium">
-                      <div className="flex justify-end gap-2.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-wrap lg:flex-nowrap">
-                        <button 
-                          onClick={() => handleOpenModal(p)}
-                          className="text-indigo-400 hover:text-indigo-300 transition-colors bg-indigo-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          onClick={() => { if(window.confirm(`Delete ${p.name} from records permanently?`)) dispatch(deleteProduct(p._id)).then(() => refreshDataLogs()) }}
-                          className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
+                    
+                    {/* Hides Edit/Delete buttons from customers */}
+                    {!isCustomer && (
+                      <td className="px-4 sm:px-6 py-1 text-right text-xs sm:text-sm font-medium">
+                        <div className="flex justify-end gap-2.5 flex-wrap lg:flex-nowrap">
+                          <button 
+                            onClick={() => handleOpenModal(p)}
+                            className="text-indigo-400 hover:text-indigo-300 transition-colors bg-indigo-500/10 hover:bg-indigo-500/20 px-2 py-1 rounded text-[11px] lg:text-xs font-semibold shrink-0"
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => { if(window.confirm(`Delete ${p.name} from records permanently?`)) dispatch(deleteProduct(p._id)).then(() => refreshDataLogs()) }}
+                            className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 hover:bg-red-500/20 px-2 py-1 rounded text-[11px] lg:text-xs font-semibold shrink-0"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
@@ -216,9 +228,9 @@ const ProductsPage = () => {
       </div>
 
       {/* Modern Form Input Edit Modal Overlay Component */}
-      {isModalOpen && (
+      {isModalOpen && !isCustomer && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-900  w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
+          <div className="bg-zinc-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
             <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30 shrink-0">
               <h3 className="text-base sm:text-lg font-bold text-white">{editId ? 'Edit Inventory Product' : 'Add New Product'}</h3>
               <button onClick={handleCloseModal} className="text-zinc-500 hover:text-white transition-colors text-2xl leading-none">&times;</button>
@@ -228,7 +240,7 @@ const ProductsPage = () => {
               <div>
                 <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Product Description Title</label>
                 <input 
-                  className="w-full bg-zinc-950  rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                  className="w-full bg-zinc-950 rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
                   placeholder="e.g. iPhone 13 Premium OLED Panel" 
                   value={form.name} 
                   onChange={e => setForm({...form, name: e.target.value})} 
@@ -240,7 +252,7 @@ const ProductsPage = () => {
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">MRP (Rs.)</label>
                   <input 
-                    className="w-full bg-zinc-950  rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
+                    className="w-full bg-zinc-950 rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
                     type="number" 
                     placeholder="0.00"
                     value={form.price} 
@@ -251,7 +263,7 @@ const ProductsPage = () => {
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Base Rate (Rs.)</label>
                   <input 
-                    className="w-full bg-zinc-950  rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
+                    className="w-full bg-zinc-950 rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
                     type="number" 
                     placeholder="0.00"
                     value={form.baseRate} 
@@ -262,7 +274,7 @@ const ProductsPage = () => {
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Stock Quantity</label>
                   <input 
-                    className="w-full bg-zinc-950  rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
+                    className="w-full bg-zinc-950 rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
                     type="number" 
                     placeholder="0"
                     value={form.quantity} 
