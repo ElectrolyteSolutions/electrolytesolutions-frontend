@@ -152,7 +152,7 @@ const AuthLandingPage = () => {
                   >
                     <option value="customer">Customer (Portal Access)</option>
                     <option value="store">Store Operator (POS Access)</option>
-                    <option value="admin">System Administrator (Full Access)</option>
+                    {/* <option value="admin">System Administrator (Full Access)</option> */}
                   </select>
                 </div>
               </div>
