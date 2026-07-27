@@ -179,11 +179,11 @@ const ProductsPage = () => {
                             Uses 'hidden' by default, switches to 'inline-flex' on row hover.
                             It pops in cleanly next to the text and cannot be clipped! 
                         */}
-                        {!isCustomer && (
+                        {/* {!isCustomer && (
                           <span className="hidden group-hover:inline-flex animate-in fade-in zoom-in-95 duration-200 items-center px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 whitespace-nowrap">
                             {Number(p.baseRate || 0).toFixed(2)}
                           </span>
-                        )}
+                        )} */}
                       </div>
                     </td>
                     
@@ -260,7 +260,7 @@ const ProductsPage = () => {
                     required 
                   />
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Base Rate (Rs.)</label>
                   <input 
                     className="w-full bg-zinc-950 rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-mono"
@@ -270,7 +270,7 @@ const ProductsPage = () => {
                     onChange={e => setForm({...form, baseRate: e.target.value})} 
                     required 
                   />
-                </div>
+                </div> */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Stock Quantity</label>
                   <input 

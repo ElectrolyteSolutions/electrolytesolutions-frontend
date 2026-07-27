@@ -14,9 +14,9 @@ const DevicesPage = lazy(() => import('./pages/Devices'));
 const CustomersPage = lazy(() => import('./pages/Customers'));
 const ProductsPage = lazy(() => import('./pages/Products'));
 const ReturnsPage = lazy(() => import('./pages/Returns'));
+const ProfilePage = lazy(() => import('./pages/Profile'));
 
 // (Optional) Dummy component for the new Profile route so it doesn't crash before you build it!
-const ProfilePage = () => <div className="text-white text-center py-20 text-xl font-bold">Profile Page Area</div>;
 
 // ⚡ SECURITY WRAPPER: Enforces login AND Role permissions
 const ProtectedRoute = ({ children, allowedRoles }) => {
