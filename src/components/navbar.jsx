@@ -11,7 +11,7 @@ const Navbar = () => {
   
   // Get current logged-in user from Redux
   const { user } = useSelector(state => state.auth);
-  
+  const {role}=user
   // State to manage mobile menu toggle
   const [isOpen, setIsOpen] = useState(false);
 
@@ -27,9 +27,9 @@ const Navbar = () => {
 
   // ⚡ DYNAMIC LINKS GENERATION BASED ON ROLE
   const getNavLinks = () => {
-    if (!user) return [];
+    if (!role) return [];
 
-    switch (user) {
+    switch (role) {
       case 'admin':
         return [
           { name: 'Dashboard', path: '/dashboard' },

@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { setCredentials } from '../features/authSlice'; 
+import { loginUser, registerUser, resetState } from '../features/authSlice'; 
 import logourl from '../assets/icon.png';
 
 const AuthLandingPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Pull state from the profile slice
+  const { isLoading } = useSelector((state) => state.auth);
+
   // Form toggles and states
   const [isLoginView, setIsLoginView] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState(''); // ⚡ Tracks registration success
+  const [successMsg, setSuccessMsg] = useState('');
 
   // Input states
   const [name, setName] = useState('');
@@ -21,39 +22,38 @@ const AuthLandingPage = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('customer');
 
-  const handleAuthSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-    setSuccessMsg('');
+  useEffect(() => {
+    dispatch(resetState());
+  }, [dispatch, isLoginView]);
 
-    try {
-      if (isLoginView) {
-        // ⚡ FLOW 1: LOGIN
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}users/login`, { email, password });
-        
-        // Save token and user info to Redux & LocalStorage
-        dispatch(setCredentials(res.data));
-        
-        // Send directly to dashboard upon successful login
-        navigate('/dashboard'); 
-        
-      } else {
-        // ⚡ FLOW 2: REGISTER
-        await axios.post(`${import.meta.env.VITE_API_URL}users/register`, { name, email, password, role });
-        
-        // Do NOT log them in automatically. Switch to login view and show success banner.
+  const handleAuthSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setSuccessMsg('');
+
+  if (isLoginView) {
+    // Dispatch and let Redux handle the result safely without strictly needing 'await' if it triggers the warning
+    dispatch(loginUser({ email, password }))
+      .unwrap()
+      .then((res) => {
+        navigate('/dashboard');
+      })
+      .catch((err) => {
+        setError(err || 'Failed to authenticate. Please check your credentials.');
+      });
+  } else {
+    dispatch(registerUser({ name, email, password, role }))
+      .unwrap()
+      .then(() => {
         setSuccessMsg('Account provisioned successfully. Please log in with your new credentials.');
         setIsLoginView(true);
-        setPassword(''); // Clear password for security, leave email populated for convenience
-      }
-
-    } catch (err) {
-      setError(err.response?.data?.message || `Failed to ${isLoginView ? 'authenticate' : 'register'}. Please try again.`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        setPassword('');
+      })
+      .catch((err) => {
+        setError(err || 'Failed to register. Please try again.');
+      });
+  }
+};
 
   const toggleView = () => {
     setIsLoginView(!isLoginView);
@@ -69,26 +69,24 @@ const AuthLandingPage = () => {
       
       {/* LEFT HALF: Tech Branding Image Overlay (Hidden on Mobile) */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-900 overflow-hidden">
-        {/* Unsplash Tech Hardware Image */}
         <img 
           src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop" 
           alt="Hardware Circuitry" 
           className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-luminosity"
         />
-        {/* Premium Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent"></div>
-        <div className="absolute inset-0 bg-emerald-900/10 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-indigo-900/10 mix-blend-overlay"></div>
         
         {/* Branding Content */}
         <div className="relative z-10 flex flex-col justify-end p-14 w-full h-full pb-24">
-          <div className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest w-max mb-6 backdrop-blur-sm">
+          <div className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest w-max mb-6 backdrop-blur-sm">
             System Architecture v2.0
           </div>
           <h1 className="text-5xl font-black text-white tracking-tighter leading-[1.1]">
             Electrolyte<br />Solutions ERP.
           </h1>
           <p className="text-zinc-400 mt-5 text-base max-w-md leading-relaxed">
-            Enterprise-grade point-of-sale, hardware repair tracking, and intelligent inventory management.
+            Enterprise-grade point-of-sale, hardware repair tracking, and intelligent inventory management with concurrent session intelligence.
           </p>
         </div>
       </div>
@@ -99,8 +97,8 @@ const AuthLandingPage = () => {
           
           {/* Header & Logo Section */}
           <div className="flex flex-col items-center lg:items-center text-center lg:text-left space-y-4">
-            <div className="">
-              <img src={logourl} alt="Electrolyte Logo" className="w-28 h-28" />
+            <div>
+              <img src={logourl} alt="Electrolyte Logo" className="w-24 h-24 object-contain" />
             </div>
             <div>
               <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
@@ -137,7 +135,7 @@ const AuthLandingPage = () => {
                     type="text" 
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-700"
+                    className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-zinc-700"
                     placeholder="e.g. John Doe"
                     required={!isLoginView}
                   />
@@ -148,11 +146,10 @@ const AuthLandingPage = () => {
                   <select 
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all cursor-pointer"
+                    className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer"
                   >
                     <option value="customer">Customer (Portal Access)</option>
                     <option value="store">Store Operator (POS Access)</option>
-                    {/* <option value="admin">System Administrator (Full Access)</option> */}
                   </select>
                 </div>
               </div>
@@ -165,7 +162,7 @@ const AuthLandingPage = () => {
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-700"
+                className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-zinc-700"
                 placeholder="operator@company.com"
                 required
               />
@@ -175,13 +172,13 @@ const AuthLandingPage = () => {
             <div>
               <div className="flex justify-between items-center mb-1.5 ml-0.5 mr-0.5">
                 <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Password</label>
-                {isLoginView && <button type="button" className="text-[10px] font-bold text-zinc-500 hover:text-emerald-400 transition-colors">Forgot?</button>}
+                {isLoginView && <button type="button" className="text-[10px] font-bold text-zinc-500 hover:text-indigo-400 transition-colors">Forgot?</button>}
               </div>
               <input 
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-zinc-700"
+                className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-zinc-700"
                 placeholder="••••••••"
                 required
                 minLength="6"
@@ -192,7 +189,7 @@ const AuthLandingPage = () => {
             <button 
               type="submit" 
               disabled={isLoading}
-              className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold py-3.5 rounded-lg text-sm tracking-wider uppercase transition-all shadow-lg shadow-emerald-900/20 mt-6 flex justify-center items-center gap-2"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold py-3.5 rounded-lg text-sm tracking-wider uppercase transition-all shadow-lg shadow-indigo-900/20 mt-6 flex justify-center items-center gap-2 cursor-pointer"
             >
               {isLoading ? (
                 <span className="animate-pulse">Processing...</span>
@@ -209,7 +206,7 @@ const AuthLandingPage = () => {
               <button 
                 type="button" 
                 onClick={toggleView}
-                className="font-bold text-emerald-500 hover:text-emerald-400 hover:underline transition-all"
+                className="font-bold text-indigo-400 hover:text-indigo-300 hover:underline transition-all"
               >
                 {isLoginView ? 'Request Account' : 'Login Here'}
               </button>
