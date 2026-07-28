@@ -1,10 +1,11 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import InvoiceTemplate from './components/InvoiceTemplate';
+import { logout } from './features/authSlice';
 
 // Lazy loaded pages
 const AuthLandingPage = lazy(() => import('./auth/landing'));
@@ -22,9 +23,11 @@ const ProfilePage = lazy(() => import('./pages/Profile'));
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { token, user } = useSelector(state => state.auth);
     const role= user?.role
+    const dispatch =useDispatch()
 
     // 1. Not logged in? Kick to login screen.
     if (!token || !role) {
+        dispatch(logout())
         return <Navigate to="/" replace />; 
     }
 
