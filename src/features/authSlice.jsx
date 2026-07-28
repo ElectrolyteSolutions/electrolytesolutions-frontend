@@ -118,8 +118,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.sessions = [];
-      localStorage.removeItem('erp_user');
-      localStorage.removeItem('erp_token');
+      localStorage.clear()
     },
   },
   extraReducers: (builder) => {
