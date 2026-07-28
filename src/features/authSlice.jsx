@@ -4,8 +4,8 @@ import axios from 'axios';
 const API_URL = `${import.meta.env.VITE_API_URL}users/`;
 
 // Check localStorage on initial load
-const storedUser = JSON.parse(localStorage.getItem('erp_user')) || null;
-const storedToken = localStorage.getItem('erp_token') || null;
+const storedUser = JSON.parse(localStorage.getItem('user')) || null;
+const storedToken = localStorage.getItem('token') || null;
 
 const initialState = {
   user: storedUser,
@@ -131,10 +131,7 @@ const authSlice = createSlice({
           state.user = null;
           state.token = null;
           state.sessions = [];
-          localStorage.removeItem('erp_user');
-          localStorage.removeItem('erp_token');
-          localStorage.removeItem('token');
-          localStorage.removeItem('theme');
+          localStorage.clear()
         })
       .addCase(terminateSession.fulfilled, (state, action) => {
           // Remove the terminated session from the sessions array immediately
@@ -149,7 +146,8 @@ const authSlice = createSlice({
         const { token, ...userData } = action.payload;
         state.user = userData;
         state.token = token;
-        localStorage.setItem('erp_user', JSON.stringify(userData));
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', JSON.stringify(token));
       })
       .addCase(loginUser.rejected, (state, action) => { state.isLoading = false; state.isError = true; state.message = action.payload; })
 
@@ -167,7 +165,7 @@ const authSlice = createSlice({
         // Merge updated fields while keeping existing identifiers intact
         state.user = { ...state.user, ...action.payload };
         state.message = 'Profile updated successfully';
-        localStorage.setItem('erp_user', JSON.stringify(state.user));
+        localStorage.setItem('user', JSON.stringify(state.user));
       })
       .addCase(updateUserProfile.rejected, (state, action) => { state.isLoading = false; state.isError = true; state.message = action.payload; })
 

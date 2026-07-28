@@ -24,9 +24,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     const { token, user } = useSelector(state => state.auth);
     const role= user?.role
     const dispatch =useDispatch()
+    
+    dispatch(getUserProfile());
 
     // 1. Not logged in? Kick to login screen.
-    if (!token || !role) {
+    if (!token) {
         dispatch(logout())
         return <Navigate to="/" replace />; 
     }
