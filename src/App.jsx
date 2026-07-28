@@ -25,7 +25,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     const role= user?.role
     const dispatch =useDispatch()
     
-    dispatch(getUserProfile());
 
     // 1. Not logged in? Kick to login screen.
     if (!token) {
