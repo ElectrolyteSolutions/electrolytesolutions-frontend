@@ -77,6 +77,33 @@ export const getActiveSessions = createAsyncThunk('auth/getSessions', async (_, 
   }
 });
 
+export const logoutAllDevices = createAsyncThunk('auth/logoutAll', async (_, thunkAPI) => {
+  try {
+    const token = thunkAPI.getState().auth.token;
+    const response = await axios.post(API_URL + 'logout-all', {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+// ⚡ Async Thunk to Terminate a Specific Session
+export const terminateSession = createAsyncThunk('auth/terminateSession', async (sessionId, thunkAPI) => {
+  try {
+    const token = thunkAPI.getState().auth.token;
+    await axios.delete(API_URL + `sessions/${sessionId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return sessionId; // Return the ID so we can filter it out of the state
+  } catch (error) {
+    const message = error.response?.data?.message || error.message;
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -101,7 +128,18 @@ const authSlice = createSlice({
       .addCase(registerUser.pending, (state) => { state.isLoading = true; })
       .addCase(registerUser.fulfilled, (state) => { state.isLoading = false; state.isSuccess = true; })
       .addCase(registerUser.rejected, (state, action) => { state.isLoading = false; state.isError = true; state.message = action.payload; })
-      
+      .addCase(logoutAllDevices.fulfilled, (state) => {
+          state.user = null;
+          state.token = null;
+          state.sessions = [];
+          localStorage.removeItem('erp_user');
+          localStorage.removeItem('erp_token');
+        })
+      .addCase(terminateSession.fulfilled, (state, action) => {
+          // Remove the terminated session from the sessions array immediately
+          state.sessions = state.sessions.filter(s => s.sessionId !== action.payload);
+          state.message = 'Session terminated successfully';
+        })
       // Login
       .addCase(loginUser.pending, (state) => { state.isLoading = true; })
       .addCase(loginUser.fulfilled, (state, action) => {
@@ -137,6 +175,8 @@ const authSlice = createSlice({
       .addCase(getActiveSessions.fulfilled, (state, action) => {
         state.sessions = action.payload.activeSessions;
       });
+
+      
   },
 });
 

@@ -4,15 +4,14 @@ import {
   getUserProfile, 
   updateUserProfile, 
   getActiveSessions, 
+  terminateSession,
+  logoutAllDevices,
   resetState 
 } from '../features/authSlice';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const { user, sessions, isLoading, isError, isSuccess, message } = useSelector((state) => state.auth);
-
-  console.log("user",user)
-
 
   const [formData, setFormData] = useState({
     name: '',
@@ -63,6 +62,16 @@ const ProfilePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(updateUserProfile(formData));
+  };
+
+  const handleTerminateSession = (sessionId) => {
+    dispatch(terminateSession(sessionId));
+  };
+
+  const handleLogoutAll = () => {
+    if (window.confirm('Are you sure you want to log out from all active devices?')) {
+      dispatch(logoutAllDevices());
+    }
   };
 
   if (isLoading && !user) {
@@ -172,35 +181,56 @@ const ProfilePage = () => {
         </div>
 
         {/* SECTION 2: Active Sessions Management */}
-        <div className="bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-xl border border-zinc-800/60">
-          <h3 className="text-base sm:text-lg font-bold text-white mb-1">Active Login Sessions</h3>
-          <p className="text-zinc-500 text-xs mb-4">Here is where and when your account is currently logged in.</p>
-
-          {sessions && sessions.length === 0 ? (
-            <p className="text-zinc-500 text-xs italic py-8 text-center">No active sessions found.</p>
-          ) : (
-            <div className="space-y-3">
-              {sessions?.map((session) => (
-                <div 
-                  key={session.sessionId} 
-                  className={`bg-zinc-950 p-3.5 rounded-lg border border-zinc-800/80 ${
-                    session.isCurrent ? 'border-l-4 border-l-emerald-400' : 'border-l-4 border-l-zinc-700'
-                  }`}
+        <div className="bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-xl border border-zinc-800/60 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-base sm:text-lg font-bold text-white">Active Login Sessions</h3>
+              {sessions && sessions.length > 0 && (
+                <button
+                  onClick={handleLogoutAll}
+                  className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold text-zinc-200 text-xs sm:text-sm">{session.device}</span>
-                    {session.isCurrent && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 whitespace-nowrap">
-                        Current Device
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-zinc-400 text-xs font-mono mt-1">IP: {session.ipAddress}</p>
-                  <p className="text-zinc-500 text-xs font-mono mt-0.5">Logged in: {new Date(session.loginAt).toLocaleString()}</p>
-                </div>
-              ))}
+                  Log out all devices
+                </button>
+              )}
             </div>
-          )}
+            <p className="text-zinc-500 text-xs mb-4">Here is where and when your account is currently logged in.</p>
+
+            {sessions && sessions.length === 0 ? (
+              <p className="text-zinc-500 text-xs italic py-8 text-center">No active sessions found.</p>
+            ) : (
+              <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
+                {sessions?.map((session) => (
+                  <div 
+                    key={session.sessionId} 
+                    className={`bg-zinc-950 p-3.5 rounded-lg border border-zinc-800/80 flex items-center justify-between ${
+                      session.isCurrent ? 'border-l-4 border-l-emerald-400' : 'border-l-4 border-l-zinc-700'
+                    }`}
+                  >
+                    <div className="text-sm">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-zinc-200 text-xs sm:text-sm">{session.device}</span>
+                        {session.isCurrent && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 whitespace-nowrap">
+                            Current Device
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-zinc-400 text-xs font-mono mt-1">IP: {session.ipAddress}</p>
+                      <p className="text-zinc-500 text-xs font-mono mt-0.5">Logged in: {new Date(session.loginAt).toLocaleString()}</p>
+                    </div>
+
+                    <button
+                      onClick={() => handleTerminateSession(session.sessionId)}
+                      className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ml-4"
+                    >
+                      Log out
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
       </div>
