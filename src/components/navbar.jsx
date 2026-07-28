@@ -11,7 +11,7 @@ const Navbar = () => {
   
   // Get current logged-in user from Redux
   const { user } = useSelector(state => state.auth);
-  const {role}=user
+  const role =user?.role
   // State to manage mobile menu toggle
   const [isOpen, setIsOpen] = useState(false);
 

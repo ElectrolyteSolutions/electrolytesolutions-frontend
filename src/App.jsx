@@ -21,7 +21,7 @@ const ProfilePage = lazy(() => import('./pages/Profile'));
 // ⚡ SECURITY WRAPPER: Enforces login AND Role permissions
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { token, user } = useSelector(state => state.auth);
-    const {role} = user
+    const role= user?.role
 
     // 1. Not logged in? Kick to login screen.
     if (!token || !role) {
@@ -31,8 +31,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     
     // 2. Logged in, but wrong role? Kick to their safest default page.
     if (allowedRoles && !allowedRoles.includes(role)) {
-        if (user === 'admin') return <Navigate to="/dashboard" replace />;
-        if (user === 'store') return <Navigate to="/billing" replace />;
+        if (role === 'admin') return <Navigate to="/dashboard" replace />;
+        if (role === 'store') return <Navigate to="/billing" replace />;
         return <Navigate to="/products" replace />; // Default for customers
     }
     

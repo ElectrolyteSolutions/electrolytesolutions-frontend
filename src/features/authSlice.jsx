@@ -134,6 +134,8 @@ const authSlice = createSlice({
           state.sessions = [];
           localStorage.removeItem('erp_user');
           localStorage.removeItem('erp_token');
+          localStorage.removeItem('token');
+          localStorage.removeItem('theme');
         })
       .addCase(terminateSession.fulfilled, (state, action) => {
           // Remove the terminated session from the sessions array immediately
@@ -149,7 +151,6 @@ const authSlice = createSlice({
         state.user = userData;
         state.token = token;
         localStorage.setItem('erp_user', JSON.stringify(userData));
-        localStorage.setItem('erp_token', token);
       })
       .addCase(loginUser.rejected, (state, action) => { state.isLoading = false; state.isError = true; state.message = action.payload; })
 
