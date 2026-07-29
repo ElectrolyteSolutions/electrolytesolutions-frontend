@@ -1,10 +1,13 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import logourl from '../assets/icon.png';
 import signUrl from '../assets/sign.png';
 
 const InvoiceTemplate = ({ billData }) => {
   const printRef = useRef();
+
+  // State to manage GSTIN masking (default is masked)
+  const [isGstinMasked, setIsGstinMasked] = useState(true);
 
   // Pull complete system records collections for hot data validation and linking
   const storeCustomers = useSelector((state) => state.customers.items);
@@ -64,18 +67,42 @@ const InvoiceTemplate = ({ billData }) => {
   const baseAmount = (invoice.items || []).reduce((sum, item) => sum + (item.subTotal || 0), 0) + (invoice.serviceCharge || 0);
   const grossTotal = baseAmount;
 
+  // Actual GSTIN value
+  const fullGstin = "09EYOPR0179F1ZV";
+
+  // Masking logic: Keeps all characters except the last 5 masked with 'x' (or 'X')
+  const getMaskedGstin = (gstin) => {
+    if (!gstin || gstin.length <= 5) return gstin;
+    const visiblePart = gstin.slice(-5);
+    const maskedPart = 'x'.repeat(gstin.length - 5);
+    return maskedPart + visiblePart;
+  };
+
+  const displayedGstin = isGstinMasked ? getMaskedGstin(fullGstin) : fullGstin;
+
   return (
     <div className="max-w-2xl mx-auto my-4 p-3 sm:p-4 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl text-zinc-100 w-full ">
       
       {/* Control Actions bar - Flex wrap for mobile spacing */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-3 border-b border-zinc-800 pb-3 px-2">
         <span className="text-xs text-zinc-400 font-medium text-center sm:text-left">Invoice Printing Engine Preview</span>
-        <button 
-          onClick={handlePrint}
-          className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 sm:py-1.5 rounded-md font-semibold text-xs transition-all shadow"
-        >
-          🖨️ Print Invoice Sheet
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Toggle Mask/Unmask Button */}
+          <button 
+            onClick={() => setIsGstinMasked(!isGstinMasked)}
+            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-2 sm:py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700"
+            title="Toggle GSTIN Masking"
+          >
+            {isGstinMasked ? '👁️ Unmask GSTIN' : '🔒 Mask GSTIN'}
+          </button>
+          
+          <button 
+            onClick={handlePrint}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 sm:py-1.5 rounded-md font-semibold text-xs transition-all shadow"
+          >
+            🖨️ Print Invoice Sheet
+          </button>
+        </div>
       </div>
 
       {/* --- SCROLLABLE WRAPPER FOR MOBILE --- */}
@@ -116,7 +143,7 @@ const InvoiceTemplate = ({ billData }) => {
             </div>
             
             <div className="text-right">
-              <p className="font-bold font-mono text-zinc-900 text-[11px] uppercase">GSTIN: 09EYOPR0179F1ZV</p>
+              <p className="font-bold font-mono text-zinc-900 text-[11px] uppercase">GSTIN: {displayedGstin}</p>
               <h2 className="text-xs font-black text-zinc-950 uppercase tracking-wider bg-zinc-100 px-2 py-0.5 rounded inline-block">Tax Invoice</h2>
               <div className="text-[10px] text-zinc-600 space-y-0.5 mt-1.5 font-mono">
                 <div className="text-[9px] text-zinc-900 bg-zinc-100 font-bold px-1.5 py-0.5 rounded uppercase tracking-wide inline-block mb-1">Purpose: {invoice.purpose}</div>
