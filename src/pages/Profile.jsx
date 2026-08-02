@@ -11,7 +11,7 @@ import {
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
-  const { user, sessions, isLoading, isError, isSuccess, message } = useSelector((state) => state.auth);
+  const { profileData, sessions, isLoading, isError, isSuccess, message } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -33,16 +33,16 @@ const ProfilePage = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (user) {
+    if (profileData) {
       setFormData({
-        name: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        address: user.address || '',
+        name: profileData.name || '',
+        email: profileData.email || '',
+        phone: profileData.phone || '',
+        address: profileData.address || '',
         password: ''
       });
     }
-  }, [user]);
+  }, [profileData]);
 
   useEffect(() => {
     if (isSuccess && message) {
@@ -62,10 +62,13 @@ const ProfilePage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(updateUserProfile(formData));
+    
   };
 
   const handleTerminateSession = (sessionId) => {
     dispatch(terminateSession(sessionId));
+    dispatch(getUserProfile());
+    dispatch(getActiveSessions());
   };
 
   const handleLogoutAll = () => {

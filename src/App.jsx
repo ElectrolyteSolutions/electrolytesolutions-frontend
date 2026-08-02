@@ -1,11 +1,11 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import InvoiceTemplate from './components/InvoiceTemplate';
-import { logout } from './features/authSlice';
+import { getUserProfile, logout } from './features/authSlice';
 
 // Lazy loaded pages
 const AuthLandingPage = lazy(() => import('./auth/landing'));
@@ -21,20 +21,18 @@ const ProfilePage = lazy(() => import('./pages/Profile'));
 
 // ⚡ SECURITY WRAPPER: Enforces login AND Role permissions
 const ProtectedRoute = ({ children, allowedRoles }) => {
-    const { token, user } = useSelector(state => state.auth);
-    const role= user?.role
+    const { role } = useSelector(state => state?.auth);
     const dispatch =useDispatch()
-    
-
+ 
     // 1. Not logged in? Kick to login screen.
-    if (!token) {
+    if (!role) {
         dispatch(logout())
         return <Navigate to="/" replace />; 
     }
 
     
     // 2. Logged in, but wrong role? Kick to their safest default page.
-    if (allowedRoles && !allowedRoles.includes(role)) {
+    if (allowedRoles && !allowedRoles?.includes(role)) {
         if (role === 'admin') return <Navigate to="/dashboard" replace />;
         if (role === 'store') return <Navigate to="/billing" replace />;
         return <Navigate to="/products" replace />; // Default for customers
@@ -48,6 +46,7 @@ const AppLayout = ({ children }) => {
     const location = useLocation();
     const isAuthPage = location.pathname === '/';
 
+
     return (
         <div className="flex flex-col min-h-screen bg-zinc-950">
             {!isAuthPage && <Navbar />}
@@ -59,9 +58,16 @@ const AppLayout = ({ children }) => {
     );
 };
 
+
+
 function App() {
     // We grab the user here so we can auto-redirect them away from the login screen if they are already signed in.
-    const { token, user } = useSelector(state => state.auth);
+    const { token, role } = useSelector(state => state.auth);
+    const dispatch=useDispatch()
+
+    useEffect(()=>{
+        dispatch(getUserProfile())
+    },[dispatch])
 
     return (
         <BrowserRouter>
@@ -80,7 +86,7 @@ function App() {
                             path="/" 
                             element={
                                 token ? (
-                                    <Navigate to={user?.role === 'admin' ? '/dashboard' : user?.role === 'store' ? '/billing' : '/products'} replace />
+                                    <Navigate to={role === 'admin' ? '/dashboard' : role === 'store' ? '/billing' : '/products'} replace />
                                 ) : (
                                     <AuthLandingPage />
                                 )

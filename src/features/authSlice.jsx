@@ -1,16 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = `${import.meta.env.VITE_API_URL}users/`;
 
 // Check localStorage on initial load
-const storedUser = JSON.parse(localStorage.getItem('user')) || null;
+
 const storedToken = localStorage.getItem('token') || null;
 
 const initialState = {
-  user: storedUser,
+  role: storedToken? jwtDecode(storedToken)?.role : null,
   token: storedToken,
-  sessions: [],
+  profileData:null,
   isLoading: false,
   isSuccess: false,
   isError: false,
@@ -24,6 +26,7 @@ const getAuthConfig = (thunkAPI) => {
     headers: { Authorization: `Bearer ${token}` },
   };
 };
+
 
 // ⚡ Async Thunks
 export const registerUser = createAsyncThunk('auth/register', async (userData, thunkAPI) => {
@@ -49,9 +52,17 @@ export const loginUser = createAsyncThunk('auth/login', async (userData, thunkAP
 export const getUserProfile = createAsyncThunk('auth/getProfile', async (userData, thunkAPI) => {
   try {
     const response = await axios.get(API_URL + 'profile', getAuthConfig(thunkAPI));
-    console.log(getAuthConfig(thunkAPI))
     return response.data;
   } catch (error) {
+    const status = error.response?.status;
+
+    // Check if the error is 401 Unauthorized or 404 Not Found
+    if (status === 401 || status === 404) {
+      // Dispatch your logout action (replace 'auth/logout' with your actual logout action or function)
+      thunkAPI.dispatch(logout());
+      navigate("/") 
+    }
+
     const message = error.response?.data?.message || error.message;
     return thunkAPI.rejectWithValue(message);
   }
@@ -115,9 +126,9 @@ const authSlice = createSlice({
       state.message = '';
     },
     logout: (state) => {
-      state.user = null;
-      state.token = null;
-      state.sessions = [];
+      state.profileData = null,
+      state.token =null,
+      state.role=null
       localStorage.clear()
     },
   },
@@ -128,10 +139,7 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state) => { state.isLoading = false; state.isSuccess = true; })
       .addCase(registerUser.rejected, (state, action) => { state.isLoading = false; state.isError = true; state.message = action.payload; })
       .addCase(logoutAllDevices.fulfilled, (state) => {
-          state.user = null;
-          state.token = null;
-          state.sessions = [];
-          localStorage.clear()
+          dispatch(logout())
         })
       .addCase(terminateSession.fulfilled, (state, action) => {
           // Remove the terminated session from the sessions array immediately
@@ -141,20 +149,21 @@ const authSlice = createSlice({
       // Login
       .addCase(loginUser.pending, (state) => { state.isLoading = true; })
       .addCase(loginUser.fulfilled, (state, action) => {
+        const { token, ...userData } = action.payload;
         state.isLoading = false;
         state.isSuccess = true;
-        const { token, ...userData } = action.payload;
-        state.user = userData;
+        state.role = userData?.role;
+        state.profileData = userData;
         state.token = token;
-        localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('token', JSON.stringify(token));
+        state.message = action.payload
+        localStorage.setItem('token',token);
       })
       .addCase(loginUser.rejected, (state, action) => { state.isLoading = false; state.isError = true; state.message = action.payload; })
 
       // Get Profile
       .addCase(getUserProfile.fulfilled, (state, action) => {
         const { token, sessions, ...userData } = action.payload;
-        state.user = userData;
+        state.profileData = userData;
       })
 
       // Update Profile
@@ -163,9 +172,8 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         // Merge updated fields while keeping existing identifiers intact
-        state.user = { ...state.user, ...action.payload };
+        state.profileData = action.payload;
         state.message = 'Profile updated successfully';
-        localStorage.setItem('user', JSON.stringify(state.user));
       })
       .addCase(updateUserProfile.rejected, (state, action) => { state.isLoading = false; state.isError = true; state.message = action.payload; })
 

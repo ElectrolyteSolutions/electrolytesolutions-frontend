@@ -10,8 +10,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   
   // Get current logged-in user from Redux
-  const { user } = useSelector(state => state.auth);
-  const role =user?.role
+  const { profileData,role } = useSelector(state => state.auth);
   // State to manage mobile menu toggle
   const [isOpen, setIsOpen] = useState(false);
 
@@ -40,12 +39,13 @@ const Navbar = () => {
           { name: 'Returns', path: '/returns' },
           { name: 'Profile', path: '/profile' }
         ];
-      case 'store':
-        return [
-          { name: 'Products', path: '/products' },
-          { name: 'Devices', path: '/devices' },
-          { name: 'Billing', path: '/billing' },
-          { name: 'Returns', path: '/returns' },
+        case 'store':
+          return [
+            { name: 'Products', path: '/products' },
+            { name: 'Devices', path: '/devices' },
+            { name: 'Billing', path: '/billing' },
+            { name: 'Returns', path: '/returns' },
+            { name: 'Stores / Customers', path: '/customers' },
           { name: 'Profile', path: '/profile' }
         ];
       case 'customer':
@@ -101,8 +101,8 @@ const Navbar = () => {
             {/* Desktop Actions */}
             <div className="hidden lg:flex items-center gap-4">
               <div className="flex flex-col text-right">
-                <span className="text-sm font-bold text-zinc-200">{user?.name}</span>
-                <span className="text-[10px] uppercase tracking-widest text-emerald-500">{user?.role}</span>
+                <span className="text-sm font-bold text-zinc-200">{profileData?.name}</span>
+                <span className="text-[10px] uppercase tracking-widest text-emerald-500">{role}</span>
               </div>
               <button 
                 onClick={handleLogout}
@@ -157,8 +157,8 @@ const Navbar = () => {
         {/* Mobile Sub-Actions Segment */}
         <div className="pt-4 pb-4 border-t border-zinc-800 px-5 flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-zinc-200">{user?.name}</span>
-            <span className="text-[10px] uppercase tracking-widest text-emerald-500">{user?.role}</span>
+            <span className="text-sm font-bold text-zinc-200">{profileData?.name}</span>
+            <span className="text-[10px] uppercase tracking-widest text-emerald-500">{profileData?.role}</span>
           </div>
           <button 
             onClick={handleLogout}
