@@ -24,18 +24,17 @@ const InvoiceTemplate = ({ billData }) => {
   };
 
   // --- DYNAMIC LINKING DEEP-RESOLVER LOGIC ---
-  
-  // Resolve Billed Customer details (handles populated object or plain string reference ID)
   const resolvedCustomer = typeof invoice.customer === 'object' && invoice.customer !== null
     ? invoice.customer
     : storeCustomers.find(c => c._id?.toString() === invoice.customer?.toString()) || {
         name: "Walk-in Client",
         phone: "N/A",
         address: "Counter Sale Transaction Log",
-        customerType: "Individual"
+        customerType: "Individual",
+        gst:"none",
+        pan:"none"
       };
 
-  // Resolve Linked Hardware Target details (handles populated object or plain string reference ID)
   let resolvedDevice = null;
   if (invoice.device) {
     if (typeof invoice.device === 'object' && invoice.device !== null) {
@@ -45,7 +44,6 @@ const InvoiceTemplate = ({ billData }) => {
     }
   }
 
-  // Cross-reference customer fields if device payload structure dropped active issue arrays
   if (invoice.purpose === 'repair' && resolvedCustomer?.devices && !resolvedDevice?.issues) {
     const targetId = typeof invoice.device === 'object' ? invoice.device?._id : invoice.device;
     const directMatch = resolvedCustomer.devices.find(d => d._id?.toString() === targetId?.toString());
@@ -64,13 +62,11 @@ const InvoiceTemplate = ({ billData }) => {
   };
 
   // Base total calculation uses post-discount line subtotals + service fees
-  const baseAmount = (invoice.items || []).reduce((sum, item) => sum + (item.subTotal || 0), 0) + (invoice.serviceCharge || 0);
-  const grossTotal = baseAmount;
+  const grossTotal = (invoice.items || []).reduce((sum, item) => sum + (item.subTotal || 0), 0) + (invoice.serviceCharge || 0);
 
   // Actual GSTIN value
   const fullGstin = "09EYOPR0179F1ZV";
 
-  // Masking logic: Keeps all characters except the last 5 masked with 'x' (or 'X')
   const getMaskedGstin = (gstin) => {
     if (!gstin || gstin.length <= 5) return gstin;
     const visiblePart = gstin.slice(-5);
@@ -81,13 +77,12 @@ const InvoiceTemplate = ({ billData }) => {
   const displayedGstin = isGstinMasked ? getMaskedGstin(fullGstin) : fullGstin;
 
   return (
-    <div className="max-w-2xl mx-auto my-4 p-3 sm:p-4 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl text-zinc-100 w-full ">
+    <div className="max-w-4xl mx-auto my-4 p-3 sm:p-4 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl text-zinc-100 w-full">
       
-      {/* Control Actions bar - Flex wrap for mobile spacing */}
+      {/* Control Actions bar */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-3 border-b border-zinc-800 pb-3 px-2">
         <span className="text-xs text-zinc-400 font-medium text-center sm:text-left">Invoice Printing Engine Preview</span>
         <div className="flex items-center gap-2">
-          {/* Toggle Mask/Unmask Button */}
           <button 
             onClick={() => setIsGstinMasked(!isGstinMasked)}
             className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-2 sm:py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700"
@@ -105,12 +100,9 @@ const InvoiceTemplate = ({ billData }) => {
         </div>
       </div>
 
-      {/* --- SCROLLABLE WRAPPER FOR MOBILE --- */}
       <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-700 pb-2">
         
-        {/* --- PRINTABLE BOUNDARY WRAPPER START --- */}
-        {/* min-w-[650px] locks the layout so it never crushes on phones */}
-        <div ref={printRef} className="bg-white text-zinc-900 p-5 rounded-md shadow-inner font-sans tracking-tight text-[11px] min-w-[650px]">
+        <div ref={printRef} className="bg-white text-zinc-900 p-5 rounded-md shadow-inner font-sans tracking-tight text-[11px] min-w-[760px]">
           
           <style dangerouslySetInnerHTML={{__html: `
             @media print {
@@ -124,7 +116,6 @@ const InvoiceTemplate = ({ billData }) => {
           {/* Branded Identity Header Block */}
           <div className="flex justify-between items-start border-b border-zinc-300 pb-3">
             <div className="flex items-center gap-3">
-              {/* Embedded Company Logo Container */}
               <div className="w-16 h-16 rounded bg-zinc-100 border border-zinc-200 overflow-hidden flex items-center justify-center p-0.5 shrink-0">
                 <img 
                   src={logourl} 
@@ -152,13 +143,11 @@ const InvoiceTemplate = ({ billData }) => {
             </div>
           </div>
 
-          {/* Un-truncated Full 24-char MongoDB ID row for reverse POS lookups and returns handling */}
           <div className="bg-zinc-100 border-b border-zinc-200 px-2 py-1 flex justify-between items-center text-[9px] font-mono text-zinc-800">
             <span className="font-sans font-bold uppercase tracking-wider text-zinc-500">System Bill Reference Token:</span>
             <span className="font-bold select-all tracking-wide text-zinc-950">{invoice._id}</span>
           </div>
 
-          {/* Address & Detailed Customer/Device Breakdown Grid */}
           <div className="grid grid-cols-2 gap-4 my-3 pb-3 border-b border-zinc-100">
             <div>
               <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Billed To:</span>
@@ -172,6 +161,8 @@ const InvoiceTemplate = ({ billData }) => {
                 {resolvedCustomer.address}
               </div>
               <div className="text-zinc-700 font-mono font-medium text-[10px] mt-0.5">Ph: {resolvedCustomer.phone}</div>
+              {resolvedCustomer?.gst && <div className="text-zinc-700 font-mono font-medium text-[10px] ">GST: {resolvedCustomer?.gst}</div>}
+              {resolvedCustomer?.pan && <div className="text-zinc-700 font-mono font-medium text-[10px] ">PAN: {resolvedCustomer?.pan}</div>}
             </div>
             
             <div className="text-right flex flex-col items-end justify-start">
@@ -181,7 +172,6 @@ const InvoiceTemplate = ({ billData }) => {
                   <div className="text-zinc-900 text-[11px] font-black leading-none">{resolvedDevice.deviceName}</div>
                   <div className="text-zinc-600 font-mono text-[9px]">HWID: {resolvedDevice.deviceHardwareId}</div>
                   
-                  {/* Dynamic Repair Diagnostics Issue List Badging mapping section */}
                   {resolvedDevice.issues && resolvedDevice.issues.length > 0 && (
                     <div className="pt-1 flex flex-wrap gap-1 border-t border-zinc-200/60 mt-1">
                       {resolvedDevice.issues.map((issue, idx) => (
@@ -206,49 +196,88 @@ const InvoiceTemplate = ({ billData }) => {
               <tr className="bg-zinc-100 text-zinc-700 font-semibold border-b border-zinc-300">
                 <th className="px-2 py-1.5 w-6">#</th>
                 <th className="px-2 py-1.5">Item Description</th>
-                <th className="px-2 py-1.5 text-right w-16">
+                <th className="px-2 py-1.5 text-right w-14">
                   <div>Rate</div>
-                  <div className="text-[7px] text-zinc-400 font-normal tracking-normal leading-none mt-0.5">(GST Incl.)</div>
+                  <div className="text-[7px] text-zinc-400 font-normal tracking-normal leading-none mt-0.5">(Excl. 18%)</div>
                 </th>
-                <th className="px-2 py-1.5 text-right w-14 text-amber-600">Discount</th>
-                <th className="px-2 py-1.5 text-center w-10">Quantity</th>
-                <th className="px-2 py-1.5 text-right w-20">Total</th>
+                <th className="px-2 py-1.5 text-right w-12 text-amber-600">Disc.</th>
+                <th className="px-2 py-1.5 text-center w-8">Qty</th>
+                <th className="px-2 py-1.5 text-right w-16 font-mono text-zinc-600">
+                  <div>CGST</div>
+                  <div className="text-[7px] font-normal">(9%)</div>
+                </th>
+                <th className="px-2 py-1.5 text-right w-16 font-mono text-zinc-600">
+                  <div>SGST</div>
+                  <div className="text-[7px] font-normal">(9%)</div>
+                </th>
+                <th className="px-2 py-1.5 text-right w-16">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 text-zinc-800">
-              {invoice.items?.map((item, idx) => (
-                <tr key={item._id || idx}>
-                  <td className="px-2 py-2 font-mono text-zinc-400">{idx + 1}</td>
-                  <td className="px-2 py-2">
-                    <div className="font-bold text-zinc-950">
-                      {item.brand ? `[${item.brand.toUpperCase()}] ` : ''}{item.name}
-                    </div>
-                    {item.modelName && (
-                      <div className="text-[9px] text-zinc-400 font-mono mt-0.5">Model ref: {item.modelName}</div>
-                    )}
-                  </td>
-                  <td className="px-2 py-2 text-right font-mono">Rs.{Number(item.price).toFixed(2)}</td>
-                  <td className={`px-2 py-2 text-right font-mono font-medium ${item.discount > 0 ? 'text-amber-600 bg-amber-50/40 print:bg-amber-50' : 'text-zinc-400'}`}>
-                    {item.discount > 0 ? `-Rs.${Number(item.discount).toFixed(2)}` : '0.00'}
-                  </td>
-                  <td className="px-2 py-2 text-center font-mono">{item.orderedQuantity}</td>
-                  <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{Number(item.subTotal).toFixed(2)}</td>
-                </tr>
-              ))}
+              {invoice.items?.map((item, idx) => {
+                const itemPrice = Number(item.price) || 0;
+                const itemDiscount = Number(item.discount) || 0;
+                const itemQty = Number(item.orderedQuantity) || 1;
 
-              {invoice.purpose === 'repair' && invoice.serviceCharge > 0 && (
-                <tr className="bg-amber-50/40 border-t border-dashed border-zinc-200">
-                  <td className="px-2 py-2 font-mono text-amber-600">*</td>
-                  <td className="px-2 py-2 font-medium text-zinc-900">
-                    <div>Technical Service Labor / Diagnostic Fee</div>
-                    <div className="text-[8px] text-zinc-400 italic">Non-refundable labor line charge</div>
-                  </td>
-                  <td className="px-2 py-2 text-right font-mono">Rs.{Number(invoice.serviceCharge).toFixed(2)}</td>
-                  <td className="px-2 py-2 text-right font-mono text-zinc-400">0.00</td>
-                  <td className="px-2 py-2 text-center font-mono">1</td>
-                  <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{Number(invoice.serviceCharge).toFixed(2)}</td>
-                </tr>
-              )}
+                // Rate = item.price - (18% of item.price)
+                const calculatedRate = itemPrice - (0.18 * itemPrice);
+                
+                // Tax is calculated on (rate - discount) * qty
+                const taxableValuePerUnit = calculatedRate - itemDiscount;
+                const lineTaxableTotal = taxableValuePerUnit * itemQty;
+                
+                const cgst = lineTaxableTotal * 0.09;
+                const sgst = lineTaxableTotal * 0.09;
+                
+                // Total = (item.price - discount) x qty
+                const calculatedTotal = (itemPrice - itemDiscount) * itemQty;
+
+                return (
+                  <tr key={item._id || idx}>
+                    <td className="px-2 py-2 font-mono text-zinc-400">{idx + 1}</td>
+                    <td className="px-2 py-2">
+                      <div className="font-bold text-zinc-950">
+                        {item.brand ? `[${item.brand.toUpperCase()}] ` : ''}{item.name}
+                      </div>
+                      {item.modelName && (
+                        <div className="text-[9px] text-zinc-400 font-mono mt-0.5">Model ref: {item.modelName}</div>
+                      )}
+                    </td>
+                    <td className="px-2 py-2 text-right font-mono">Rs.{calculatedRate.toFixed(2)}</td>
+                    <td className={`px-2 py-2 text-right font-mono font-medium ${itemDiscount > 0 ? 'text-amber-600 bg-amber-50/40 print:bg-amber-50' : 'text-zinc-400'}`}>
+                      {itemDiscount > 0 ? `-${itemDiscount.toFixed(2)}` : '0.00'}
+                    </td>
+                    <td className="px-2 py-2 text-center font-mono">{itemQty}</td>
+                    <td className="px-2 py-2 text-right font-mono text-zinc-600">Rs.{cgst.toFixed(2)}</td>
+                    <td className="px-2 py-2 text-right font-mono text-zinc-600">Rs.{sgst.toFixed(2)}</td>
+                    <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{calculatedTotal.toFixed(2)}</td>
+                  </tr>
+                );
+              })}
+
+              {invoice.purpose === 'repair' && invoice.serviceCharge > 0 && (() => {
+                const sCharge = Number(invoice.serviceCharge);
+                const sRate = sCharge - (0.18 * sCharge);
+                const sTaxableTotal = sRate * 1;
+                const sCgst = sTaxableTotal * 0.09;
+                const sSgst = sTaxableTotal * 0.09;
+
+                return (
+                  <tr className="bg-amber-50/40 border-t border-dashed border-zinc-200">
+                    <td className="px-2 py-2 font-mono text-amber-600">*</td>
+                    <td className="px-2 py-2 font-medium text-zinc-900">
+                      <div>Technical Service Labor / Diagnostic Fee</div>
+                      <div className="text-[8px] text-zinc-400 italic">Non-refundable labor line charge</div>
+                    </td>
+                    <td className="px-2 py-2 text-right font-mono">Rs.{sRate.toFixed(2)}</td>
+                    <td className="px-2 py-2 text-right font-mono text-zinc-400">0.00</td>
+                    <td className="px-2 py-2 text-center font-mono">1</td>
+                    <td className="px-2 py-2 text-right font-mono text-zinc-600">Rs.{sCgst.toFixed(2)}</td>
+                    <td className="px-2 py-2 text-right font-mono text-zinc-600">Rs.{sSgst.toFixed(2)}</td>
+                    <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{sCharge.toFixed(2)}</td>
+                  </tr>
+                );
+              })()}
             </tbody>
           </table>
 
@@ -267,7 +296,6 @@ const InvoiceTemplate = ({ billData }) => {
 
               {/* Signature space */}
               <div className="pt-5 flex flex-col items-end">
-                {/* Embedded Signature Image */}
                 <img 
                   src={signUrl} 
                   alt="Authorized Signature" 
@@ -280,7 +308,6 @@ const InvoiceTemplate = ({ billData }) => {
           </div>
 
         </div>
-        {/* --- PRINTABLE BOUNDARY WRAPPER END --- */}
       </div>
 
     </div>

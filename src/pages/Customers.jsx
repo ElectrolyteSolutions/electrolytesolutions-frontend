@@ -14,7 +14,9 @@ const CustomersPage = () => {
     name: '', 
     phone: '', 
     customerType: 'Individual', 
-    address: '' 
+    address: '',
+    pan:'',
+    gst:''
   });
 
   // Device Registration states
@@ -30,7 +32,7 @@ const CustomersPage = () => {
       setForm(customer);
       setEditId(customer._id);
     } else {
-      setForm({ name: '', phone: '', customerType: 'Individual', address: '' });
+      setForm({ name: '', phone: '', customerType: 'Individual', address: '',pan:'',gst:'' });
       setEditId(null);
     }
     setIsModalOpen(true);
@@ -102,8 +104,10 @@ const CustomersPage = () => {
               ) : (
                 items.map((c) => (
                   <tr key={c._id} className="hover:bg-zinc-800/30 transition-colors group">
-                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
+                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm space-y-2">
                       <div className="font-semibold text-zinc-100">{c.name}</div>
+                      {c?.gst && <div className="font-semibold text-zinc-400 text-[10px] border rounded-full p-[2px] px-1 bg-blue-900">{c?.gst}</div>}
+                      {c?.pan && <div className="font-semibold text-zinc-400 text-[10px] border rounded-full p-[2px] px-1 bg-red-900">{c?.pan}</div>}
                     </td>
                     <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm text-zinc-300 font-mono">
                       {c.phone}
@@ -217,6 +221,26 @@ const CustomersPage = () => {
                     required 
                   />
                 </div>
+                {form.customerType ==="Corporate" && <><div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1"> Company GST</label>
+                  <input 
+                    className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                    value={form.gst} 
+                    onChange={e => setForm({...form, gst: e.target.value})} 
+                    placeholder="GSTIN...."
+                    required 
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">PAN</label>
+                  <input 
+                    className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                    value={form.pan} 
+                    onChange={e => setForm({...form, pan: e.target.value})} 
+                    placeholder="PAN Number"
+                    required 
+                  />
+                </div></>}
                 
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Phone Number</label>
