@@ -233,7 +233,7 @@ const BillReceiptCore = ({
               {invoice.publicToken && (
                 <div className="flex items-center gap-2 mt-3 pt-2 border-t border-zinc-100">
                   <img 
-                    src={invoice.qrCode || `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://localhost:5173/bills/${invoice.publicToken}`} 
+                    src={invoice.qrCode || `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://shop.electrolytesolutions.in/bills/${invoice.publicToken}`} 
                     alt="Scan to view bill" 
                     className="w-14 h-14 object-contain border border-zinc-200 rounded p-0.5 bg-white shrink-0"
                   />
