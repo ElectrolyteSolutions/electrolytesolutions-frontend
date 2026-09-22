@@ -6,6 +6,7 @@ import Navbar from './components/navbar';
 import Footer from './components/footer';
 import InvoiceTemplate from './components/InvoiceTemplate';
 import { getUserProfile, logout } from './features/authSlice';
+import PublicBillView from './pages/PublicBillView';
 
 // Lazy loaded pages
 const AuthLandingPage = lazy(() => import('./auth/landing'));
@@ -44,7 +45,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 // LAYOUT WRAPPER: Hides the Navbar and Footer on the Login screen
 const AppLayout = ({ children }) => {
     const location = useLocation();
-    const isAuthPage = location.pathname === '/';
+    const isAuthPage = location.pathname === '/' || location.pathname.split('/')[1] === 'bills' ;
 
 
     return (
@@ -82,6 +83,8 @@ function App() {
                     <Routes>
                         {/* 🔓 PUBLIC ROUTE / AUTO-REDIRECT */}
                         {/* If they have a token, automatically send them to their dashboard so they don't see the login page again */}
+                        <Route path="/bills/:token" element={<PublicBillView />} />
+
                         <Route 
                             path="/" 
                             element={

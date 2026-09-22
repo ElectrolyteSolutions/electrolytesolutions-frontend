@@ -12,7 +12,7 @@ const ProductsPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ name: '', price: '', quantity: '', baseRate: '' });
+  const [form, setForm] = useState({ name: '', price: '', quantity: '', baseRate: '',hsn: '' });
 
   // Core Staging State Controls for Lookups, Filtering & Matrix Sorting
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,7 +45,7 @@ const ProductsPage = () => {
       setForm(product);
       setEditId(product._id);
     } else {
-      setForm({ name: '', price: '', quantity: '', baseRate: '' });
+      setForm({ name: '', price: '', quantity: '', baseRate: '' ,hsn:''});
       setEditId(null);
     }
     setIsModalOpen(true);
@@ -140,6 +140,9 @@ const ProductsPage = () => {
                 <th onClick={() => handleSortToggle('price')} className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors">
                   <div className="flex items-center justify-end pr-4">MRP {renderSortIndicatorArrow('price')}</div>
                 </th>
+                <th onClick={() => handleSortToggle('hsn')} className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors">
+                  <div className="flex items-center justify-end pr-4">HSN {renderSortIndicatorArrow('hsn')}</div>
+                </th>
                 
                 <th onClick={() => handleSortToggle('qty')} className="px-4 sm:px-6 py-1 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors">
                   <div className="flex items-center">Stock Volume {renderSortIndicatorArrow('qty')}</div>
@@ -188,6 +191,7 @@ const ProductsPage = () => {
                     </td>
                     
                     <td className="px-4 sm:px-6 py-1 text-xs sm:text-sm text-zinc-300 font-mono text-right pr-10">Rs. {Number(p.price).toFixed(2)}</td>
+                    <td className="px-4 sm:px-6 py-1 text-xs sm:text-sm text-zinc-300 font-mono text-right pr-10">HSN-{p.hsn}</td>
                     <td className="px-4 sm:px-6 py-1 text-xs sm:text-sm">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-bold font-mono justify-center ${
                         p.quantity <= 0 
@@ -199,6 +203,17 @@ const ProductsPage = () => {
                         {p.quantity}
                       </span>
                     </td>
+                    {/* <td className="px-4 sm:px-6 py-1 text-xs sm:text-sm"
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-bold font-mono justify-center ${
+                        p.quantity <= 0 
+                          ? ' text-red-400 ' 
+                          : p.quantity < 10
+                          ? ' text-amber-400 '
+                          : ' text-emerald-400 '
+                      }`}>
+                        {p.hsn}
+                      </span>
+                    </td> */} 
                     
                     {/* Hides Edit/Delete buttons from customers */}
                     {!isCustomer && (
@@ -244,6 +259,16 @@ const ProductsPage = () => {
                   placeholder="e.g. iPhone 13 Premium OLED Panel" 
                   value={form.name} 
                   onChange={e => setForm({...form, name: e.target.value})} 
+                  required 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">HSN Code</label>
+                <input 
+                  className="w-full bg-zinc-950 rounded-lg px-4 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                  placeholder="e.g. iPhone 13 Premium OLED Panel" 
+                  value={form.hsn} 
+                  onChange={e => setForm({...form, hsn: e.target.value})} 
                   required 
                 />
               </div>
