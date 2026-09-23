@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCustomers, addCustomer, deleteCustomer, updateCustomer } from '../features/customerSlice';
 import RegisterDeviceModal from '../components/addDevice'; // Mount our decoupled modal
@@ -15,13 +15,17 @@ const CustomersPage = () => {
     phone: '', 
     customerType: 'Individual', 
     address: '',
-    pan:'',
-    gst:''
+    pan: '',
+    gst: ''
   });
 
   // Device Registration states
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
   const [targetedCustomerId, setTargetedCustomerId] = useState('');
+
+  // Search and Sort State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'name' | 'type'
 
   useEffect(() => {
     dispatch(getCustomers());
@@ -32,7 +36,7 @@ const CustomersPage = () => {
       setForm(customer);
       setEditId(customer._id);
     } else {
-      setForm({ name: '', phone: '', customerType: 'Individual', address: '',pan:'',gst:'' });
+      setForm({ name: '', phone: '', customerType: 'Individual', address: '', pan: '', gst: '' });
       setEditId(null);
     }
     setIsModalOpen(true);
@@ -55,11 +59,38 @@ const CustomersPage = () => {
     setEditId(null);
   };
 
+  // Filter and Sort Logic for Customers
+  const filteredAndSortedCustomers = useMemo(() => {
+    if (!items) return [];
+
+    const filtered = items.filter((c) => {
+      const term = searchTerm.toLowerCase();
+      const name = c.name?.toLowerCase() || '';
+      const phone = c.phone?.toLowerCase() || '';
+      const address = c.address?.toLowerCase() || '';
+      const gst = c.gst?.toLowerCase() || '';
+      const pan = c.pan?.toLowerCase() || '';
+
+      return name.includes(term) || phone.includes(term) || address.includes(term) || gst.includes(term) || pan.includes(term);
+    });
+
+    return filtered.sort((a, b) => {
+      if (sortBy === 'name') {
+        return (a.name || '').localeCompare(b.name || '');
+      } else if (sortBy === 'type') {
+        return (a.customerType || '').localeCompare(b.customerType || '');
+      } else {
+        // Default: 'newest' (by createdAt or _id timestamp fallback)
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      }
+    });
+  }, [items, searchTerm, sortBy]);
+
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full">
       
       {/* Header Section */}
-      <header className="flex sm:items-center justify-between gap-4 w-full">
+      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Customer Management</h1>
         </div>
@@ -71,18 +102,43 @@ const CustomersPage = () => {
         </button>
       </header>
 
+      {/* Search & Filter Toolbar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-zinc-900 p-4 rounded-xl shadow-md border border-zinc-800">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="Search by name, phone, address, GST, or PAN..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full bg-zinc-950 text-zinc-100 placeholder-zinc-500 px-4 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-emerald-500 text-xs sm:text-sm transition-all"
+          />
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Sort By:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="bg-zinc-950 text-zinc-200 text-xs sm:text-sm px-3 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-emerald-500 cursor-pointer"
+          >
+            <option value="newest">Newest First</option>
+            <option value="name">Customer Name</option>
+            <option value="type">Customer Type</option>
+          </select>
+        </div>
+      </div>
+
       {/* Table Section */}
-      <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-xl w-full">
+      <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
         <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
           <table className="w-full text-left border-collapse min-w-[950px]">
             <thead>
               <tr className="bg-zinc-800/50 border-b border-zinc-800">
-                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Customer Name</th>
-                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Contact Info</th>
-                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Address</th>
-                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Type</th>
-                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Registered Devices</th>
-                <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Actions</th>
+                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Customer Name</th>
+                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Contact Info</th>
+                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Address</th>
+                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Type</th>
+                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Registered Devices</th>
+                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800">
@@ -95,29 +151,29 @@ const CustomersPage = () => {
                     </div>
                   </td>
                 </tr>
-              ) : items.length === 0 ? (
+              ) : filteredAndSortedCustomers.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-zinc-500 text-sm">
-                    No customers found in the system database.
+                  <td colSpan="6" className="px-6 py-12 text-center text-zinc-500 text-sm italic">
+                    {items.length === 0 ? "No customers found in the system database." : "No customers match your search criteria."}
                   </td>
                 </tr>
               ) : (
-                items.map((c) => (
+                filteredAndSortedCustomers.map((c) => (
                   <tr key={c._id} className="hover:bg-zinc-800/30 transition-colors group">
-                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm space-y-2">
+                    <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm space-y-2">
                       <div className="font-semibold text-zinc-100">{c.name}</div>
-                      {c?.gst && <div className="font-semibold text-zinc-400 text-[10px] border rounded-full p-[2px] px-1 bg-blue-900">{c?.gst}</div>}
-                      {c?.pan && <div className="font-semibold text-zinc-400 text-[10px] border rounded-full p-[2px] px-1 bg-red-900">{c?.pan}</div>}
+                      {c?.gst && <div className="font-semibold text-zinc-400 text-[10px] border rounded-full p-[2px] px-1 bg-blue-900 inline-block">{c?.gst}</div>}
+                      {c?.pan && <div className="font-semibold text-zinc-400 text-[10px] border rounded-full p-[2px] px-1 bg-red-900 inline-block ml-1">{c?.pan}</div>}
                     </td>
-                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm text-zinc-300 font-mono">
+                    <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-zinc-300 font-mono">
                       {c.phone}
                     </td>
-                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
+                    <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
                       <div className="text-zinc-400 max-w-[200px] truncate hover:text-clip hover:whitespace-normal transition-all cursor-help" title={c.address}>
                         {c.address}
                       </div>
                     </td>
-                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
+                    <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-medium border ${
                         c.customerType === 'Corporate' 
                           ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
@@ -128,7 +184,7 @@ const CustomersPage = () => {
                     </td>
                     
                     {/* Devices Data Display */}
-                    <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
+                    <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
                       {c.devices && c.devices.length > 0 ? (
                         <div className="flex flex-wrap gap-1.5 max-w-[300px]">
                           {c.devices.map((device, idx) => {
@@ -158,7 +214,7 @@ const CustomersPage = () => {
                       )}
                     </td>
 
-                    <td className="px-4 sm:px-6 py-2 text-right text-xs sm:text-sm font-medium">
+                    <td className="px-4 sm:px-6 py-3 text-right text-xs sm:text-sm font-medium">
                       <div className="flex justify-end gap-2.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-wrap lg:flex-nowrap">
                         <button 
                           onClick={() => handleOpenDeviceModal(c._id)}
@@ -190,9 +246,9 @@ const CustomersPage = () => {
 
       {/* Customer Profile Modal Overlay */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-3  bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-900  w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[95vh] flex flex-col">
-            <div className="px-5 sm:px-6 py-2 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30 shrink-0">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-zinc-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[95vh] flex flex-col border border-zinc-800">
+            <div className="px-5 sm:px-6 py-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30 shrink-0">
               <h3 className="text-base sm:text-lg font-bold text-white">{editId ? 'Update Profile' : 'Register Customer'}</h3>
               <button onClick={() => setIsModalOpen(false)} className="text-zinc-500 hover:text-white transition-colors text-2xl leading-none">&times;</button>
             </div>
@@ -202,7 +258,7 @@ const CustomersPage = () => {
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Customer Category</label>
                   <select 
-                    className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all appearance-none cursor-pointer"
+                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all appearance-none cursor-pointer"
                     value={form.customerType} 
                     onChange={e => setForm({...form, customerType: e.target.value})}
                   >
@@ -214,7 +270,7 @@ const CustomersPage = () => {
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">{form.customerType ==="Individual" ?"Full":"Corporate"} Name</label>
                   <input 
-                    className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
                     value={form.name} 
                     onChange={e => setForm({...form, name: e.target.value})} 
                     placeholder="John Doe"
@@ -224,7 +280,7 @@ const CustomersPage = () => {
                 {form.customerType ==="Corporate" && <><div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1"> Company GST</label>
                   <input 
-                    className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
                     value={form.gst} 
                     onChange={e => setForm({...form, gst: e.target.value})} 
                     placeholder="GSTIN...."
@@ -234,7 +290,7 @@ const CustomersPage = () => {
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">PAN</label>
                   <input 
-                    className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
                     value={form.pan} 
                     onChange={e => setForm({...form, pan: e.target.value})} 
                     placeholder="PAN Number"
@@ -245,7 +301,7 @@ const CustomersPage = () => {
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Phone Number</label>
                   <input 
-                    className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
                     value={form.phone} 
                     onChange={e => setForm({...form, phone: e.target.value})} 
                     placeholder="+1 (555) 000-0000"
@@ -256,7 +312,7 @@ const CustomersPage = () => {
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Full Address</label>
                   <textarea 
-                    className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all min-h-[80px]"
+                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all min-h-[80px]"
                     value={form.address} 
                     onChange={e => setForm({...form, address: e.target.value})} 
                     placeholder="Street, City, Zip Code"
@@ -269,7 +325,7 @@ const CustomersPage = () => {
                 <button 
                   type="button" 
                   onClick={() => setIsModalOpen(false)} 
-                  className="flex-1 px-4 py-2.5 rounded-lg  text-zinc-300 font-semibold hover:bg-zinc-800 transition-colors text-xs sm:text-sm"
+                  className="flex-1 px-4 py-2.5 rounded-lg text-zinc-300 font-semibold bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors text-xs sm:text-sm"
                 >
                   Cancel
                 </button>

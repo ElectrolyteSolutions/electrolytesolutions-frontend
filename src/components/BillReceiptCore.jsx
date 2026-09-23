@@ -17,6 +17,9 @@ const BillReceiptCore = ({
 
   return (
     <div className="w-full">
+      <head>
+        <title>{invoice.billNumber}</title>
+      </head>
       {/* Optional Control Actions bar (Print/Mask toggles) */}
       {showControls && (
         <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-3 border-b border-zinc-800 pb-3 px-2 no-print">
@@ -71,24 +74,25 @@ const BillReceiptCore = ({
                 <p className="text-[10px] text-zinc-500 leading-tight mt-1">
                   Nahar Bala Ganj, Balrampur, UP, 271201<br />
                   <span className="font-semibold font-mono text-zinc-700 text-[9px]">Contact No.: 9648146167, 8081111867</span><br/>
-                  <span className="font-semibold font-mono text-zinc-700 text-[9px]">Email: contact.electolytesolutions@gmail.com</span>
+                  <span className="font-semibold font-mono text-zinc-700 text-[9px]">Email: contact.electolytesolutions@gmail.com</span><br/>
+                  <span className="font-semibold font-mono text-zinc-700 text-[9px]">Website: www.electrolytesolutions.in</span>
                 </p>
               </div>
             </div>
             
             <div className="text-right">
               <p className="font-bold font-mono text-zinc-900 text-[11px] uppercase">GSTIN: {displayedGstin}</p>
-              <h2 className="text-xs font-black text-zinc-950 uppercase tracking-wider bg-zinc-100 px-2 py-0.5 rounded inline-block">Tax Invoice</h2>
+              <h2 className="text-xs font-black text-zinc-950 uppercase tracking-wider bg-zinc-100 py-0.5 rounded inline-block">Tax Invoice</h2>
               <div className="text-[10px] text-zinc-600 space-y-0.5 mt-1.5 font-mono">
-                <div className="text-[9px] text-zinc-900 bg-zinc-100 font-bold px-1.5 py-0.5 rounded uppercase tracking-wide inline-block mb-1">Purpose: {invoice.purpose}</div>
+                <div className="text-[9px] text-zinc-900 bg-zinc-100 font-bold  py-0.5 rounded uppercase tracking-wide inline-block mb-1">Purpose: {invoice.purpose}</div>
                 <div>Date: {invoice.lastUpdated ? invoice.lastUpdated.split(',')[0] : new Date(invoice.createdAt || Date.now()).toLocaleDateString()}</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-zinc-100 border-b border-zinc-200 px-2 py-1 flex justify-between items-center text-[9px] font-mono text-zinc-800">
-            <span className="font-sans font-bold uppercase tracking-wider text-zinc-500">System Bill Reference Token:</span>
-            <span className="font-bold select-all tracking-wide text-zinc-950">{invoice.publicToken || invoice._id}</span>
+          <div className="bg-zinc-100 border-b border-zinc-200 py-1 flex justify-between items-center text-[9px] font-mono text-zinc-800">
+            <span className="font-sans font-bold uppercase tracking-wider text-zinc-500">Bill Id:</span>
+            <span className="font-bold select-all tracking-wide text-zinc-950">{invoice.billNumber || invoice._id}</span>
           </div>
 
           <div className="grid grid-cols-2 gap-4 my-3 pb-3 border-b border-zinc-100">
@@ -103,8 +107,8 @@ const BillReceiptCore = ({
               <div className="text-zinc-600 text-[10px] leading-tight mt-0.5" title={resolvedCustomer?.address}>
                 {resolvedCustomer?.address || 'Counter Sale Transaction Log'}
               </div>
-              <div className="text-zinc-700 font-mono font-medium text-[10px] mt-0.5">Ph: {resolvedCustomer?.phone || 'N/A'}</div>
-              {resolvedCustomer?.gst && <div className="text-zinc-700 font-mono font-medium text-[10px] ">GST: {resolvedCustomer?.gst}</div>}
+              <div className="text-zinc-700 font-mono font-medium text-[10px] mt-0.5">Phone: {resolvedCustomer?.phone || 'N/A'}</div>
+              {resolvedCustomer?.gst && <div className="text-zinc-700 font-mono font-medium text-[10px] ">GSTIN: {resolvedCustomer?.gst}</div>}
               {resolvedCustomer?.pan && <div className="text-zinc-700 font-mono font-medium text-[10px] ">PAN: {resolvedCustomer?.pan}</div>}
             </div>
             
@@ -144,18 +148,15 @@ const BillReceiptCore = ({
                 </th>
                 <th className="px-2 py-1.5 text-right w-14">
                   <div>Rate</div>
-                  <div className="text-[7px] text-zinc-400 font-normal tracking-normal leading-none mt-0.5">(Excl. 18%)</div>
                 </th>
-                <th className="px-2 py-1.5 text-right w-12 text-amber-600">Disc.</th>
+                <th className="px-2 py-1.5 text-right w-12 text-amber-600">Discount</th>
+                <th className="px-2 py-1.5 text-right w-16 font-mono text-zinc-600">
+                  <div>CGST<span className="text-[7px] font-normal ml-1">(9%)</span></div>
+                </th>
+                <th className="px-2 py-1.5 text-right w-16 font-mono text-zinc-600">
+                  <div>SGST<span className="text-[7px] font-normal ml-1">(9%)</span></div>
+                </th>
                 <th className="px-2 py-1.5 text-center w-8">Qty</th>
-                <th className="px-2 py-1.5 text-right w-16 font-mono text-zinc-600">
-                  <div>CGST</div>
-                  <div className="text-[7px] font-normal">(9%)</div>
-                </th>
-                <th className="px-2 py-1.5 text-right w-16 font-mono text-zinc-600">
-                  <div>SGST</div>
-                  <div className="text-[7px] font-normal">(9%)</div>
-                </th>
                 <th className="px-2 py-1.5 text-right w-16">Total</th>
               </tr>
             </thead>
@@ -185,14 +186,14 @@ const BillReceiptCore = ({
                       )}
                     </td>
                     <td className="px-2 py-2 text-right font-mono">{item?.hsn || "-"} </td>
-                    <td className="px-2 py-2 text-right font-mono">Rs.{calculatedRate.toFixed(2)}</td>
+                    <td className="px-2 py-2 text-right font-mono">₹{calculatedRate.toFixed(2)}</td>
                     <td className={`px-2 py-2 text-right font-mono font-medium ${itemDiscount > 0 ? 'text-amber-600 bg-amber-50/40 print:bg-amber-50' : 'text-zinc-400'}`}>
                       {itemDiscount > 0 ? `-${itemDiscount.toFixed(2)}` : '0.00'}
                     </td>
+                    <td className="px-2 py-2 text-right font-mono text-zinc-600">₹{cgst.toFixed(2)}</td>
+                    <td className="px-2 py-2 text-right font-mono text-zinc-600">₹{sgst.toFixed(2)}</td>
                     <td className="px-2 py-2 text-center font-mono">{itemQty}</td>
-                    <td className="px-2 py-2 text-right font-mono text-zinc-600">Rs.{cgst.toFixed(2)}</td>
-                    <td className="px-2 py-2 text-right font-mono text-zinc-600">Rs.{sgst.toFixed(2)}</td>
-                    <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{calculatedTotal.toFixed(2)}</td>
+                    <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">₹{calculatedTotal.toFixed(2)}</td>
                   </tr>
                 );
               })}
@@ -209,12 +210,12 @@ const BillReceiptCore = ({
                       <div className="text-[8px] text-zinc-400 italic">Non-refundable labor line charge</div>
                     </td>
                     <td className="px-2 py-2 text-right font-mono">-</td>
-                    <td className="px-2 py-2 text-right font-mono">Rs.{sCharge.toFixed(2)}</td>
+                    <td className="px-2 py-2 text-right font-mono">₹{sCharge.toFixed(2)}</td>
                     <td className="px-2 py-2 text-right font-mono text-zinc-400">0.00</td>
                     <td className="px-2 py-2 text-center font-mono">-</td>
                     <td className="px-2 py-2 text-right font-mono text-zinc-600">-</td>
                     <td className="px-2 py-2 text-right font-mono text-zinc-600">-</td>
-                    <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{sCharge.toFixed(2)}</td>
+                    <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">₹{sCharge.toFixed(2)}</td>
                   </tr>
                 );
               })()}
@@ -248,7 +249,7 @@ const BillReceiptCore = ({
             <div className="w-1/2 space-y-1 font-medium text-zinc-600 text-right">
               <div className="flex justify-between items-center bg-zinc-950 text-white px-3 py-1.5 rounded text-[11px] font-bold mt-2">
                 <span>Grand Net Total:</span>
-                <span className="font-black font-mono text-xs">Rs.{grossTotal.toFixed(2)}</span>
+                <span className="font-black font-mono text-xs">₹{grossTotal.toFixed(2)}</span>
               </div>
 
               {/* Signature space */}

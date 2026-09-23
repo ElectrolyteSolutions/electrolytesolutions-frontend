@@ -98,10 +98,10 @@ const DashboardPage = () => {
         <div className="bg-zinc-900 p-4 rounded-xl flex items-center justify-between shadow-xl relative overflow-hidden group hover:border-emerald-500/30 abc transition-all">
           <div className="space-y-1.5 w-full z-10">
             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Gross Settled Revenue</span>
-            <div className="text-2xl font-black text-emerald-400 font-mono">Rs.{grossPaidRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-black text-emerald-400 font-mono">₹{grossPaidRevenue.toLocaleString()}</div>
             <div className="flex justify-between items-center pt-2 border-t border-zinc-800/80">
               <span className="text-[10px] text-zinc-500 uppercase font-semibold tracking-wider">Unpaid Balances</span>
-              <span className="text-xs text-red-400 font-bold font-mono">Rs.{outstandingUnpaidRevenue.toLocaleString()}</span>
+              <span className="text-xs text-red-400 font-bold font-mono">₹{outstandingUnpaidRevenue.toLocaleString()}</span>
             </div>
           </div>
           <div className="absolute right-[-10px] bottom-[-10px] text-7xl opacity-5 group-hover:opacity-10 transition-opacity">💰</div>
@@ -111,10 +111,10 @@ const DashboardPage = () => {
         <div className="bg-zinc-900 p-4 rounded-xl flex items-center justify-between shadow-xl relative overflow-hidden group hover:border-indigo-500/30 abc transition-all">
           <div className="space-y-1.5 w-full z-10">
             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Net Realized Profit</span>
-            <div className="text-2xl font-black text-indigo-400 font-mono">Rs.{settledProfit.toLocaleString()}</div>
+            <div className="text-2xl font-black text-indigo-400 font-mono">₹{settledProfit.toLocaleString()}</div>
             <div className="flex justify-between items-center pt-2 border-t border-zinc-800/80">
               <span className="text-[10px] text-zinc-500 uppercase font-semibold tracking-wider">Pending Profit</span>
-              <span className="text-xs text-amber-400 font-bold font-mono">Rs.{pendingUnpaidProfit.toLocaleString()}</span>
+              <span className="text-xs text-amber-400 font-bold font-mono">₹{pendingUnpaidProfit.toLocaleString()}</span>
             </div>
           </div>
           <div className="absolute right-[-10px] bottom-[-10px] text-7xl opacity-5 group-hover:opacity-10 transition-opacity">📈</div>
@@ -127,10 +127,10 @@ const DashboardPage = () => {
               <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Inventory Assets (Base)</span>
               <span className="text-[10px] font-bold bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">{totalStockUnits} Units</span>
             </div>
-            <div className="text-2xl font-black text-purple-400 font-mono">Rs.{totalStockBaseValue.toLocaleString()}</div>
+            <div className="text-2xl font-black text-purple-400 font-mono">₹{totalStockBaseValue.toLocaleString()}</div>
             <div className="flex justify-between items-center pt-2 border-t border-zinc-800/80">
               <span className="text-[10px] text-zinc-500 uppercase font-semibold tracking-wider">Projected MRP</span>
-              <span className="text-xs text-emerald-400 font-bold font-mono">Rs.{totalStockMRPValue.toLocaleString()}</span>
+              <span className="text-xs text-emerald-400 font-bold font-mono">₹{totalStockMRPValue.toLocaleString()}</span>
             </div>
           </div>
           <div className="absolute right-[-10px] bottom-[-10px] text-7xl opacity-5 group-hover:opacity-10 transition-opacity">📦</div>
@@ -274,7 +274,7 @@ const DashboardPage = () => {
                       </span>
                     </td>
                     <td className="px-4 sm:px-6 py-3.5 text-zinc-400 text-[11px] sm:text-xs">{bill.lastUpdated}</td>
-                    <td className="px-4 sm:px-6 py-3.5 text-right font-bold text-emerald-400 font-mono text-xs sm:text-sm">Rs.{Number(bill.totalAmount || 0).toLocaleString()}</td>
+                    <td className="px-4 sm:px-6 py-3.5 text-right font-bold text-emerald-400 font-mono text-xs sm:text-sm">₹{Number(bill.totalAmount || 0).toLocaleString()}</td>
                   </tr>
                 ))
               )}

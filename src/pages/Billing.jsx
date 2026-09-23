@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom'; 
 import axios from 'axios'; 
@@ -30,6 +30,10 @@ const BillingPage = () => {
 
   // Local Product Catalog Filter/Search Input State Parameter Token
   const [productSearchKeyword, setProductSearchKeyword] = useState('');
+
+  // History Log Search and Sort State
+  const [billSearchKeyword, setBillSearchKeyword] = useState('');
+  const [billSortBy, setBillSortBy] = useState('newest'); // 'newest' | 'amount' | 'purpose'
 
   // Local states for expanded Custom Charges (Name, Sell Price, Base Cost, Quantity)
   const [customItemName, setCustomItemName] = useState('');
@@ -82,6 +86,32 @@ const BillingPage = () => {
     product.brand?.toLowerCase().includes(productSearchKeyword.toLowerCase()) ||
     product.modelName?.toLowerCase().includes(productSearchKeyword.toLowerCase())
   );
+
+  // Filter and Sort Logic for History Ledger Logs
+  const filteredAndSortedBills = useMemo(() => {
+    if (!bills) return [];
+
+    const filtered = bills.filter((bill) => {
+      const term = billSearchKeyword.toLowerCase();
+      const id = bill._id?.toLowerCase() || '';
+      const customerName = bill.customer?.name?.toLowerCase() || '';
+      const customerPhone = bill.customer?.phone?.toLowerCase() || '';
+      const billPurpose = bill.purpose?.toLowerCase() || '';
+
+      return id.includes(term) || customerName.includes(term) || customerPhone.includes(term) || billPurpose.includes(term);
+    });
+
+    return filtered.sort((a, b) => {
+      if (billSortBy === 'amount') {
+        return (Number(b.totalAmount) || 0) - (Number(a.totalAmount) || 0);
+      } else if (billSortBy === 'purpose') {
+        return (a.purpose || '').localeCompare(b.purpose || '');
+      } else {
+        // Default: 'newest'
+        return new Date(b.lastUpdated || b.createdAt || 0) - new Date(a.lastUpdated || a.createdAt || 0);
+      }
+    });
+  }, [bills, billSearchKeyword, billSortBy]);
 
   const handleLoadExistingBillToEdit = (bill) => {
     setEditingBillId(bill._id);
@@ -142,7 +172,6 @@ const BillingPage = () => {
     }));
   };
 
-  // Inject Quantity and BaseRate into custom lines payload
   const handleAddCustomCharge = (e) => {
     e.preventDefault();
     if (!customItemName.trim() || !customItemPrice) return alert("Enter charge description and selling price");
@@ -160,7 +189,6 @@ const BillingPage = () => {
 
     setCart([...cart, newCustomField]);
     
-    // Reset local custom charge states
     setCustomItemName('');
     setCustomItemPrice('');
     setCustomItemBaseRate('');
@@ -256,7 +284,7 @@ const BillingPage = () => {
       {/* Navigation Switcher header grid */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
         <div><h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Billing Registry</h1></div>
-        <div className="inline-flex w-full sm:w-auto p-1 bg-zinc-900  rounded-xl space-x-1">
+        <div className="inline-flex w-full sm:w-auto p-1 bg-zinc-900 rounded-xl space-x-1">
           <button onClick={() => { setActiveTab('checkout'); handleCancelEditMode(); }} className={`flex-1 sm:flex-none text-center px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all ${activeTab === 'checkout' && !editingBillId ? 'bg-emerald-600 text-white shadow' : 'text-zinc-400'}`}>POS Console</button>
           <button onClick={() => setActiveTab('history')} className={`flex-1 sm:flex-none text-center px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all ${activeTab === 'history' ? 'bg-emerald-600 text-white shadow' : 'text-zinc-400'}`}>Invoice History Log</button>
         </div>
@@ -264,7 +292,7 @@ const BillingPage = () => {
 
       {activeTab === 'print' && printTargetData && (
         <div className="space-y-4 animate-in fade-in duration-300">
-          <div className="flex flex-col sm:flex-row gap-3 justify-between items-center max-w-2xl mx-auto bg-zinc-900  p-4 rounded-xl w-full">
+          <div className="flex flex-col sm:flex-row gap-3 justify-between items-center max-w-2xl mx-auto bg-zinc-900 p-4 rounded-xl w-full">
             <span className="text-xs sm:text-sm font-semibold text-emerald-400 text-center sm:text-left">🎉 Transaction Processed Successfully!</span>
             <button onClick={() => { setPrintTargetData(null); setActiveTab('checkout'); }} className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold">← Back to New Transaction</button>
           </div>
@@ -284,7 +312,7 @@ const BillingPage = () => {
               </div>
               <div className="flex gap-2 w-full md:w-auto shrink-0">
                 <button onClick={() => handleLoadExistingBillToEdit(duplicateBillMatch)} className="flex-1 md:flex-none text-center bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs px-4 py-2 rounded-lg transition-colors shadow-md">Edit Bill</button>
-                <button onClick={() => setDuplicateBillMatch(null)} className="flex-1 md:flex-none text-center bg-zinc-900 hover:bg-zinc-800 text-zinc-300  text-xs px-3 py-2 rounded-lg transition-colors">Ignore & New</button>
+                <button onClick={() => setDuplicateBillMatch(null)} className="flex-1 md:flex-none text-center bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs px-3 py-2 rounded-lg transition-colors">Ignore & New</button>
               </div>
             </div>
           )}
@@ -300,20 +328,20 @@ const BillingPage = () => {
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 animate-in fade-in duration-300">
-            <div className="lg:col-span-2 bg-zinc-900  p-4 sm:p-6 rounded-xl space-y-6 shadow-xl">
+            <div className="lg:col-span-2 bg-zinc-900 p-4 sm:p-6 rounded-xl space-y-6 shadow-xl">
               <h2 className="text-lg sm:text-xl font-bold tracking-tight text-emerald-400 border-b border-zinc-800 pb-3">{editingBillId ? 'Modify Invoice Console' : 'POS Console'}</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-2">Target Customer</label>
-                  <select className="w-full bg-zinc-950  rounded-lg px-3 py-2.5 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50" value={selectedCustomerId} disabled={!!editingBillId} onChange={(e) => { setSelectedCustomerId(e.target.value); setCart([]); setSelectedDeviceId(''); setDuplicateBillMatch(null); }}>
+                  <select className="w-full bg-zinc-950 rounded-lg px-3 py-2.5 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50" value={selectedCustomerId} disabled={!!editingBillId} onChange={(e) => { setSelectedCustomerId(e.target.value); setCart([]); setSelectedDeviceId(''); setDuplicateBillMatch(null); }}>
                     <option value="">Select Accounts Database Profile</option>
                     {customers.map(c => <option key={c._id} value={c._id}>{c.name} ({c.phone})</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-2">Workflow Purpose</label>
-                  <select className="w-full bg-zinc-950  rounded-lg px-3 py-2.5 text-xs sm:text-sm capitalize text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50" value={purpose} disabled={!!editingBillId} onChange={(e) => { setPurpose(e.target.value); if (e.target.value !== 'repair') setServiceCharge(0); setDuplicateBillMatch(null); }}>
+                  <select className="w-full bg-zinc-950 rounded-lg px-3 py-2.5 text-xs sm:text-sm capitalize text-zinc-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50" value={purpose} disabled={!!editingBillId} onChange={(e) => { setPurpose(e.target.value); if (e.target.value !== 'repair') setServiceCharge(0); setDuplicateBillMatch(null); }}>
                     <option value="purchase">Standard Sale (Purchase)</option>
                     <option value="repair">Service/Hardware Repair</option>
                     <option value="quotation">Formal Pricing Quote</option>
@@ -325,19 +353,18 @@ const BillingPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border border-amber-500/20 bg-amber-500/5 p-4 rounded-lg animate-in fade-in duration-300">
                   <div>
                     <label className="block text-xs font-semibold text-amber-400 uppercase mb-2">Linked Hardware Target</label>
-                    <select className="w-full bg-zinc-950  rounded-lg px-3 py-2.5 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-amber-500/40 disabled:opacity-50" value={selectedDeviceId} disabled={!!editingBillId} onChange={(e) => { setSelectedDeviceId(e.target.value); const structuralMatch = bills.find((b) => b.purpose === 'repair' && b.device?._id?.toString() === e.target.value.toString()); setDuplicateBillMatch(structuralMatch || null); }} required>
+                    <select className="w-full bg-zinc-950 rounded-lg px-3 py-2.5 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-amber-500/40 disabled:opacity-50" value={selectedDeviceId} disabled={!!editingBillId} onChange={(e) => { setSelectedDeviceId(e.target.value); const structuralMatch = bills.find((b) => b.purpose === 'repair' && b.device?._id?.toString() === e.target.value.toString()); setDuplicateBillMatch(structuralMatch || null); }} required>
                       <option value="">Select Profile Associated Device</option>
                       {currentCustomer?.devices?.map(d => <option key={d._id} value={d._id}>{typeof d === 'object' ? d.deviceName : d} [{typeof d === 'object' ? d.deviceHardwareId : 'ID'}]</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-amber-400 uppercase mb-2">General Service Charge (Rs.)</label>
-                    <input type="number" className="w-full bg-zinc-950  rounded-lg px-3 py-2.5 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-amber-500/40" value={serviceCharge} onChange={(e) => setServiceCharge(e.target.value)} placeholder="0.00" />
+                    <label className="block text-xs font-semibold text-amber-400 uppercase mb-2">General Service Charge (₹)</label>
+                    <input type="number" className="w-full bg-zinc-950 rounded-lg px-3 py-2.5 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-amber-500/40" value={serviceCharge} onChange={(e) => setServiceCharge(e.target.value)} placeholder="0.00" />
                   </div>
                 </div>
               )}
 
-              {/* ⚡ UPDATED: Custom Elements form now has explicit <label> titles mapping over each input */}
               <div className="bg-zinc-950/40 p-4 rounded-xl space-y-4">
                 <h4 className="text-xs font-bold uppercase text-blue-400 tracking-wider border-b border-zinc-800/50 pb-2">Add Custom Charge / Extra Services</h4>
                 
@@ -349,12 +376,12 @@ const BillingPage = () => {
                   
                   <div className="col-span-1">
                     <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 ml-0.5">Base Cost</label>
-                    <input type="number" placeholder="Rs. 0" value={customItemBaseRate} onChange={e => setCustomItemBaseRate(e.target.value)} className="bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono w-full" />
+                    <input type="number" placeholder="₹ 0" value={customItemBaseRate} onChange={e => setCustomItemBaseRate(e.target.value)} className="bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono w-full" />
                   </div>
                   
                   <div className="col-span-1">
                     <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 ml-0.5">Sell Price</label>
-                    <input type="number" placeholder="Rs. 0" value={customItemPrice} onChange={e => setCustomItemPrice(e.target.value)} className="bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono w-full" />
+                    <input type="number" placeholder="₹ 0" value={customItemPrice} onChange={e => setCustomItemPrice(e.target.value)} className="bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono w-full" />
                   </div>
                   
                   <div className="col-span-1">
@@ -373,14 +400,13 @@ const BillingPage = () => {
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center border-t border-zinc-800/80 pt-4 gap-3">
                   <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider">Inventory Matrix Catalog</label>
                   
-                  {/* Local Client Side Filter Search Box Container */}
                   <div className="relative w-full sm:max-w-xs">
                     <input 
                       type="text"
                       placeholder="🔍 Search catalog components..."
                       value={productSearchKeyword}
                       onChange={(e) => setProductSearchKeyword(e.target.value)}
-                      className="w-full bg-zinc-950  rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                      className="w-full bg-zinc-950 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
                     />
                     {productSearchKeyword && (
                       <button 
@@ -404,10 +430,10 @@ const BillingPage = () => {
                       const currentCartQty = cartItem ? cartItem.orderedQuantity : 0;
                       const isOutOfStock = purpose !== 'quotation' && (p.quantity <= 0 || currentCartQty >= p.quantity);
                       return (
-                        <div key={p._id} className="bg-zinc-950  p-3 rounded-lg flex justify-between items-center gap-3 group hover:border-emerald-500/30 transition-all">
+                        <div key={p._id} className="bg-zinc-950 p-3 rounded-lg flex justify-between items-center gap-3 group hover:border-emerald-500/30 transition-all">
                           <div className="min-w-0 flex-1">
                             <div className="text-xs sm:text-sm font-semibold text-zinc-200 truncate">{p.name}</div>
-                            <div className="text-[11px] sm:text-xs text-zinc-500 truncate">Rs.{p.price} • Stock: {p.quantity} {currentCartQty > 0 && <span className="text-emerald-500 font-medium ml-1">({currentCartQty} added)</span>}</div>
+                            <div className="text-[11px] sm:text-xs text-zinc-500 truncate">₹{p.price} • Stock: {p.quantity} {currentCartQty > 0 && <span className="text-emerald-500 font-medium ml-1">({currentCartQty} added)</span>}</div>
                           </div>
                           <button onClick={() => handleAddItem(p._id)} disabled={isOutOfStock} className="bg-zinc-800 hover:bg-emerald-600 disabled:bg-zinc-900 disabled:text-zinc-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors shrink-0">
                             {isOutOfStock ? 'Maxed Out' : '+ Add'}
@@ -420,7 +446,7 @@ const BillingPage = () => {
               </div>
             </div>
 
-            <div className="bg-zinc-900  p-4 sm:p-6 rounded-xl flex flex-col justify-between shadow-xl min-h-[500px]">
+            <div className="bg-zinc-900 p-4 sm:p-6 rounded-xl flex flex-col justify-between shadow-xl min-h-[500px]">
               <div>
                 <h2 className="text-base sm:text-lg font-bold text-zinc-200 tracking-tight border-b border-zinc-800 pb-3">Live Invoice Manifest</h2>
                 <div className="space-y-4 my-4 max-h-[340px] overflow-y-auto pr-1 sm:pr-2">
@@ -436,10 +462,10 @@ const BillingPage = () => {
                               {item.isCustomLineItem && <span className="inline-block text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Custom</span>}
                               {editingBillId && item.isExistingLineItem && <span className="inline-block text-[9px] bg-zinc-800 text-zinc-400 border border-zinc-700 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Saved Line</span>}
                             </div>
-                            <div className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">Sell Price: Rs.{item.price} • Qty: {item.orderedQuantity}</div>
+                            <div className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">Sell Price: ₹{item.price} • Qty: {item.orderedQuantity}</div>
                           </div>
                           <div className="text-right flex flex-col items-end shrink-0">
-                            <span className="text-xs sm:text-sm font-black text-emerald-400">Rs.{(item.price - (item.discount || 0)) * item.orderedQuantity}</span>
+                            <span className="text-xs sm:text-sm font-black text-emerald-400">₹{(item.price - (item.discount || 0)) * item.orderedQuantity}</span>
                             <button onClick={() => handleRemoveItem(item.productId)} className="text-[10px] text-red-500 hover:underline mt-1">Remove</button>
                           </div>
                         </div>
@@ -447,13 +473,13 @@ const BillingPage = () => {
                         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-900/80">
                           <span className="text-[10px] uppercase tracking-wider text-amber-500 font-bold">Apply Row Discount:</span>
                           <div className="relative flex items-center max-w-[110px] w-full">
-                            <span className="absolute left-2 text-zinc-500 text-xs font-mono">Rs.</span>
+                            <span className="absolute left-2 text-zinc-500 text-xs font-mono">₹</span>
                             <input 
                               type="number"
                               placeholder="0"
                               value={item.discount || ''}
                               onChange={(e) => handleItemDiscountAdjust(item.productId, e.target.value)}
-                              className="w-full bg-zinc-900  rounded px-2 py-1 pl-6 text-xs text-amber-400 font-mono focus:outline-none focus:border-amber-500/60"
+                              className="w-full bg-zinc-900 rounded px-2 py-1 pl-6 text-xs text-amber-400 font-mono focus:outline-none focus:border-amber-500/60"
                             />
                           </div>
                         </div>
@@ -463,19 +489,19 @@ const BillingPage = () => {
 
                   {purpose === 'repair' && Number(serviceCharge) > 0 && (
                     <div className="flex justify-between items-center bg-amber-500/5 border border-amber-500/20 p-3 rounded-lg text-xs sm:text-sm text-amber-400">
-                      <span>General Base Service Charges</span><span className="font-bold font-mono">Rs.{serviceCharge}</span>
+                      <span>General Base Service Charges</span><span className="font-bold font-mono">₹{serviceCharge}</span>
                     </div>
                   )}
                 </div>
               </div>
 
               <div className="border-t border-zinc-800 pt-4 mt-auto space-y-4">
-                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between bg-zinc-950 p-3  rounded-xl">
+                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between bg-zinc-950 p-3 rounded-xl">
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-zinc-300">Payment Flag Status</span>
                     <span className="text-[10px] text-zinc-500">Is this bill cleared?</span>
                   </div>
-                  <div className="inline-flex w-full sm:w-auto p-0.5 bg-zinc-900 rounded-lg  space-x-1">
+                  <div className="inline-flex w-full sm:w-auto p-0.5 bg-zinc-900 rounded-lg space-x-1">
                     <button 
                       type="button"
                       onClick={() => setIsPaid(true)}
@@ -495,7 +521,7 @@ const BillingPage = () => {
 
                 <div className="flex justify-between items-center text-sm sm:text-md">
                   <span className="font-semibold text-zinc-400">Total Invoice Amount:</span>
-                  <span className="text-xl sm:text-2xl font-black text-emerald-400 font-mono">Rs.{calculateTotal()}</span>
+                  <span className="text-xl sm:text-2xl font-black text-emerald-400 font-mono">₹{calculateTotal()}</span>
                 </div>
                 <button onClick={handleSubmitBill} className={`w-full text-white font-bold py-3 rounded-lg tracking-wide text-xs sm:text-sm transition-all shadow-lg ${editingBillId ? 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20' : 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/10'}`}>
                   {editingBillId ? 'Save & Append Changes' : `Process Workflow Transaction (${purpose})`}
@@ -508,66 +534,94 @@ const BillingPage = () => {
 
       {/* VIEW 3: LEDGER RECORDS HISTORICAL DATABASE VIEW */}
       {activeTab === 'history' && (
-        <div className="bg-zinc-900  rounded-xl overflow-hidden shadow-xl animate-in fade-in duration-300 w-full">
-          <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
-            <table className="w-full text-left border-collapse min-w-[900px]">
-              <thead>
-                <tr className="bg-zinc-800/50 border-b border-zinc-800">
-                  <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Invoice ID</th>
-                  <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Account Profile</th>
-                  <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Workflow Intent</th>
-                  <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Payment Status</th>
-                  <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Timestamp</th>
-                  <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Gross Amount</th>
-                  <th className="px-4 sm:px-6 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Records Management</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800">
-                {billStatus === 'loading' ? (
-                  <tr><td colSpan="7" className="px-6 py-12 text-center text-zinc-500 italic">Accessing secure ledger...</td></tr>
-                ) : bills.length === 0 ? (
-                  <tr><td colSpan="7" className="px-6 py-12 text-center text-zinc-500 text-sm">No recorded invoices tracked inside the database system.</td></tr>
-                ) : (
-                  bills.map((bill) => (
-                    <tr key={bill._id} className="hover:bg-zinc-800/30 transition-colors group">
-                      <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm font-mono text-zinc-400 select-all">{bill._id}</td>
-                      <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
-                        <div className="font-semibold text-zinc-200">{bill.customer?.name || 'Profile Dropped'}</div>
-                        <div className="text-xs text-zinc-500 font-mono">{bill.customer?.phone}</div>
-                      </td>
-                      <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium border uppercase ${bill.purpose === 'repair' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : bill.purpose === 'quotation' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'}`}>{bill.purpose}</span>
-                      </td>
-                      <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
-                          bill.isPaid 
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                            : 'bg-red-500/10 text-red-400 border-red-500/20'
-                        }`}>
-                          {bill.isPaid ? '● Paid' : '○ Unpaid'}
-                        </span>
-                      </td>
-                      <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm text-zinc-400 font-mono">{bill.lastUpdated}</td>
-                      <td className="px-4 sm:px-6 py-2 text-xs sm:text-sm font-bold text-emerald-400 font-mono">Rs.{bill.totalAmount}</td>
-                      <td className="px-4 sm:px-6 py-2 text-right text-xs sm:text-sm font-medium">
-                        <div className="flex justify-end gap-2.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-wrap lg:flex-nowrap">
-                          <button onClick={() => handleLoadExistingBillToEdit(bill)} className="text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold">Edit</button>
-                          <button onClick={() => handleOpenInspect(bill)} className="text-emerald-400 hover:text-emerald-300 transition-colors bg-emerald-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold">Inspect</button>
-                          <button onClick={() => { if(window.confirm('Revoke and delete this invoice?')) dispatch(deleteBill(bill._id)) }} className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold">Delete</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+        <div className="space-y-4 animate-in fade-in duration-300">
+          
+          {/* History Search & Sort Controls Toolbar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-zinc-900 p-4 rounded-xl shadow-md border border-zinc-800">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Search history by ID, customer name, phone, or purpose..."
+                value={billSearchKeyword}
+                onChange={(e) => setBillSearchKeyword(e.target.value)}
+                className="w-full bg-zinc-950 text-zinc-100 placeholder-zinc-500 px-4 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-emerald-500 text-xs sm:text-sm transition-all"
+              />
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Sort By:</span>
+              <select
+                value={billSortBy}
+                onChange={(e) => setBillSortBy(e.target.value)}
+                className="bg-zinc-950 text-zinc-200 text-xs sm:text-sm px-3 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-emerald-500 cursor-pointer"
+              >
+                <option value="newest">Newest First</option>
+                <option value="amount">Gross Amount</option>
+                <option value="purpose">Purpose</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
+            <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
+              <table className="w-full text-left border-collapse min-w-[900px]">
+                <thead>
+                  <tr className="bg-zinc-800/50 border-b border-zinc-800">
+                    <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Invoice ID</th>
+                    <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Account Profile</th>
+                    <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Workflow Intent</th>
+                    <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Payment Status</th>
+                    <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Timestamp</th>
+                    <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Gross Amount</th>
+                    <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Records Management</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800">
+                  {billStatus === 'loading' ? (
+                    <tr><td colSpan="7" className="px-6 py-12 text-center text-zinc-500 italic">Accessing secure ledger...</td></tr>
+                  ) : filteredAndSortedBills.length === 0 ? (
+                    <tr><td colSpan="7" className="px-6 py-12 text-center text-zinc-500 text-sm italic">{bills.length === 0 ? "No recorded invoices tracked inside the database system." : "No invoices match your search criteria."}</td></tr>
+                  ) : (
+                    filteredAndSortedBills.map((bill) => (
+                      <tr key={bill._id} className="hover:bg-zinc-800/30 transition-colors group">
+                        <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm font-mono text-zinc-400 select-all">{bill?.billNumber}</td>
+                        <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
+                          <div className="font-semibold text-zinc-200">{bill.customer?.name || 'Profile Dropped'}</div>
+                          <div className="text-xs text-zinc-500 font-mono">{bill.customer?.phone}</div>
+                        </td>
+                        <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium border uppercase ${bill.purpose === 'repair' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : bill.purpose === 'quotation' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'}`}>{bill.purpose}</span>
+                        </td>
+                        <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${
+                            bill.isPaid 
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                              : 'bg-red-500/10 text-red-400 border-red-500/20'
+                          }`}>
+                            {bill.isPaid ? '● Paid' : '○ Unpaid'}
+                          </span>
+                        </td>
+                        <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-zinc-400 font-mono">{bill.lastUpdated}</td>
+                        <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm font-bold text-emerald-400 font-mono">₹{bill.totalAmount}</td>
+                        <td className="px-4 sm:px-6 py-3 text-right text-xs sm:text-sm font-medium">
+                          <div className="flex justify-end gap-2.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-wrap lg:flex-nowrap">
+                            <button onClick={() => handleLoadExistingBillToEdit(bill)} className="text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold">Edit</button>
+                            <button onClick={() => handleOpenInspect(bill)} className="text-emerald-400 hover:text-emerald-300 transition-colors bg-emerald-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold">Inspect</button>
+                            <button onClick={() => { if(window.confirm('Revoke and delete this invoice?')) dispatch(deleteBill(bill._id)) }} className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold">Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
 
       {isModalOpen && selectedBill && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-900  w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+          <div className="bg-zinc-900 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
             <div className="px-4 sm:px-6 py-2 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30 shrink-0">
               <div className="min-w-0 pr-2">
                 <h3 className="text-base sm:text-lg font-bold text-white truncate">Invoice History Log Inspection</h3>
