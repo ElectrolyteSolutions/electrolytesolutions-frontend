@@ -206,7 +206,7 @@ const BillReceiptCore = ({
                   <tr className="bg-amber-50/40 border-t border-dashed border-zinc-200">
                     <td className="px-2 py-2 font-mono text-amber-600">*</td>
                     <td className="px-2 py-2 font-medium text-zinc-900">
-                      <div>Technical Service Labor / Diagnostic Fee</div>
+                      <div>Diagnostic /On-Site Convenience Fee /Technical Service Fee</div>
                       <div className="text-[8px] text-zinc-400 italic">Non-refundable labor line charge</div>
                     </td>
                     <td className="px-2 py-2 text-right font-mono">-</td>
