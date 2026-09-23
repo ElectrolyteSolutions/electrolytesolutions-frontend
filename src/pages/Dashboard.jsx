@@ -268,12 +268,12 @@ const DashboardPage = () => {
           <table className="w-full text-left border-collapse min-w-[850px]">
             <thead>
               <tr className="bg-zinc-950 border-b border-zinc-800 text-zinc-400 text-[11px] sm:text-xs font-semibold">
-                <th className="px-4 sm:px-6 py-3 uppercase tracking-wider">Invoice Code Reference Token</th>
+                <th className="px-4 sm:px-6 py-3 uppercase tracking-wider">Invoice ID</th>
                 <th className="px-4 sm:px-6 py-3 uppercase tracking-wider">Client Profile</th>
                 <th className="px-4 sm:px-6 py-3 uppercase tracking-wider">Intent</th>
-                <th className="px-4 sm:px-6 py-3 uppercase tracking-wider">Payment Flag</th>
+                <th className="px-4 sm:px-6 py-3 uppercase tracking-wider">Status</th>
                 <th className="px-4 sm:px-6 py-3 uppercase tracking-wider">Timestamp</th>
-                <th className="px-4 sm:px-6 py-3 uppercase tracking-wider text-right">Gross Total</th>
+                <th className="px-4 sm:px-6 py-3 uppercase tracking-wider text-right">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60 text-xs sm:text-sm text-zinc-300">
@@ -286,7 +286,7 @@ const DashboardPage = () => {
                   <td colSpan="6" className="px-6 py-8 text-center text-zinc-500">No recent invoice logs tracked.</td>
                 </tr>
               ) : (
-                bills.map((bill) => (
+                bills.filter(bill => !bill?.isPaid).map((bill) => (
                   <tr key={bill._id} className="hover:bg-zinc-800/20 transition-all">
                     <td className="px-4 sm:px-6 py-3.5 font-mono text-zinc-400 select-all text-[11px] sm:text-xs tracking-wider">{bill._id}</td>
                     <td className="px-4 sm:px-6 py-3.5">
