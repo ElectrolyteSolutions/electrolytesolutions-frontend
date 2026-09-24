@@ -13,7 +13,9 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
   const [form, setForm] = useState({
     owner: preSelectedCustomerId,
     deviceName: '',
-    issues: [], // Updated from issueType to match your array rules schema
+    deviceType: 'mobile',
+    customDeviceType: '',
+    issues: [],
     deviceHardwareId: '',
     deviceRepairingStatus: 'in-progress'
   });
@@ -51,6 +53,10 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
   const handleSave = (e) => {
     e.preventDefault();
     if (!form.owner) return alert('Please assign a customer profile');
+
+    if (form.deviceType === 'other' && !form.customDeviceType.trim()) {
+      return alert('Please specify a custom device type name.');
+    }
     
     // Fallback block to safely parse text remaining inside input box if form submission is hit directly
     let finalIssuesArray = [...form.issues];
@@ -62,7 +68,12 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
       return alert('Please describe at least one device fault or hardware issue.');
     }
 
-    const payload = { ...form, issues: finalIssuesArray };
+    const payload = { 
+      ...form, 
+      issues: finalIssuesArray,
+      customDeviceType: form.deviceType === 'other' ? form.customDeviceType.trim() : ''
+    };
+
     dispatch(addDevice(payload));
     dispatch(getCustomers());
     
@@ -70,6 +81,8 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
     setForm({
       owner: preSelectedCustomerId,
       deviceName: '',
+      deviceType: 'mobile',
+      customDeviceType: '',
       issues: [],
       deviceHardwareId: '',
       deviceRepairingStatus: 'in-progress'
@@ -80,7 +93,7 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-zinc-900  w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
+      <div className="bg-zinc-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh] border border-zinc-800">
         
         {/* Modal Header */}
         <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30 shrink-0">
@@ -93,7 +106,7 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
           <div>
             <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Assigned Customer</label>
             <select 
-              className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer disabled:opacity-50"
+              className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer disabled:opacity-50"
               onChange={e => setForm({...form, owner: e.target.value})} 
               value={form.owner}
               disabled={!!preSelectedCustomerId}
@@ -107,7 +120,7 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
           <div>
             <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Device Model</label>
             <input 
-              className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+              className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
               placeholder="e.g. MacBook Pro M2" 
               value={form.deviceName}
               onChange={e => setForm({...form, deviceName: e.target.value})} 
@@ -115,10 +128,42 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
             />
           </div>
 
+          {/* Device Type Selection */}
+          <div>
+            <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Device Type</label>
+            <select
+              value={form.deviceType}
+              onChange={(e) => setForm({ ...form, deviceType: e.target.value })}
+              className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 capitalize cursor-pointer"
+            >
+              <option value="mobile">Mobile</option>
+              <option value="tablet">Tablet</option>
+              <option value="printer">Printer</option>
+              <option value="desktop">Desktop</option>
+              <option value="laptop">Laptop</option>
+              <option value="speaker">Speaker</option>
+              <option value="other">Other (Custom)</option>
+            </select>
+          </div>
+
+          {form.deviceType === 'other' && (
+            <div>
+              <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Specify Custom Type</label>
+              <input
+                type="text"
+                placeholder="e.g., Smartwatch, Console..."
+                value={form.customDeviceType}
+                onChange={(e) => setForm({ ...form, customDeviceType: e.target.value })}
+                className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                required
+              />
+            </div>
+          )}
+
           <div>
             <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Hardware ID</label>
             <input 
-              className="w-full bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+              className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
               placeholder="SN / IMEI" 
               value={form.deviceHardwareId}
               onChange={e => setForm({...form, deviceHardwareId: e.target.value})} 
@@ -131,7 +176,7 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
             <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Reported Issues / Faults</label>
             <div className="flex gap-2">
               <input 
-                className="flex-1 min-w-0 bg-zinc-950  rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                className="flex-1 min-w-0 bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                 placeholder="Type fault & click add (e.g. Broken Glass)" 
                 value={currentIssueInput}
                 onChange={e => setCurrentIssueInput(e.target.value)}
@@ -140,7 +185,7 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
               <button 
                 type="button"
                 onClick={handleAddIssue}
-                className="shrink-0 bg-zinc-800 hover:bg-zinc-700 text-zinc-200  px-3 sm:px-4 rounded-lg font-bold transition-all text-xs sm:text-sm"
+                className="shrink-0 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 sm:px-4 rounded-lg font-bold transition-all text-xs sm:text-sm"
               >
                 + Add
               </button>
@@ -148,7 +193,7 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
 
             {/* Render dynamically added problem tag groups layout map */}
             {form.issues.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2.5 p-2 bg-zinc-950/60 /80 rounded-lg max-h-[100px] overflow-y-auto scrollbar-thin">
+              <div className="flex flex-wrap gap-1.5 mt-2.5 p-2 bg-zinc-950/60 rounded-lg max-h-[100px] overflow-y-auto scrollbar-thin border border-zinc-800/60">
                 {form.issues.map((issue, idx) => (
                   <span 
                     key={idx} 
@@ -172,7 +217,7 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
             <button 
               type="button" 
               onClick={onClose} 
-              className="flex-1 px-4 py-2.5 rounded-lg  text-zinc-300 font-semibold hover:bg-zinc-800 transition-colors text-xs sm:text-sm"
+              className="flex-1 px-4 py-2.5 rounded-lg text-zinc-300 font-semibold bg-zinc-950 border border-zinc-800 hover:bg-zinc-800 transition-colors text-xs sm:text-sm"
             >
               Cancel
             </button>

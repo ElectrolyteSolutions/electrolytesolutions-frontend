@@ -11,6 +11,8 @@ const EditDeviceModal = ({ isOpen, onClose, device }) => {
   const [form, setForm] = useState({
     owner: '',
     deviceName: '',
+    deviceType: 'mobile',
+    customDeviceType: '',
     issues: [],
     deviceHardwareId: '',
     deviceRepairingStatus: 'in-progress'
@@ -26,6 +28,8 @@ const EditDeviceModal = ({ isOpen, onClose, device }) => {
       setForm({
         owner: device.owner?._id || device.owner || '',
         deviceName: device.deviceName || '',
+        deviceType: device.deviceType || 'mobile',
+        customDeviceType: device.customDeviceType || '',
         issues: device.issues ? [...device.issues] : [],
         deviceHardwareId: device.deviceHardwareId || '',
         deviceRepairingStatus: device.deviceRepairingStatus || 'in-progress'
@@ -58,6 +62,10 @@ const EditDeviceModal = ({ isOpen, onClose, device }) => {
     e.preventDefault();
     if (!form.owner) return alert('Please assign a customer profile');
     
+    if (form.deviceType === 'other' && !form.customDeviceType.trim()) {
+      return alert('Please specify a custom device type name.');
+    }
+    
     let finalIssuesArray = [...form.issues];
     if (currentIssueInput.trim() && !finalIssuesArray.includes(currentIssueInput.trim())) {
       finalIssuesArray.push(currentIssueInput.trim());
@@ -67,7 +75,11 @@ const EditDeviceModal = ({ isOpen, onClose, device }) => {
       return alert('Please describe at least one device fault or hardware issue.');
     }
 
-    const payload = { ...form, issues: finalIssuesArray };
+    const payload = { 
+      ...form, 
+      issues: finalIssuesArray,
+      customDeviceType: form.deviceType === 'other' ? form.customDeviceType.trim() : ''
+    };
 
     dispatch(updateDevice({ id: device._id, data: payload }))
       .unwrap()
@@ -113,6 +125,38 @@ const EditDeviceModal = ({ isOpen, onClose, device }) => {
               required 
             />
           </div>
+
+          {/* Device Type Selection */}
+          <div>
+            <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Device Type</label>
+            <select
+              value={form.deviceType}
+              onChange={(e) => setForm({ ...form, deviceType: e.target.value })}
+              className="w-full bg-zinc-900 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50 capitalize cursor-pointer"
+            >
+              <option value="mobile">Mobile</option>
+              <option value="tablet">Tablet</option>
+              <option value="printer">Printer</option>
+              <option value="desktop">Desktop</option>
+              <option value="laptop">Laptop</option>
+              <option value="speaker">Speaker</option>
+              <option value="other">Other (Custom)</option>
+            </select>
+          </div>
+
+          {form.deviceType === 'other' && (
+            <div>
+              <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Specify Custom Type</label>
+              <input
+                type="text"
+                placeholder="e.g., Smartwatch, Console..."
+                value={form.customDeviceType}
+                onChange={(e) => setForm({ ...form, customDeviceType: e.target.value })}
+                className="w-full bg-zinc-900 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                required
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Hardware ID</label>
