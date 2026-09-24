@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import BillReceiptCore from '../components/BillReceiptCore';
+import html2canvas from 'html2canvas-pro';
+import jsPDF from 'jspdf';
 
 const PublicBillView = () => {
   const { token } = useParams();
@@ -35,6 +37,38 @@ const PublicBillView = () => {
     window.print();
   };
 
+  const handleDownloadPdf = async () => {
+  const element = printRef.current;
+  if (!element) return;
+
+  try {
+    // Render the receipt element to a canvas
+    const canvas = await html2canvas(element, {
+      scale: 2, // Increases quality/sharpness
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff'
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    
+    // Initialize jsPDF (A4 size portrait)
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    
+    // Trigger immediate direct file download
+    const fileName = `Invoice-${billData?.billNumber || billData?._id || 'receipt'}.pdf`;
+    pdf.save(fileName);
+  } catch (err) {
+    console.error("PDF generation failed:", err);
+    // Fallback to browser print preview if canvas capture fails
+    window.print();
+  }
+};
+
   const fullGstin = "09EYOPR0179F1ZV";
   const getMaskedGstin = (gstin) => {
     if (!gstin || gstin.length <= 5) return gstin;
@@ -68,7 +102,7 @@ const PublicBillView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 py-6 px-2 sm:px-4 flex flex-col items-center justify-start">
+    <div className="min-h-screen bg-zinc-950 py-6 px-2 sm:px-4 flex flex-col items-center justify-start space-y-4">
       
       {/* Strict 1-Page Single-Target Print Engine CSS */}
       <style dangerouslySetInnerHTML={{__html: `
@@ -112,6 +146,39 @@ const PublicBillView = () => {
         }
       `}} />
 
+      {/* Public Action Controls Toolbar */}
+      <div className="w-full max-w-[800px] flex flex-wrap justify-between items-center gap-3 bg-zinc-900 border border-zinc-800 px-4 py-3 rounded-xl no-print shadow-lg">
+        <div>
+          <h1 className="text-sm font-bold text-white">Public Secure Bill View</h1>
+          <p className="text-[10px] text-zinc-400 font-mono">Invoice ID: {bill?.billNumber || bill?._id}</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 ml-auto">
+          <button 
+            onClick={() => setIsGstinMasked(!isGstinMasked)}
+            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700 cursor-pointer"
+            title="Toggle GSTIN Masking"
+          >
+            {isGstinMasked ? '👁️ Unmask GSTIN' : '🔒 Mask GSTIN'}
+          </button>
+
+          <button 
+            onClick={handleDownloadPdf}
+            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow border border-zinc-700 cursor-pointer"
+          >
+            📥 Download PDF
+          </button>
+
+          <button 
+            onClick={handlePrint}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md font-semibold text-xs transition-all shadow cursor-pointer"
+          >
+            🖨️ Print
+          </button>
+        </div>
+      </div>
+
+      {/* Receipt Preview Container */}
       <div className="w-full max-w-[800px] bg-white rounded-xl shadow-2xl overflow-hidden p-2 sm:p-4">
         <div ref={printRef} id="printable-invoice-receipt" className="w-full bg-white">
           <BillReceiptCore 
@@ -121,8 +188,7 @@ const PublicBillView = () => {
             displayedGstin={displayedGstin}
             isGstinMasked={isGstinMasked}
             setIsGstinMasked={setIsGstinMasked}
-            showControls={true}
-            onPrint={handlePrint}
+            showControls={false}
           />
         </div>
       </div>

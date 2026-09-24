@@ -75,10 +75,6 @@ const DashboardPage = () => {
       
       {/* Dashboard Greetings & Profile Details Header */}
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-zinc-800 pb-6">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">System Dashboard</h1>
-          <p className="text-xs text-zinc-400 mt-1">Welcome back, <span className="text-emerald-400 font-semibold">{profileData?.name || 'Administrator'}</span></p>
-        </div>
 
         {/* Profile Card Widget */}
         {profileData && (

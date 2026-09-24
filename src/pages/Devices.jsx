@@ -14,8 +14,9 @@ const DevicesPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDeviceToEdit, setSelectedDeviceToEdit] = useState(null);
 
-  // Search and Sort State
+  // Search, Type Tab, and Sort State
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDeviceTypeTab, setSelectedDeviceTypeTab] = useState('all'); // 'all' | 'mobile' | 'tablet' | ...
   const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'name' | 'status' | 'type'
 
   useEffect(() => {
@@ -73,12 +74,29 @@ const DevicesPage = () => {
     });
   };
 
+  // Compute Counts per Device Type Tab
+  const typeCounts = useMemo(() => {
+    if (!items) return {};
+    const counts = { all: items.length };
+    items.forEach((device) => {
+      const type = device.deviceType || 'other';
+      counts[type] = (counts[type] || 0) + 1;
+    });
+    return counts;
+  }, [items]);
+
   // Filter and Sort Logic
   const filteredAndSortedDevices = useMemo(() => {
     if (!items) return [];
 
-    // Filter by search query
+    // Filter by tab category & search query
     const filtered = items.filter((device) => {
+      // 1. Device Type Tab Filter
+      if (selectedDeviceTypeTab !== 'all' && device.deviceType !== selectedDeviceTypeTab) {
+        return false;
+      }
+
+      // 2. Search Query Filter
       const term = searchTerm.toLowerCase();
       const deviceName = device.deviceName?.toLowerCase() || '';
       const hwId = device.deviceHardwareId?.toLowerCase() || '';
@@ -109,7 +127,19 @@ const DevicesPage = () => {
         return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
       }
     });
-  }, [items, searchTerm, sortBy]);
+  }, [items, searchTerm, selectedDeviceTypeTab, sortBy]);
+
+  // Tab definitions configuration
+  const deviceTypeTabs = [
+    { key: 'all', label: 'All Devices' },
+    { key: 'mobile', label: 'Mobile' },
+    { key: 'tablet', label: 'Tablet' },
+    { key: 'laptop', label: 'Laptop' },
+    { key: 'desktop', label: 'Desktop' },
+    { key: 'printer', label: 'Printer' },
+    { key: 'speaker', label: 'Speaker' },
+    { key: 'other', label: 'Other' },
+  ];
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full">
@@ -153,6 +183,32 @@ const DevicesPage = () => {
         </div>
       </div>
 
+      {/* Device Type Navigation Tabs with Dynamic Counts */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-zinc-800 w-full">
+        {deviceTypeTabs.map((tab) => {
+          const isActive = selectedDeviceTypeTab === tab.key;
+          const count = typeCounts[tab.key] || 0;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setSelectedDeviceTypeTab(tab.key)}
+              className={`px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide whitespace-nowrap transition-all border flex items-center gap-2 ${
+                isActive
+                  ? 'bg-blue-600/10 text-blue-400 border-blue-500/30 shadow-sm'
+                  : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:bg-zinc-800 hover:text-zinc-200'
+              }`}
+            >
+              <span>{tab.label}</span>
+              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                isActive ? 'bg-blue-500/20 text-blue-300' : 'bg-zinc-800 text-zinc-400'
+              }`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Table Section */}
       <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
         <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
@@ -180,7 +236,7 @@ const DevicesPage = () => {
               ) : filteredAndSortedDevices.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center text-zinc-500 text-sm italic">
-                    {items.length === 0 ? "No devices currently under repair." : "No devices match your search criteria."}
+                    {items.length === 0 ? "No devices currently under repair." : "No devices match your active filters/search."}
                   </td>
                 </tr>
               ) : (
@@ -217,7 +273,7 @@ const DevicesPage = () => {
                       <td className="px-4 sm:px-6 py-3">
                         <select
                           value={device.deviceRepairingStatus}
-                          onChange={(e) => handleStatusTypeChange(device, e.target.value)} // Note helper call matches original
+                          onChange={(e) => handleStatusChange(device, e.target.value)}
                           className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 sm:py-1.5 rounded-full border bg-zinc-950 focus:outline-none focus:ring-2 cursor-pointer transition-all ${getStatusStyles(device.deviceRepairingStatus)}`}
                         >
                           <option value="in-progress" className="bg-zinc-900 text-amber-400">In Progress</option>

@@ -1,10 +1,13 @@
 import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import BillReceiptCore from './BillReceiptCore';
+import html2canvas from 'html2canvas-pro';
+import jsPDF from 'jspdf';
 
 const InvoiceTemplate = ({ billData, onClose }) => {
   const printRef = useRef();
   const [isGstinMasked, setIsGstinMasked] = useState(true);
+  const [copyFeedback, setCopyFeedback] = useState(false);
 
   const storeCustomers = useSelector((state) => state.customers.items);
   const storeDevices = useSelector((state) => state.devices.items);
@@ -50,6 +53,69 @@ const InvoiceTemplate = ({ billData, onClose }) => {
     window.print();
   };
 
+  // Trigger PDF Download dialog via browser print engine
+  
+
+ const handleDownloadPdf = async () => {
+  const element = printRef.current;
+  if (!element) return;
+
+  try {
+    // 1. Clone the element to bypass modal layout, scrollbars, and CSS transforms
+    const clone = element.cloneNode(true);
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    clone.style.width = '794px'; // Standard A4 width in pixels at 96 DPI
+    clone.style.height = 'auto';
+    clone.style.transform = 'none';
+    clone.style.zIndex = '999999';
+    document.body.appendChild(clone);
+
+    // 2. Render the clean clone to canvas
+    const canvas = await html2canvas(clone, {
+      scale: 2, // High resolution/sharp text scaling
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      backgroundColor: '#ffffff'
+    });
+
+    // 3. Remove the temporary clone from the DOM
+    document.body.removeChild(clone);
+
+    const imgData = canvas.toDataURL('image/png');
+    
+    // 4. Initialize jsPDF configuration (A4 portrait dimensions)
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    
+    // 5. Trigger immediate file download
+    const fileName = `Invoice-${billData?.billNumber || billData?._id || 'receipt'}.pdf`;
+    pdf.save(fileName);
+  } catch (err) {
+    console.error("PDF generation failed:", err);
+    alert(`Could not generate direct PDF file (${err.message}). Falling back to print dialog.`);
+    window.print();
+  }
+};
+
+  // Copy Public Bill Link to Clipboard
+  const handleShareLink = () => {
+    const billId = invoice?.publicToken;
+    const publicUrl = `${window.location.origin}/bills/${billId}`;
+    
+    navigator.clipboard.writeText(publicUrl).then(() => {
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 2500);
+    }).catch(() => {
+      alert("Failed to copy link to clipboard.");
+    });
+  };
+
   const fullGstin = "09EYOPR0179F1ZV";
   const getMaskedGstin = (gstin) => {
     if (!gstin || gstin.length <= 5) return gstin;
@@ -77,16 +143,13 @@ const InvoiceTemplate = ({ billData, onClose }) => {
             margin: 0 !important;
             padding: 0 !important;
           }
-          /* Hide everything in body */
           body * {
             visibility: hidden !important;
           }
-          /* Reveal target element and its children exclusively */
           #printable-invoice-receipt, 
           #printable-invoice-receipt * {
             visibility: visible !important;
           }
-          /* Pin exactly to page 1 top-left with zero overflow duplication */
           #printable-invoice-receipt {
             position: fixed !important;
             left: 0 !important;
@@ -112,11 +175,11 @@ const InvoiceTemplate = ({ billData, onClose }) => {
         {/* Modal Header Bar with Controls */}
         <div className="px-4 sm:px-6 py-3 border-b border-zinc-800 flex flex-wrap justify-between items-center gap-3 bg-zinc-900 shrink-0">
           <div className="min-w-0 pr-2">
-            <h3 className="text-base sm:text-lg font-bold text-white truncate">Print Invoice</h3>
+            <h3 className="text-base sm:text-lg font-bold text-white truncate">Invoice & Billing Statement</h3>
             <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase mt-0.5 truncate">Invoice ID: {billData?.billNumber || billData?._id}</p>
           </div>
 
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex flex-wrap items-center gap-2 ml-auto">
             <button 
               onClick={() => setIsGstinMasked(!isGstinMasked)}
               className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
@@ -126,10 +189,24 @@ const InvoiceTemplate = ({ billData, onClose }) => {
             </button>
 
             <button 
+              onClick={handleShareLink}
+              className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow cursor-pointer no-print"
+            >
+              {copyFeedback ? '✓ Link Copied!' : '🔗 Share Public Link'}
+            </button>
+
+            <button 
+              onClick={handleDownloadPdf}
+              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
+            >
+              📥 Download PDF
+            </button>
+
+            <button 
               onClick={handlePrint}
               className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md font-semibold text-xs transition-all shadow cursor-pointer no-print"
             >
-              🖨️ Print Invoice Sheet
+              🖨️ Print
             </button>
 
             {onClose && (
@@ -141,7 +218,7 @@ const InvoiceTemplate = ({ billData, onClose }) => {
         {/* Modal Body Container */}
         <div className="overflow-y-auto flex-1 text-zinc-900 scrollbar-thin bg-zinc-950 p-4">
           <div className="w-full overflow-x-hidden flex justify-center">
-            <div ref={printRef} id="printable-invoice-receipt" className="w-full  overflow-hidden bg-white rounded-lg shadow-inner p-2">
+            <div ref={printRef} id="printable-invoice-receipt" className="w-full overflow-hidden bg-white rounded-lg shadow-inner p-2">
               <BillReceiptCore 
                 invoice={invoice}
                 resolvedCustomer={resolvedCustomer}
