@@ -3,12 +3,18 @@ import axios from 'axios';
 
 const API_URL = `${import.meta.env.VITE_API_URL}products`;
 
-
+// Helper for Auth Headers
+const getAuthConfig = (thunkAPI) => {
+  const token = thunkAPI.getState().auth.token;
+  return {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+};
 
 // ⚡ Updated: Dynamic async thunk supporting search, filters, and matrix sorting layouts
 export const getProducts = createAsyncThunk(
   'products/get',
-  async (filterParams = {}, { rejectWithValue }) => {
+  async (filterParams = {}, thunkAPI) => {
     try {
       // Destructure expected variables out to track configurations cleanly
       const { alert, search, sortBy, sortOrder, brand, modelName } = filterParams;
@@ -23,30 +29,50 @@ export const getProducts = createAsyncThunk(
       if (brand) queryPayload.brand = brand;
       if (modelName) queryPayload.modelName = modelName;
 
-      // Pass the query dictionary configuration parameters into the config payload block
-      const res = await axios.get(API_URL, { params: queryPayload });
+      // Pass the query dictionary configuration parameters along with auth headers into the config payload block
+      const config = {
+        ...getAuthConfig(thunkAPI),
+        params: queryPayload,
+      };
+
+      const res = await axios.get(API_URL, config);
       return res.data;
     } catch (err) {
       // Gracefully catch pipeline drops or connection timeouts safely
-      return rejectWithValue(err.response?.data || err.message);
+      const message = err.response?.data?.message || err.message;
+      return thunkAPI.rejectWithValue(message);
     }
   }
 );
 
-export const addProduct = createAsyncThunk('products/add', async (item) => {
-    const res = await axios.post(API_URL, item);
+export const addProduct = createAsyncThunk('products/add', async (item, thunkAPI) => {
+  try {
+    const res = await axios.post(API_URL, item, getAuthConfig(thunkAPI));
     return res.data;
+  } catch (err) {
+    const message = err.response?.data?.message || err.message;
+    return thunkAPI.rejectWithValue(message);
+  }
 });
 
-export const updateProduct = createAsyncThunk('products/update', async ({ id, data }) => {
-    
-    const res = await axios.put(`${API_URL}/${id}`, data);
+export const updateProduct = createAsyncThunk('products/update', async ({ id, data }, thunkAPI) => {
+  try {
+    const res = await axios.put(`${API_URL}/${id}`, data, getAuthConfig(thunkAPI));
     return res.data;
+  } catch (err) {
+    const message = err.response?.data?.message || err.message;
+    return thunkAPI.rejectWithValue(message);
+  }
 });
 
-export const deleteProduct = createAsyncThunk('products/delete', async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
+export const deleteProduct = createAsyncThunk('products/delete', async (id, thunkAPI) => {
+  try {
+    await axios.delete(`${API_URL}/${id}`, getAuthConfig(thunkAPI));
     return id;
+  } catch (err) {
+    const message = err.response?.data?.message || err.message;
+    return thunkAPI.rejectWithValue(message);
+  }
 });
 
 const productSlice = createSlice({
@@ -61,7 +87,9 @@ const productSlice = createSlice({
             })
             .addCase(updateProduct.fulfilled, (state, action) => {
                 const index = state.items.findIndex(i => i._id === action.payload._id);
-                state.items[index] = action.payload;
+                if (index !== -1) {
+                  state.items[index] = action.payload;
+                }
             });
     }
 });

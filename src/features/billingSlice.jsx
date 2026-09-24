@@ -3,36 +3,44 @@ import axios from 'axios';
 
 const API_URL = `${import.meta.env.VITE_API_URL}billings`;
 
+// Helper for Auth Headers
+const getAuthConfig = (thunkAPI) => {
+  const token = thunkAPI.getState().auth.token;
+  return {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+};
+
 // --- Asynchronous Thunks ---
 
 // Fetch the complete invoice history database
-export const getBills = createAsyncThunk('bills/get', async (_, { rejectWithValue }) => {
+export const getBills = createAsyncThunk('bills/get', async (_, thunkAPI) => {
   try {
-    const res = await axios.get(API_URL);
+    const res = await axios.get(API_URL, getAuthConfig(thunkAPI));
     return res.data;
   } catch (err) { 
-    return rejectWithValue(err.response?.data || { message: "Failed to fetch invoices" }); 
+    return thunkAPI.rejectWithValue(err.response?.data || { message: "Failed to fetch invoices" }); 
   }
 });
 
 // Process a brand new checkout transaction (Deducts stock on backend)
-export const createInvoice = createAsyncThunk('bills/create', async (billData, { rejectWithValue }) => {
+export const createInvoice = createAsyncThunk('bills/create', async (billData, thunkAPI) => {
   try {
-    const res = await axios.post(API_URL, billData);
+    const res = await axios.post(API_URL, billData, getAuthConfig(thunkAPI));
     return res.data;
   } catch (err) { 
     // This catches business rule validations like "Insufficient stock"
-    return rejectWithValue(err.response?.data || { message: "Invoice transaction failed" }); 
+    return thunkAPI.rejectWithValue(err.response?.data || { message: "Invoice transaction failed" }); 
   }
 });
 
 // Delete an invoice record (Cleans up cross-references on backend)
-export const deleteBill = createAsyncThunk('bills/delete', async (id, { rejectWithValue }) => {
+export const deleteBill = createAsyncThunk('bills/delete', async (id, thunkAPI) => {
   try {
-    await axios.delete(`${API_URL}/${id}`);
+    await axios.delete(`${API_URL}/${id}`, getAuthConfig(thunkAPI));
     return id;
   } catch (err) {
-    return rejectWithValue(err.response?.data || { message: "Failed to delete invoice" });
+    return thunkAPI.rejectWithValue(err.response?.data || { message: "Failed to delete invoice" });
   }
 });
 

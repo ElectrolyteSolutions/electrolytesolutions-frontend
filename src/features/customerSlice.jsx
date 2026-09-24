@@ -3,41 +3,53 @@ import axios from 'axios';
 
 const API_URL = `${import.meta.env.VITE_API_URL}customers`;
 
+// Helper for Auth Headers
+const getAuthConfig = (thunkAPI) => {
+  const token = thunkAPI.getState().auth.token;
+  return {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+};
+
 // --- Thunks ---
 
-export const getCustomers = createAsyncThunk('customers/get', async (_, { rejectWithValue }) => {
+export const getCustomers = createAsyncThunk('customers/get', async (_, thunkAPI) => {
   try {
-    const res = await axios.get(API_URL);
+    const res = await axios.get(API_URL, getAuthConfig(thunkAPI));
     return res.data;
   } catch (err) {
-    return rejectWithValue(err.response.data);
+    const message = err.response?.data?.message || err.message;
+    return thunkAPI.rejectWithValue(message);
   }
 });
 
-export const addCustomer = createAsyncThunk('customers/add', async (data, { rejectWithValue }) => {
+export const addCustomer = createAsyncThunk('customers/add', async (data, thunkAPI) => {
   try {
-    const res = await axios.post(API_URL, data);
+    const res = await axios.post(API_URL, data, getAuthConfig(thunkAPI));
     return res.data;
   } catch (err) {
-    return rejectWithValue(err.response.data);
+    const message = err.response?.data?.message || err.message;
+    return thunkAPI.rejectWithValue(message);
   }
 });
 
-export const updateCustomer = createAsyncThunk('customers/update', async ({ id, data }, { rejectWithValue }) => {
+export const updateCustomer = createAsyncThunk('customers/update', async ({ id, data }, thunkAPI) => {
   try {
-    const res = await axios.put(`${API_URL}/${id}`, data);
+    const res = await axios.put(`${API_URL}/${id}`, data, getAuthConfig(thunkAPI));
     return res.data;
   } catch (err) {
-    return rejectWithValue(err.response.data);
+    const message = err.response?.data?.message || err.message;
+    return thunkAPI.rejectWithValue(message);
   }
 });
 
-export const deleteCustomer = createAsyncThunk('customers/delete', async (id, { rejectWithValue }) => {
+export const deleteCustomer = createAsyncThunk('customers/delete', async (id, thunkAPI) => {
   try {
-    await axios.delete(`${API_URL}/${id}`);
+    await axios.delete(`${API_URL}/${id}`, getAuthConfig(thunkAPI));
     return id; // Return the ID so we can filter it out of the state
   } catch (err) {
-    return rejectWithValue(err.response.data);
+    const message = err.response?.data?.message || err.message;
+    return thunkAPI.rejectWithValue(message);
   }
 });
 
