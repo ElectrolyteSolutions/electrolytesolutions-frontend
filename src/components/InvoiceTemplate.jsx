@@ -6,7 +6,7 @@ import jsPDF from 'jspdf';
 
 const InvoiceTemplate = ({ billData, onClose }) => {
   const printRef = useRef();
-  const [isGstinMasked, setIsGstinMasked] = useState(true);
+  const [isGstinMasked, setIsGstinMasked] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(false);
 
   const storeCustomers = useSelector((state) => state.customers.items);
