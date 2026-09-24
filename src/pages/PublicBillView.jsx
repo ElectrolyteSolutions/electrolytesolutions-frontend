@@ -10,7 +10,7 @@ const PublicBillView = () => {
   const [bill, setBill] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isGstinMasked, setIsGstinMasked] = useState(true);
+  const [isGstinMasked, setIsGstinMasked] = useState(false);
 
   useEffect(() => {
     const fetchPublicBill = async () => {
@@ -154,13 +154,13 @@ const PublicBillView = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 ml-auto">
-          <button 
+          {/* <button 
             onClick={() => setIsGstinMasked(!isGstinMasked)}
             className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700 cursor-pointer"
             title="Toggle GSTIN Masking"
           >
             {isGstinMasked ? '👁️ Unmask GSTIN' : '🔒 Mask GSTIN'}
-          </button>
+          </button> */}
 
           <button 
             onClick={handleDownloadPdf}
