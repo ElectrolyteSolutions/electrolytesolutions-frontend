@@ -619,24 +619,7 @@ const BillingPage = () => {
         </div>
       )}
 
-      {isModalOpen && selectedBill && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-900 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-            <div className="px-4 sm:px-6 py-2 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30 shrink-0">
-              <div className="min-w-0 pr-2">
-                <h3 className="text-base sm:text-lg font-bold text-white truncate">Invoice History Log Inspection</h3>
-                <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase mt-0.5 truncate">DB_ID: {selectedBill._id}</p>
-              </div>
-              <button onClick={() => setIsModalOpen(false)} className="text-zinc-400 hover:text-white transition-colors text-2xl shrink-0 leading-none">&times;</button>
-            </div>
-            <div className="p-3 sm:p-4 overflow-y-auto flex-1 bg-white text-zinc-900 scrollbar-thin">
-              <div className="min-w-[500px] sm:min-w-0">
-                <InvoiceTemplate billData={selectedBill} />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {isModalOpen && selectedBill && (<InvoiceTemplate billData={selectedBill} onClose={()=>setIsModalOpen(false)} />)}
 
     </div>
   );

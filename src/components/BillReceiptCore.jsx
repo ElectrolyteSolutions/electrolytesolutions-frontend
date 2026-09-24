@@ -16,20 +16,17 @@ const BillReceiptCore = ({
   const grossTotal = (invoice.items || []).reduce((sum, item) => sum + (item.subTotal || 0), 0) + (invoice.serviceCharge || 0);
 
   return (
-    <div className="w-full">
-      <head>
-        <title>{invoice.billNumber}</title>
-      </head>
-      {/* Optional Control Actions bar (Print/Mask toggles) */}
+    <div className="w-full bg-white text-zinc-900 overflow-x-hidden">
+      <head><title>{invoice?.billNumber}</title></head>
+      {/* Optional Control Actions bar */}
       {showControls && (
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-3 border-b border-zinc-800 pb-3 px-2 no-print">
-          <span className="text-xs text-zinc-400 font-medium text-center sm:text-left">Invoice Printing Engine Preview</span>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-3 border-b border-zinc-200 pb-3 px-2 no-print">
+          <span className="text-xs text-zinc-500 font-medium text-center sm:text-left">Invoice Printing Engine Preview</span>
           <div className="flex items-center gap-2">
             {setIsGstinMasked && (
               <button 
                 onClick={() => setIsGstinMasked(!isGstinMasked)}
-                className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-2 sm:py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700"
-                title="Toggle GSTIN Masking"
+                className="bg-zinc-100 hover:bg-zinc-200 text-zinc-800 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-300 cursor-pointer"
               >
                 {isGstinMasked ? '👁️ Unmask GSTIN' : '🔒 Mask GSTIN'}
               </button>
@@ -38,7 +35,7 @@ const BillReceiptCore = ({
             {onPrint && (
               <button 
                 onClick={onPrint}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 sm:py-1.5 rounded-md font-semibold text-xs transition-all shadow"
+                className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md font-semibold text-xs transition-all shadow cursor-pointer"
               >
                 🖨️ Print Invoice Sheet
               </button>
@@ -47,22 +44,13 @@ const BillReceiptCore = ({
         </div>
       )}
 
-      <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-700 pb-2">
-        <div className="bg-white text-zinc-900 p-5 rounded-md shadow-inner font-sans tracking-tight text-[11px] min-w-[760px]">
+      <div className="w-full pb-2 bg-white">
+        <div className="bg-white text-zinc-900 p-4 sm:p-5 rounded-md font-sans tracking-tight text-[11px] w-full">
           
-          <style dangerouslySetInnerHTML={{__html: `
-            @media print {
-              @page { size: A4 portrait; margin: 8mm; }
-              body { color: #000000 !important; background: #ffffff !important; padding: 0; margin: 0; }
-              .print\\:bg-zinc-100 { background-color: #f4f4f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-              .no-print { display: none !important; }
-            }
-          `}} />
-
           {/* Branded Identity Header Block */}
-          <div className="flex justify-between items-start border-b border-zinc-300 pb-3">
+          <div className="flex justify-between items-start border-b border-zinc-300 pb-2">
             <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded bg-zinc-100 border border-zinc-200 overflow-hidden flex items-center justify-center p-0.5 shrink-0">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded bg-white border border-zinc-200 overflow-hidden flex items-center justify-center p-0.5 shrink-0">
                 <img 
                   src={logourl} 
                   alt="Company Identity Logo" 
@@ -70,7 +58,7 @@ const BillReceiptCore = ({
                 />
               </div>
               <div>
-                <h1 className="text-lg font-black text-zinc-950 tracking-tighter leading-none">ELECTROLYTE SOLUTIONS</h1>
+                <h1 className="text-base sm:text-lg font-black text-zinc-950 tracking-tighter leading-none">ELECTROLYTE SOLUTIONS</h1>
                 <p className="text-[10px] text-zinc-500 leading-tight mt-1">
                   Nahar Bala Ganj, Balrampur, UP, 271201<br />
                   <span className="font-semibold font-mono text-zinc-700 text-[9px]">Contact No.: 9648146167, 8081111867</span><br/>
@@ -82,20 +70,20 @@ const BillReceiptCore = ({
             
             <div className="text-right">
               <p className="font-bold font-mono text-zinc-900 text-[11px] uppercase">GSTIN: {displayedGstin}</p>
-              <h2 className="text-xs font-black text-zinc-950 uppercase tracking-wider bg-zinc-100 py-0.5 rounded inline-block">Tax Invoice</h2>
-              <div className="text-[10px] text-zinc-600 space-y-0.5 mt-1.5 font-mono">
-                <div className="text-[9px] text-zinc-900 bg-zinc-100 font-bold  py-0.5 rounded uppercase tracking-wide inline-block mb-1">Purpose: {invoice.purpose}</div>
+              <h2 className="text-xs font-black text-zinc-950 uppercase tracking-wider   rounded inline-block mt-1">Tax Invoice</h2>
+              <div className="text-[10px] text-zinc-600  font-mono">
+                <div className="text-[9px] text-zinc-900  font-bold  rounded uppercase tracking-wide inline-block mb-1">Purpose: {invoice.purpose}</div>
                 <div>Date: {invoice.lastUpdated ? invoice.lastUpdated.split(',')[0] : new Date(invoice.createdAt || Date.now()).toLocaleDateString()}</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-zinc-100 border-b border-zinc-200 py-1 flex justify-between items-center text-[9px] font-mono text-zinc-800">
+          <div className="bg-zinc-200 border-b border-zinc-200 p-1.5 flex justify-between items-center text-[9px] font-mono text-zinc-800 ">
             <span className="font-sans font-bold uppercase tracking-wider text-zinc-500">Bill Id:</span>
             <span className="font-bold select-all tracking-wide text-zinc-950">{invoice.billNumber || invoice._id}</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 my-3 pb-3 border-b border-zinc-100">
+          <div className="grid grid-cols-2 gap-4 my-2 border-b border-zinc-100">
             <div>
               <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Billed To:</span>
               <div className="font-bold text-zinc-900 text-xs flex items-center gap-1.5">
@@ -108,8 +96,8 @@ const BillReceiptCore = ({
                 {resolvedCustomer?.address || 'Counter Sale Transaction Log'}
               </div>
               <div className="text-zinc-700 font-mono font-medium text-[10px] mt-0.5">Phone: {resolvedCustomer?.phone || 'N/A'}</div>
-              {resolvedCustomer?.gst && <div className="text-zinc-700 font-mono font-medium text-[10px] ">GSTIN: {resolvedCustomer?.gst}</div>}
-              {resolvedCustomer?.pan && <div className="text-zinc-700 font-mono font-medium text-[10px] ">PAN: {resolvedCustomer?.pan}</div>}
+              {resolvedCustomer?.gst && <div className="text-zinc-700 font-mono font-medium text-[10px]">GSTIN: {resolvedCustomer?.gst}</div>}
+              {resolvedCustomer?.pan && <div className="text-zinc-700 font-mono font-medium text-[10px]">PAN: {resolvedCustomer?.pan}</div>}
             </div>
             
             <div className="text-right flex flex-col items-end justify-start">
@@ -138,24 +126,16 @@ const BillReceiptCore = ({
           </div>
 
           {/* Line Items Matrix Table */}
-          <table className="w-full text-left border-collapse my-3 text-[10px]">
+          <table className="w-full text-left border-collapse my-2 text-[10px]">
             <thead>
               <tr className="bg-zinc-100 text-zinc-700 font-semibold border-b border-zinc-300">
                 <th className="px-2 py-1.5 w-6">#</th>
                 <th className="px-2 py-1.5">Item Description</th>
-                <th className="px-2 py-1.5 text-right w-14">
-                  <div>HSN</div>
-                </th>
-                <th className="px-2 py-1.5 text-right w-14">
-                  <div>Rate</div>
-                </th>
+                <th className="px-2 py-1.5 text-right w-14">HSN</th>
+                <th className="px-2 py-1.5 text-right w-14">Rate</th>
                 <th className="px-2 py-1.5 text-right w-12 text-amber-600">Discount</th>
-                <th className="px-2 py-1.5 text-right w-16 font-mono text-zinc-600">
-                  <div>CGST<span className="text-[7px] font-normal ml-1">(9%)</span></div>
-                </th>
-                <th className="px-2 py-1.5 text-right w-16 font-mono text-zinc-600">
-                  <div>SGST<span className="text-[7px] font-normal ml-1">(9%)</span></div>
-                </th>
+                <th className="px-2 py-1.5 text-right w-16 font-mono text-zinc-600">CGST<span className="text-[7px] font-normal ml-1">(9%)</span></th>
+                <th className="px-2 py-1.5 text-right w-16 font-mono text-zinc-600">SGST<span className="text-[7px] font-normal ml-1">(9%)</span></th>
                 <th className="px-2 py-1.5 text-center w-8">Qty</th>
                 <th className="px-2 py-1.5 text-right w-16">Total</th>
               </tr>
@@ -187,7 +167,7 @@ const BillReceiptCore = ({
                     </td>
                     <td className="px-2 py-2 text-right font-mono">{item?.hsn || "-"} </td>
                     <td className="px-2 py-2 text-right font-mono">₹{calculatedRate.toFixed(2)}</td>
-                    <td className={`px-2 py-2 text-right font-mono font-medium ${itemDiscount > 0 ? 'text-amber-600 bg-amber-50/40 print:bg-amber-50' : 'text-zinc-400'}`}>
+                    <td className={`px-2 py-2 text-right font-mono font-medium ${itemDiscount > 0 ? 'text-amber-600 bg-amber-50/40' : 'text-zinc-400'}`}>
                       {itemDiscount > 0 ? `-${itemDiscount.toFixed(2)}` : '0.00'}
                     </td>
                     <td className="px-2 py-2 text-right font-mono text-zinc-600">₹{cgst.toFixed(2)}</td>
@@ -200,13 +180,12 @@ const BillReceiptCore = ({
 
               {invoice.purpose === 'repair' && invoice.serviceCharge > 0 && (() => {
                 const sCharge = Number(invoice.serviceCharge);
-                
 
                 return (
                   <tr className="bg-amber-50/40 border-t border-dashed border-zinc-200">
                     <td className="px-2 py-2 font-mono text-amber-600">*</td>
                     <td className="px-2 py-2 font-medium text-zinc-900">
-                      <div>Diagnostic /On-Site Convenience Fee /Technical Service Fee</div>
+                      <div>Diagnostic /On-Site Convenience Fee /Technical Service Fee /Installation Charge</div>
                       <div className="text-[8px] text-zinc-400 italic">Non-refundable labor line charge</div>
                     </td>
                     <td className="px-2 py-2 text-right font-mono">-</td>
@@ -223,7 +202,7 @@ const BillReceiptCore = ({
           </table>
 
           {/* Lower Summarization Sign-off Area */}
-          <div className="flex justify-between items-end mt-4 pt-3 border-t border-zinc-200">
+          <div className="flex justify-between items-end  border-t border-zinc-200">
             <div className="w-1/2 text-[9px] text-zinc-400 pr-4 leading-normal flex flex-col justify-between h-full">
               <div>
                 <span className="font-bold text-zinc-600 block mb-0.5">Terms & Conditions:</span>
@@ -236,7 +215,7 @@ const BillReceiptCore = ({
                   <img 
                     src={invoice.qrCode || `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://shop.electrolytesolutions.in/bills/${invoice.publicToken}`} 
                     alt="Scan to view bill" 
-                    className="w-14 h-14 object-contain border border-zinc-200 rounded p-0.5 bg-white shrink-0"
+                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain border border-zinc-200 rounded p-0.5 bg-white shrink-0"
                   />
                   <div className="text-[9px] text-zinc-500 leading-tight">
                     <span className="font-bold text-zinc-700 block uppercase tracking-tight">Scan to View Web Bill</span>
@@ -247,19 +226,19 @@ const BillReceiptCore = ({
             </div>
 
             <div className="w-1/2 space-y-1 font-medium text-zinc-600 text-right">
-              <div className="flex justify-between items-center bg-zinc-950 text-white px-3 py-1.5 rounded text-[11px] font-bold mt-2">
+              <div className="flex justify-between items-center bg-zinc-950 text-white print:text-black px-3 py-1.5 rounded text-[11px] font-bold mt-2">
                 <span>Grand Net Total:</span>
-                <span className="font-black font-mono text-xs">₹{grossTotal.toFixed(2)}</span>
+                <span className="font-black font-mono text-xs print:text-black">₹{grossTotal.toFixed(2)}</span>
               </div>
 
               {/* Signature space */}
-              <div className="pt-5 flex flex-col items-end">
+              <div className="pt-4 flex flex-col items-end">
                 <img 
                   src={signUrl} 
                   alt="Authorized Signature" 
-                  className="h-12 w-28 object-contain mix-blend-multiply mb-1 mr-2" 
+                  className="h-10 sm:h-12 w-24 sm:w-28 object-contain mix-blend-multiply mb-1 mr-2" 
                 />
-                <div className="w-36 h-0.5 bg-zinc-300 mb-0.5"></div>
+                <div className="w-32 sm:w-36 h-0.5 bg-zinc-300 mb-0.5"></div>
                 <div className="text-[8px] uppercase font-bold text-zinc-400 tracking-wider">Authorized Signature</div>
               </div>
             </div>
