@@ -1,6 +1,7 @@
 import React from 'react';
 import logourl from '../assets/icon.png';
 import signUrl from '../assets/sign.png';
+import stampUrl from '../assets/stamp.png';
 
 const BillReceiptCore = ({ 
   invoice, 
@@ -232,12 +233,21 @@ const BillReceiptCore = ({
               </div>
 
               {/* Signature space */}
-              <div className="pt-4 flex flex-col items-end">
+              <div className="pt-4 flex flex-col items-end relative">
+                {/* Stamp positioned behind the signature area */}
+                <img 
+                  src={stampUrl} 
+                  alt="Company Seal Stamp" 
+                  className="absolute bottom- right-16 w-52 sm:w-52 h-auto object-contain mix-blend-multiply opacity-90 pointer-events-none transform -rotate-6" 
+                />
+
+                {/* Authorized Signature */}
                 <img 
                   src={signUrl} 
                   alt="Authorized Signature" 
-                  className="h-10 sm:h-12 w-24 sm:w-28 object-contain mix-blend-multiply mb-1 mr-2" 
+                  className="relative z-10 h-10 sm:h-18 w-32 sm:w-28 object-contain mix-blend-multiply mb-1 mr-2" 
                 />
+
                 <div className="w-32 sm:w-36 h-0.5 bg-zinc-300 mb-0.5"></div>
                 <div className="text-[8px] uppercase font-bold text-zinc-400 tracking-wider">Authorized Signature</div>
               </div>

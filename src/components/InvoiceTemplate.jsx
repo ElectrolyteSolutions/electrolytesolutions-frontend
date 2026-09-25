@@ -209,9 +209,7 @@ const InvoiceTemplate = ({ billData, onClose }) => {
               🖨️ Print
             </button>
 
-            {onClose && (
-              <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors text-2xl shrink-0 leading-none cursor-pointer ml-2 no-print">&times;</button>
-            )}
+            <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors text-2xl shrink-0 leading-none cursor-pointer ml-2 no-print">&times;</button>
           </div>
         </div>
 

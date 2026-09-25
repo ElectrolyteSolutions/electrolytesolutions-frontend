@@ -14,6 +14,7 @@ const BillingPage = () => {
   const customers = useSelector(state => state.customers.items);
   const products = useSelector(state => state.products.items);
   const { items: bills, status: billStatus } = useSelector(state => state.billings);
+  const { token } = useSelector(state => state.auth);
 
   const [activeTab, setActiveTab] = useState('checkout');
   const [printTargetData, setPrintTargetData] = useState(null);
@@ -228,12 +229,20 @@ const BillingPage = () => {
     };
 
     if (editingBillId) {
-      axios.put(`${import.meta.env.VITE_API_URL}billings/${editingBillId}`, completePayload)
-        .then((res) => {
-          alert("Invoice updated successfully!");
-          handlePostSubmitCleanup(res.data);
-        })
-        .catch(err => alert(`Failed to update bill record: ${err.response?.data?.message || err.message}`));
+      axios.put(
+  `${import.meta.env.VITE_API_URL}billings/${editingBillId}`,
+  completePayload,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+)
+.then((res) => {
+  alert("Invoice updated successfully!");
+  handlePostSubmitCleanup(res.data);
+})
+.catch(err => alert(`Failed to update bill record: ${err.response?.data?.message || err.message}`));
     } else {
       dispatch(createInvoice(completePayload)).then((res) => {
         if (!res.error) {
@@ -278,6 +287,12 @@ const BillingPage = () => {
     setIsModalOpen(true);
   };
 
+  const handleCloseInspect = () => {
+    setSelectedBill(null);
+    setIsModalOpen(false);
+    setPrintTargetData(null)
+  };
+
   return (
     <div className="max-w-[1500px] mx-auto text-zinc-100 bg-zinc-950 min-h-screen space-y-6">
       
@@ -297,7 +312,7 @@ const BillingPage = () => {
             <button onClick={() => { setPrintTargetData(null); setActiveTab('checkout'); }} className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold">← Back to New Transaction</button>
           </div>
           <div className="overflow-x-auto">
-            <InvoiceTemplate billData={printTargetData} />
+            <InvoiceTemplate billData={printTargetData} onClose={handleCloseInspect} />
           </div>
         </div>
       )}
@@ -619,8 +634,7 @@ const BillingPage = () => {
         </div>
       )}
 
-      {isModalOpen && selectedBill && (<InvoiceTemplate billData={selectedBill} onClose={()=>setIsModalOpen(false)} />)}
-
+      {isModalOpen && selectedBill && (<InvoiceTemplate billData={selectedBill} onClose={handleCloseInspect} />)}
     </div>
   );
 };
