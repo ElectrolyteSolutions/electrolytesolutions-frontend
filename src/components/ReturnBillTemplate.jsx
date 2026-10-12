@@ -113,9 +113,9 @@ const RefundVoucherTemplate = ({ refundData }) => {
               <tr key={item.productId || idx} className="bg-red-50/5">
                 <td className="px-2 py-2 font-mono text-zinc-400">{idx + 1}</td>
                 <td className="px-2 py-2 font-bold text-red-950">{item.name}</td>
-                <td className="px-2 py-2 text-right font-mono">Rs.{Number(item.price || 0).toFixed(2)}</td>
+                <td className="px-2 py-2 text-right font-mono">₹{Number(item.price || 0).toFixed(2)}</td>
                 <td className="px-2 py-2 text-center font-bold text-red-600 font-mono">+{item.orderedQuantity}</td>
-                <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{Number(item.subTotal || 0).toFixed(2)}</td>
+                <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">₹{Number(item.subTotal || 0).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
@@ -129,11 +129,11 @@ const RefundVoucherTemplate = ({ refundData }) => {
           <div className="w-1/2 space-y-1 text-zinc-600 text-right">
             <div className="flex justify-between pl-12 text-[10px]">
               <span>Taxable Refund Base:</span>
-              <span className="text-zinc-900 font-mono">Rs.{absoluteGrandRefund.toFixed(2)}</span>
+              <span className="text-zinc-900 font-mono">₹{absoluteGrandRefund.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center bg-red-600 text-white px-3 py-1.5 rounded text-[11px] font-bold mt-1.5 shadow-sm">
               <span>Total Cash Refunded:</span>
-              <span className="font-black font-mono text-xs">Rs.{absoluteGrandRefund.toFixed(2)}</span>
+              <span className="font-black font-mono text-xs">₹{absoluteGrandRefund.toFixed(2)}</span>
             </div>
 
             {/* Signature Block space boundary layout line components */}

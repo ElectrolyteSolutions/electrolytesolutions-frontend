@@ -129,7 +129,7 @@ const ReturnsPage = () => {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-xs sm:text-sm font-semibold text-zinc-200 truncate">{item.name}</div>
-                        <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5">Purchased Qty: {item.orderedQuantity} • Rate: Rs.{item.price}</div>
+                        <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5">Purchased Qty: {item.orderedQuantity} • Rate: ₹{item.price}</div>
                       </div>
                     </div>
 
@@ -173,7 +173,7 @@ const ReturnsPage = () => {
                   return (
                     <div key={key} className="flex justify-between items-center bg-zinc-950 border border-zinc-800 px-3 py-2 rounded-lg font-medium text-zinc-400 gap-2">
                       <span className="truncate min-w-0">{match?.name} (×{selectedQty})</span>
-                      <span className="font-bold text-red-400 font-mono shrink-0">Rs.{match ? match.price * selectedQty : 0}</span>
+                      <span className="font-bold text-red-400 font-mono shrink-0">₹{match ? match.price * selectedQty : 0}</span>
                     </div>
                   );
                 })}
@@ -184,7 +184,7 @@ const ReturnsPage = () => {
               <div className="flex justify-between items-center">
                 <span className="text-[11px] sm:text-xs text-zinc-400 font-bold">Total Cash to Handback:</span>
                 <span className="text-lg sm:text-xl font-black text-red-400 font-mono">
-                  Rs.{Object.keys(returnCart).reduce((sum, k) => {
+                  ₹{Object.keys(returnCart).reduce((sum, k) => {
                     const match = activeBill.items.find(i => i.productId === k);
                     return sum + (match ? match.price * returnCart[k] : 0);
                   }, 0)}

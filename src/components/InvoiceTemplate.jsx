@@ -1,19 +1,17 @@
 import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import logourl from '../assets/icon.png';
-import signUrl from '../assets/sign.png';
+import BillReceiptCore from './BillReceiptCore';
+import html2canvas from 'html2canvas-pro';
+import jsPDF from 'jspdf';
 
-const InvoiceTemplate = ({ billData }) => {
+const InvoiceTemplate = ({ billData, onClose }) => {
   const printRef = useRef();
+  const [isGstinMasked, setIsGstinMasked] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState(false);
 
-  // State to manage GSTIN masking (default is masked)
-  const [isGstinMasked, setIsGstinMasked] = useState(true);
-
-  // Pull complete system records collections for hot data validation and linking
   const storeCustomers = useSelector((state) => state.customers.items);
   const storeDevices = useSelector((state) => state.devices.items);
 
-  // Structural fallback data if component mounts with dead properties context
   const invoice = billData || {
     _id: "6a0617fe2fca22443dd500d8",
     purpose: "purchase",
@@ -23,19 +21,17 @@ const InvoiceTemplate = ({ billData }) => {
     items: []
   };
 
-  // --- DYNAMIC LINKING DEEP-RESOLVER LOGIC ---
-  
-  // Resolve Billed Customer details (handles populated object or plain string reference ID)
   const resolvedCustomer = typeof invoice.customer === 'object' && invoice.customer !== null
     ? invoice.customer
     : storeCustomers.find(c => c._id?.toString() === invoice.customer?.toString()) || {
         name: "Walk-in Client",
         phone: "N/A",
         address: "Counter Sale Transaction Log",
-        customerType: "Individual"
+        customerType: "Individual",
+        gst: "none",
+        pan: "none"
       };
 
-  // Resolve Linked Hardware Target details (handles populated object or plain string reference ID)
   let resolvedDevice = null;
   if (invoice.device) {
     if (typeof invoice.device === 'object' && invoice.device !== null) {
@@ -45,7 +41,6 @@ const InvoiceTemplate = ({ billData }) => {
     }
   }
 
-  // Cross-reference customer fields if device payload structure dropped active issue arrays
   if (invoice.purpose === 'repair' && resolvedCustomer?.devices && !resolvedDevice?.issues) {
     const targetId = typeof invoice.device === 'object' ? invoice.device?._id : invoice.device;
     const directMatch = resolvedCustomer.devices.find(d => d._id?.toString() === targetId?.toString());
@@ -55,234 +50,187 @@ const InvoiceTemplate = ({ billData }) => {
   }
 
   const handlePrint = () => {
-    const printContent = printRef.current.innerHTML;
-    const originalContent = document.body.innerHTML;
-    document.body.innerHTML = printContent;
     window.print();
-    document.body.innerHTML = originalContent;
-    window.location.reload(); 
   };
 
-  // Base total calculation uses post-discount line subtotals + service fees
-  const baseAmount = (invoice.items || []).reduce((sum, item) => sum + (item.subTotal || 0), 0) + (invoice.serviceCharge || 0);
-  const grossTotal = baseAmount;
+  // Trigger PDF Download dialog via browser print engine
+  
 
-  // Actual GSTIN value
+ const handleDownloadPdf = async () => {
+  const element = printRef.current;
+  if (!element) return;
+
+  try {
+    // 1. Clone the element to bypass modal layout, scrollbars, and CSS transforms
+    const clone = element.cloneNode(true);
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    clone.style.width = '794px'; // Standard A4 width in pixels at 96 DPI
+    clone.style.height = 'auto';
+    clone.style.transform = 'none';
+    clone.style.zIndex = '999999';
+    document.body.appendChild(clone);
+
+    // 2. Render the clean clone to canvas
+    const canvas = await html2canvas(clone, {
+      scale: 2, // High resolution/sharp text scaling
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      backgroundColor: '#ffffff'
+    });
+
+    // 3. Remove the temporary clone from the DOM
+    document.body.removeChild(clone);
+
+    const imgData = canvas.toDataURL('image/png');
+    
+    // 4. Initialize jsPDF configuration (A4 portrait dimensions)
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+    
+    // 5. Trigger immediate file download
+    const fileName = `Invoice-${billData?.billNumber || billData?._id || 'receipt'}.pdf`;
+    pdf.save(fileName);
+  } catch (err) {
+    console.error("PDF generation failed:", err);
+    alert(`Could not generate direct PDF file (${err.message}). Falling back to print dialog.`);
+    window.print();
+  }
+};
+
+  // Copy Public Bill Link to Clipboard
+  const handleShareLink = () => {
+    const billId = invoice?.publicToken;
+    const publicUrl = `${window.location.origin}/bills/${billId}`;
+    
+    navigator.clipboard.writeText(publicUrl).then(() => {
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 2500);
+    }).catch(() => {
+      alert("Failed to copy link to clipboard.");
+    });
+  };
+
   const fullGstin = "09EYOPR0179F1ZV";
-
-  // Masking logic: Keeps all characters except the last 5 masked with 'x' (or 'X')
   const getMaskedGstin = (gstin) => {
     if (!gstin || gstin.length <= 5) return gstin;
     const visiblePart = gstin.slice(-5);
     const maskedPart = 'x'.repeat(gstin.length - 5);
     return maskedPart + visiblePart;
   };
-
   const displayedGstin = isGstinMasked ? getMaskedGstin(fullGstin) : fullGstin;
 
   return (
-    <div className="max-w-2xl mx-auto my-4 p-3 sm:p-4 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl text-zinc-100 w-full ">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
       
-      {/* Control Actions bar - Flex wrap for mobile spacing */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-3 border-b border-zinc-800 pb-3 px-2">
-        <span className="text-xs text-zinc-400 font-medium text-center sm:text-left">Invoice Printing Engine Preview</span>
-        <div className="flex items-center gap-2">
-          {/* Toggle Mask/Unmask Button */}
-          <button 
-            onClick={() => setIsGstinMasked(!isGstinMasked)}
-            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-2 sm:py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700"
-            title="Toggle GSTIN Masking"
-          >
-            {isGstinMasked ? '👁️ Unmask GSTIN' : '🔒 Mask GSTIN'}
-          </button>
-          
-          <button 
-            onClick={handlePrint}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 sm:py-1.5 rounded-md font-semibold text-xs transition-all shadow"
-          >
-            🖨️ Print Invoice Sheet
-          </button>
-        </div>
-      </div>
+      {/* Strict 1-Page Single-Target Print Engine CSS */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 5mm;
+          }
+          body, html {
+            background: #ffffff !important;
+            color: #000000 !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          body * {
+            visibility: hidden !important;
+          }
+          #printable-invoice-receipt, 
+          #printable-invoice-receipt * {
+            visibility: visible !important;
+          }
+          #printable-invoice-receipt {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            max-height: 100vh !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            border: none !important;
+            overflow: hidden !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+        }
+      `}} />
 
-      {/* --- SCROLLABLE WRAPPER FOR MOBILE --- */}
-      <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-700 pb-2">
+      <div className="bg-zinc-900 w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] border border-zinc-800">
         
-        {/* --- PRINTABLE BOUNDARY WRAPPER START --- */}
-        {/* min-w-[650px] locks the layout so it never crushes on phones */}
-        <div ref={printRef} className="bg-white text-zinc-900 p-5 rounded-md shadow-inner font-sans tracking-tight text-[11px] min-w-[650px]">
-          
-          <style dangerouslySetInnerHTML={{__html: `
-            @media print {
-              @page { size: A4 portrait; margin: 8mm; }
-              body { color: #000000 !important; background: #ffffff !important; padding: 0; margin: 0; }
-              .print\\:bg-zinc-100 { background-color: #f4f4f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-              .no-print { display: none !important; }
-            }
-          `}} />
-
-          {/* Branded Identity Header Block */}
-          <div className="flex justify-between items-start border-b border-zinc-300 pb-3">
-            <div className="flex items-center gap-3">
-              {/* Embedded Company Logo Container */}
-              <div className="w-16 h-16 rounded bg-zinc-100 border border-zinc-200 overflow-hidden flex items-center justify-center p-0.5 shrink-0">
-                <img 
-                  src={logourl} 
-                  alt="Company Identity Logo" 
-                  className="w-full h-full object-contain mix-blend-multiply rounded" 
-                />
-              </div>
-              <div>
-                <h1 className="text-lg font-black text-zinc-950 tracking-tighter leading-none">ELECTROLYTE SOLUTIONS</h1>
-                <p className="text-[10px] text-zinc-500 leading-tight mt-1">
-                  Nahar Bala Ganj, Balrampur, UP, 271201<br />
-                  <span className="font-semibold font-mono text-zinc-700 text-[9px]">Contact No.: 9648146167, 8081111867</span><br/>
-                  <span className="font-semibold font-mono text-zinc-700 text-[9px]">Email: contact.electolytesolutions@gmail.com</span>
-                </p>
-              </div>
-            </div>
-            
-            <div className="text-right">
-              <p className="font-bold font-mono text-zinc-900 text-[11px] uppercase">GSTIN: {displayedGstin}</p>
-              <h2 className="text-xs font-black text-zinc-950 uppercase tracking-wider bg-zinc-100 px-2 py-0.5 rounded inline-block">Tax Invoice</h2>
-              <div className="text-[10px] text-zinc-600 space-y-0.5 mt-1.5 font-mono">
-                <div className="text-[9px] text-zinc-900 bg-zinc-100 font-bold px-1.5 py-0.5 rounded uppercase tracking-wide inline-block mb-1">Purpose: {invoice.purpose}</div>
-                <div>Date: {invoice.lastUpdated ? invoice.lastUpdated.split(',')[0] : 'N/A'}</div>
-              </div>
-            </div>
+        {/* Modal Header Bar with Controls */}
+        <div className="px-4 sm:px-6 py-3 border-b border-zinc-800 flex flex-wrap justify-between items-center gap-3 bg-zinc-900 shrink-0">
+          <div className="min-w-0 pr-2">
+            <h3 className="text-base sm:text-lg font-bold text-white truncate">Invoice & Billing Statement</h3>
+            <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase mt-0.5 truncate">Invoice ID: {billData?.billNumber || billData?._id}</p>
           </div>
 
-          {/* Un-truncated Full 24-char MongoDB ID row for reverse POS lookups and returns handling */}
-          <div className="bg-zinc-100 border-b border-zinc-200 px-2 py-1 flex justify-between items-center text-[9px] font-mono text-zinc-800">
-            <span className="font-sans font-bold uppercase tracking-wider text-zinc-500">System Bill Reference Token:</span>
-            <span className="font-bold select-all tracking-wide text-zinc-950">{invoice._id}</span>
+          <div className="flex flex-wrap items-center gap-2 ml-auto">
+            <button 
+              onClick={() => setIsGstinMasked(!isGstinMasked)}
+              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
+              title="Toggle GSTIN Masking"
+            >
+              {isGstinMasked ? '👁️ Unmask GSTIN' : '🔒 Mask GSTIN'}
+            </button>
+
+            <button 
+              onClick={handleShareLink}
+              className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow cursor-pointer no-print"
+            >
+              {copyFeedback ? '✓ Link Copied!' : '🔗 Share Public Link'}
+            </button>
+
+            <button 
+              onClick={handleDownloadPdf}
+              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
+            >
+              📥 Download PDF
+            </button>
+
+            <button 
+              onClick={handlePrint}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md font-semibold text-xs transition-all shadow cursor-pointer no-print"
+            >
+              🖨️ Print
+            </button>
+
+            <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors text-2xl shrink-0 leading-none cursor-pointer ml-2 no-print">&times;</button>
           </div>
-
-          {/* Address & Detailed Customer/Device Breakdown Grid */}
-          <div className="grid grid-cols-2 gap-4 my-3 pb-3 border-b border-zinc-100">
-            <div>
-              <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Billed To:</span>
-              <div className="font-bold text-zinc-900 text-xs flex items-center gap-1.5">
-                {resolvedCustomer.name}
-                <span className="text-[8px] bg-zinc-100 text-zinc-600 border px-1 rounded font-normal uppercase tracking-tight">
-                  {resolvedCustomer.customerType || 'Individual'}
-                </span>
-              </div>
-              <div className="text-zinc-600 text-[10px] leading-tight mt-0.5" title={resolvedCustomer.address}>
-                {resolvedCustomer.address}
-              </div>
-              <div className="text-zinc-700 font-mono font-medium text-[10px] mt-0.5">Ph: {resolvedCustomer.phone}</div>
-            </div>
-            
-            <div className="text-right flex flex-col items-end justify-start">
-              {invoice.purpose === 'repair' && resolvedDevice ? (
-                <div className="bg-zinc-50 p-2 rounded text-left border border-zinc-200 w-full max-w-[260px] space-y-1">
-                  <div className="font-bold text-zinc-400 text-[8px] uppercase tracking-wide leading-none">Hardware Asset Profile</div>
-                  <div className="text-zinc-900 text-[11px] font-black leading-none">{resolvedDevice.deviceName}</div>
-                  <div className="text-zinc-600 font-mono text-[9px]">HWID: {resolvedDevice.deviceHardwareId}</div>
-                  
-                  {/* Dynamic Repair Diagnostics Issue List Badging mapping section */}
-                  {resolvedDevice.issues && resolvedDevice.issues.length > 0 && (
-                    <div className="pt-1 flex flex-wrap gap-1 border-t border-zinc-200/60 mt-1">
-                      {resolvedDevice.issues.map((issue, idx) => (
-                        <span key={idx} className="bg-red-50 text-red-700 border border-red-100 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-tight">
-                          ⚠️ {issue}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <span className="text-zinc-500 bg-zinc-50 px-2 py-1.5 border border-zinc-200/60 rounded italic font-medium text-[10px]">
-                  📦 Standard Product Sale Manifest
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Line Items Matrix Table */}
-          <table className="w-full text-left border-collapse my-3 text-[10px]">
-            <thead>
-              <tr className="bg-zinc-100 text-zinc-700 font-semibold border-b border-zinc-300">
-                <th className="px-2 py-1.5 w-6">#</th>
-                <th className="px-2 py-1.5">Item Description</th>
-                <th className="px-2 py-1.5 text-right w-16">
-                  <div>Rate</div>
-                  <div className="text-[7px] text-zinc-400 font-normal tracking-normal leading-none mt-0.5">(GST Incl.)</div>
-                </th>
-                <th className="px-2 py-1.5 text-right w-14 text-amber-600">Discount</th>
-                <th className="px-2 py-1.5 text-center w-10">Quantity</th>
-                <th className="px-2 py-1.5 text-right w-20">Total</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100 text-zinc-800">
-              {invoice.items?.map((item, idx) => (
-                <tr key={item._id || idx}>
-                  <td className="px-2 py-2 font-mono text-zinc-400">{idx + 1}</td>
-                  <td className="px-2 py-2">
-                    <div className="font-bold text-zinc-950">
-                      {item.brand ? `[${item.brand.toUpperCase()}] ` : ''}{item.name}
-                    </div>
-                    {item.modelName && (
-                      <div className="text-[9px] text-zinc-400 font-mono mt-0.5">Model ref: {item.modelName}</div>
-                    )}
-                  </td>
-                  <td className="px-2 py-2 text-right font-mono">Rs.{Number(item.price).toFixed(2)}</td>
-                  <td className={`px-2 py-2 text-right font-mono font-medium ${item.discount > 0 ? 'text-amber-600 bg-amber-50/40 print:bg-amber-50' : 'text-zinc-400'}`}>
-                    {item.discount > 0 ? `-Rs.${Number(item.discount).toFixed(2)}` : '0.00'}
-                  </td>
-                  <td className="px-2 py-2 text-center font-mono">{item.orderedQuantity}</td>
-                  <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{Number(item.subTotal).toFixed(2)}</td>
-                </tr>
-              ))}
-
-              {invoice.purpose === 'repair' && invoice.serviceCharge > 0 && (
-                <tr className="bg-amber-50/40 border-t border-dashed border-zinc-200">
-                  <td className="px-2 py-2 font-mono text-amber-600">*</td>
-                  <td className="px-2 py-2 font-medium text-zinc-900">
-                    <div>Technical Service Labor / Diagnostic Fee</div>
-                    <div className="text-[8px] text-zinc-400 italic">Non-refundable labor line charge</div>
-                  </td>
-                  <td className="px-2 py-2 text-right font-mono">Rs.{Number(invoice.serviceCharge).toFixed(2)}</td>
-                  <td className="px-2 py-2 text-right font-mono text-zinc-400">0.00</td>
-                  <td className="px-2 py-2 text-center font-mono">1</td>
-                  <td className="px-2 py-2 text-right font-bold text-zinc-950 font-mono">Rs.{Number(invoice.serviceCharge).toFixed(2)}</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-
-          {/* Lower Summarization Sign-off Area */}
-          <div className="flex justify-between items-end mt-4 pt-3 border-t border-zinc-200">
-            <div className="w-1/2 text-[9px] text-zinc-400 pr-4 leading-normal">
-              <span className="font-bold text-zinc-600 block mb-0.5">Terms & Conditions:</span>
-              <span className="block text-zinc-400">Computer generated system document. Valid for processing item-return requests over reverse POS counters when full Token reference ID is supplied.</span>
-            </div>
-
-            <div className="w-1/2 space-y-1 font-medium text-zinc-600 text-right">
-              <div className="flex justify-between items-center bg-zinc-950 text-white px-3 py-1.5 rounded text-[11px] font-bold mt-2">
-                <span>Grand Net Total:</span>
-                <span className="font-black font-mono text-xs">Rs.{grossTotal.toFixed(2)}</span>
-              </div>
-
-              {/* Signature space */}
-              <div className="pt-5 flex flex-col items-end">
-                {/* Embedded Signature Image */}
-                <img 
-                  src={signUrl} 
-                  alt="Authorized Signature" 
-                  className="h-12 w-28 object-contain mix-blend-multiply mb-1 mr-2" 
-                />
-                <div className="w-36 h-0.5 bg-zinc-300 mb-0.5"></div>
-                <div className="text-[8px] uppercase font-bold text-zinc-400 tracking-wider">Authorized Signature</div>
-              </div>
-            </div>
-          </div>
-
         </div>
-        {/* --- PRINTABLE BOUNDARY WRAPPER END --- */}
-      </div>
 
+        {/* Modal Body Container */}
+        <div className="overflow-y-auto flex-1 text-zinc-900 scrollbar-thin bg-zinc-950 p-4">
+          <div className="w-full overflow-x-hidden flex justify-center">
+            <div ref={printRef} id="printable-invoice-receipt" className="w-full overflow-hidden bg-white rounded-lg shadow-inner p-2">
+              <BillReceiptCore 
+                invoice={invoice}
+                resolvedCustomer={resolvedCustomer}
+                resolvedDevice={resolvedDevice}
+                displayedGstin={displayedGstin}
+                isGstinMasked={isGstinMasked}
+                setIsGstinMasked={setIsGstinMasked}
+                showControls={false}
+              />
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 };

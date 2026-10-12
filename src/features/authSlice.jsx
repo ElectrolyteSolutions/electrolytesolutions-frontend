@@ -1,18 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import { useNavigate } from 'react-router-dom';
 
 const API_URL = `${import.meta.env.VITE_API_URL}users/`;
 
 // Check localStorage on initial load
-
 const storedToken = localStorage.getItem('token') || null;
 
 const initialState = {
-  role: storedToken? jwtDecode(storedToken)?.role : null,
+  role: storedToken ? jwtDecode(storedToken)?.role : null,
   token: storedToken,
-  profileData:null,
+  profileData: null,
+  sessions: [],
   isLoading: false,
   isSuccess: false,
   isError: false,
@@ -27,12 +26,11 @@ const getAuthConfig = (thunkAPI) => {
   };
 };
 
-
 // ⚡ Async Thunks
 export const registerUser = createAsyncThunk('auth/register', async (userData, thunkAPI) => {
   try {
     const response = await axios.post(API_URL + 'register', userData);
-    return response.data; // { _id, name, email, role, token }
+    return response.data;
   } catch (error) {
     const message = error.response?.data?.message || error.message;
     return thunkAPI.rejectWithValue(message);
@@ -49,18 +47,15 @@ export const loginUser = createAsyncThunk('auth/login', async (userData, thunkAP
   }
 });
 
-export const getUserProfile = createAsyncThunk('auth/getProfile', async (userData, thunkAPI) => {
+export const getUserProfile = createAsyncThunk('auth/getProfile', async (_, thunkAPI) => {
   try {
     const response = await axios.get(API_URL + 'profile', getAuthConfig(thunkAPI));
     return response.data;
   } catch (error) {
     const status = error.response?.status;
 
-    // Check if the error is 401 Unauthorized or 404 Not Found
     if (status === 401 || status === 404) {
-      // Dispatch your logout action (replace 'auth/logout' with your actual logout action or function)
       thunkAPI.dispatch(logout());
-      navigate("/") 
     }
 
     const message = error.response?.data?.message || error.message;
@@ -81,7 +76,7 @@ export const updateUserProfile = createAsyncThunk('auth/updateProfile', async (u
 export const getActiveSessions = createAsyncThunk('auth/getSessions', async (_, thunkAPI) => {
   try {
     const response = await axios.get(API_URL + 'sessions', getAuthConfig(thunkAPI));
-    return response.data; // { count, activeSessions }
+    return response.data;
   } catch (error) {
     const message = error.response?.data?.message || error.message;
     return thunkAPI.rejectWithValue(message);
@@ -101,14 +96,13 @@ export const logoutAllDevices = createAsyncThunk('auth/logoutAll', async (_, thu
   }
 });
 
-// ⚡ Async Thunk to Terminate a Specific Session
 export const terminateSession = createAsyncThunk('auth/terminateSession', async (sessionId, thunkAPI) => {
   try {
     const token = thunkAPI.getState().auth.token;
     await axios.delete(API_URL + `sessions/${sessionId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    return sessionId; // Return the ID so we can filter it out of the state
+    return sessionId;
   } catch (error) {
     const message = error.response?.data?.message || error.message;
     return thunkAPI.rejectWithValue(message);
@@ -126,26 +120,46 @@ const authSlice = createSlice({
       state.message = '';
     },
     logout: (state) => {
-      state.profileData = null,
-      state.token =null,
-      state.role=null
-      localStorage.clear()
+      state.profileData = null;
+      state.token = null;
+      state.role = null;
+      state.sessions = [];
+      localStorage.clear();
     },
   },
   extraReducers: (builder) => {
     builder
       // Register
       .addCase(registerUser.pending, (state) => { state.isLoading = true; })
-      .addCase(registerUser.fulfilled, (state) => { state.isLoading = false; state.isSuccess = true; })
-      .addCase(registerUser.rejected, (state, action) => { state.isLoading = false; state.isError = true; state.message = action.payload; })
+      .addCase(registerUser.fulfilled, (state) => { 
+        state.isLoading = false; 
+        state.isSuccess = true; 
+        state.message = 'Registration successful';
+      })
+      .addCase(registerUser.rejected, (state, action) => { 
+        state.isLoading = false; 
+        state.isError = true; 
+        state.message = action.payload; 
+      })
+
+      // Logout All Devices
       .addCase(logoutAllDevices.fulfilled, (state) => {
-          dispatch(logout())
-        })
+        state.profileData = null;
+        state.token = null;
+        state.role = null;
+        state.sessions = [];
+        state.isSuccess = true;
+        state.message = 'Logged out from all devices';
+        localStorage.clear();
+      })
+
+      // Terminate Specific Session
       .addCase(terminateSession.fulfilled, (state, action) => {
-          // Remove the terminated session from the sessions array immediately
-          state.sessions = state.sessions.filter(s => s.sessionId !== action.payload);
-          state.message = 'Session terminated successfully';
-        })
+        state.sessions = state.sessions.filter(s => s.sessionId !== action.payload);
+        state.isSuccess = true;
+        state.message = 'Session terminated successfully';
+      })
+
       // Login
       .addCase(loginUser.pending, (state) => { state.isLoading = true; })
       .addCase(loginUser.fulfilled, (state, action) => {
@@ -155,10 +169,14 @@ const authSlice = createSlice({
         state.role = userData?.role;
         state.profileData = userData;
         state.token = token;
-        state.message = action.payload
-        localStorage.setItem('token',token);
+        state.message = 'Logged in successfully';
+        localStorage.setItem('token', token);
       })
-      .addCase(loginUser.rejected, (state, action) => { state.isLoading = false; state.isError = true; state.message = action.payload; })
+      .addCase(loginUser.rejected, (state, action) => { 
+        state.isLoading = false; 
+        state.isError = true; 
+        state.message = action.payload; 
+      })
 
       // Get Profile
       .addCase(getUserProfile.fulfilled, (state, action) => {
@@ -171,18 +189,19 @@ const authSlice = createSlice({
       .addCase(updateUserProfile.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        // Merge updated fields while keeping existing identifiers intact
         state.profileData = action.payload;
         state.message = 'Profile updated successfully';
       })
-      .addCase(updateUserProfile.rejected, (state, action) => { state.isLoading = false; state.isError = true; state.message = action.payload; })
+      .addCase(updateUserProfile.rejected, (state, action) => { 
+        state.isLoading = false; 
+        state.isError = true; 
+        state.message = action.payload; 
+      })
 
       // Get Sessions
       .addCase(getActiveSessions.fulfilled, (state, action) => {
-        state.sessions = action.payload.activeSessions;
+        state.sessions = action.payload.activeSessions || [];
       });
-
-      
   },
 });
 
