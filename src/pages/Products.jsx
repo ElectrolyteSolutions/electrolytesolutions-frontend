@@ -12,8 +12,9 @@ const ProductsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   
-  // Available collections fetched from backend for the dropdown picker
+  // Lookups fetched from backend
   const [availableCollections, setAvailableCollections] = useState([]);
+  const [availableTypes, setAvailableTypes] = useState([]);
 
   // Inline Collection Creator State
   const [isCreatingCollection, setIsCreatingCollection] = useState(false);
@@ -21,7 +22,7 @@ const ProductsPage = () => {
   const [newCollectionErpId, setNewCollectionErpId] = useState('');
   const [creatingCollectionLoading, setCreatingCollectionLoading] = useState(false);
   
-  // Form state including brand, collections, and image array
+  // Form state including brand, collections, type, hsn, isCustomType, and image array
   const [form, setForm] = useState({ 
     erpProductId: '',
     images: [],
@@ -37,7 +38,9 @@ const ProductsPage = () => {
     quantity: '', 
     seoMetaDescription: '',
     seoKeywords: '',
-    hsn: ''
+    hsn: '',
+    type: '',
+    isCustomType: false
   });
 
   // Temporary local state for typing a new image URL before adding it to the array
@@ -57,16 +60,22 @@ const ProductsPage = () => {
     };
 
     dispatch(getProducts(payloadQueryOptions));
-    fetchCollectionsList();
+    fetchLookups();
   }, [dispatch, searchTerm, stockFilter, currentSortBy, currentSortOrder]);
 
-  const fetchCollectionsList = async () => {
+  const fetchLookups = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}products/collections`);
-      const data = await res.json();
-      setAvailableCollections(data);
+      // Fetch Collections
+      const colRes = await fetch(`${import.meta.env.VITE_API_URL}products/collections`);
+      const colData = await colRes.json();
+      setAvailableCollections(colData);
+
+      // Fetch Product Types (clean string array)
+      const typeRes = await fetch(`${import.meta.env.VITE_API_URL}products/types`);
+      const typeData = await typeRes.json();
+      setAvailableTypes(typeData);
     } catch (err) {
-      console.error("Failed to load collections lookup", err);
+      console.error("Failed to load metadata lookups", err);
     }
   };
 
@@ -87,7 +96,7 @@ const ProductsPage = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        await fetchCollectionsList();
+        await fetchLookups();
         setForm(prev => ({ ...prev, collections: [data._id] }));
         setNewCollectionTitle('');
         setNewCollectionErpId('');
@@ -129,7 +138,9 @@ const ProductsPage = () => {
         seoMetaDescription: product.seo?.metaDescription || '',
         seoKeywords: product.seo?.keywords ? product.seo.keywords.join(', ') : '',
         images: product?.images && product.images.length > 0 ? [...product.images] : [],
-        hsn: product.hsn || ''
+        hsn: product.hsn || '',
+        type: product.type || '',
+        isCustomType: false
       });
       setEditId(product._id);
     } else {
@@ -148,7 +159,9 @@ const ProductsPage = () => {
         quantity: '', 
         seoMetaDescription: '', 
         seoKeywords: '',
-        hsn: ''
+        hsn: '',
+        type: '',
+        isCustomType: false
       });
       setEditId(null);
     }
@@ -175,8 +188,11 @@ const ProductsPage = () => {
   const handleSave = (e) => {
     e.preventDefault();
     
+    // Omit frontend-only helper flags before sending payload to backend
+    const { isCustomType, ...cleanForm } = form;
+    
     const payload = {
-      ...form,
+      ...cleanForm,
       seo: {
         metaTitle: form.name,
         metaDescription: form.seoMetaDescription,
@@ -185,10 +201,11 @@ const ProductsPage = () => {
     };
 
     if (editId) {
-      dispatch(updateProduct({ id: editId, data: payload })).then(() => refreshDataLogs());
+      dispatch(updateProduct({ id: editId, data: payload }))
     } else {
-      dispatch(addProduct(payload)).then(() => refreshDataLogs());
+      dispatch(addProduct(payload));
     }
+    refreshDataLogs()
     handleCloseModal();
   };
 
@@ -335,7 +352,7 @@ const ProductsPage = () => {
                     </td>
 
                     <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-zinc-300 font-mono text-right pr-10">
-                      {p.hsn ? `HSN-${p.hsn}` : '-'}
+                      {p.hsn ? p.hsn : '-'}
                     </td>
 
                     <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
@@ -378,7 +395,7 @@ const ProductsPage = () => {
         </div>
       </div>
 
-      {/* Modal Form Handling All Schema Fields + Collections Picker + Inline Creator */}
+      {/* Modal Form Handling All Schema Fields + Collections Picker + Types Dropdown */}
       {isModalOpen && !isCustomer && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-zinc-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
@@ -474,6 +491,54 @@ const ProductsPage = () => {
                 </div>
               </div>
 
+              {/* Product Type Dropdown & HSN Code Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <div className="flex justify-between items-center mb-1.5 ml-1">
+                    <label className="block text-xs font-semibold text-zinc-400 uppercase">Product Type</label>
+                    <button 
+                      type="button"
+                      onClick={() => setForm({ ...form, isCustomType: !form.isCustomType, type: '' })}
+                      className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold"
+                    >
+                      {form.isCustomType ? '← Select from List' : '+ Custom Type'}
+                    </button>
+                  </div>
+
+                  {!form.isCustomType ? (
+                    <select 
+                      className="w-full bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-zinc-800"
+                      value={form.type}
+                      onChange={e => setForm({...form, type: e.target.value})}
+                      required={!form.isCustomType}
+                    >
+                      <option value="">Select Product Type</option>
+                      {availableTypes.map((t, index) => (
+                        <option key={index} value={t?.type || "None"}>{t?.type || "None"}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input 
+                      type="text"
+                      className="w-full bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-zinc-800 font-mono"
+                      placeholder="Type custom product type (e.g. accessory)..."
+                      value={form.type}
+                      onChange={e => setForm({...form, type: e.target.value})}
+                      required
+                    />
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">HSN Code</label>
+                  <input 
+                    className="w-full bg-zinc-950 rounded-lg px-3 py-2 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono border border-zinc-800"
+                    placeholder="e.g. 8517" 
+                    value={form.hsn} 
+                    onChange={e => setForm({...form, hsn: e.target.value})} 
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">SKU Code</label>
@@ -494,17 +559,6 @@ const ProductsPage = () => {
                     required 
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">HSN Code</label>
-                <input 
-                  className="w-full bg-zinc-950 rounded-lg px-3 py-2.5 text-xs sm:text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all font-mono"
-                  placeholder="e.g. 8517" 
-                  value={form.hsn} 
-                  onChange={e => setForm({...form, hsn: e.target.value})} 
-                  required 
-                />
               </div>
               
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
