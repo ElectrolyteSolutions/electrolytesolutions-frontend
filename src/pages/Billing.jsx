@@ -159,10 +159,10 @@ const BillingPage = () => {
     }
   };
 
-  const handleItemDiscountAdjust = (productId, discountValue) => {
+  const handleItemDiscountAdjust = (index, discountValue) => {
     const numericDiscount = Number(discountValue) || 0;
-    setCart(cart.map(item => {
-      if (item.productId === productId) {
+    setCart(cart.map((item, idx) => {
+      if (idx === index) {
         if (numericDiscount > item.price) {
           alert("Discount cannot exceed original component rate value!");
           return item;
@@ -468,8 +468,8 @@ const BillingPage = () => {
                   {cart.length === 0 ? (
                     <div className="text-zinc-500 text-xs text-center py-12 italic">Cart manifest layout is empty</div>
                   ) : (
-                    cart.map(item => (
-                      <div key={item.productId} className="flex flex-col gap-2.5 border p-3 rounded-xl bg-zinc-950 border-zinc-800/60">
+                    cart.map((item, index) => (
+                      <div key={item.productId || index} className="flex flex-col gap-2.5 border p-3 rounded-xl bg-zinc-950 border-zinc-800/60">
                         <div className="flex justify-between items-start gap-2">
                           <div className="min-w-0 flex-1">
                             <div className="text-xs sm:text-sm font-bold text-zinc-200 break-words">
