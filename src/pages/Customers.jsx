@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCustomers, addCustomer, deleteCustomer, updateCustomer } from '../features/customerSlice';
-import RegisterDeviceModal from '../components/addDevice'; // Mount our decoupled modal
+import RegisterDeviceModal from '../components/addDevice';
 
 const CustomersPage = () => {
   const dispatch = useDispatch();
@@ -12,6 +12,8 @@ const CustomersPage = () => {
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ 
     name: '', 
+    firstName: '',
+    lastName: '',
     phone: '', 
     customerType: 'Individual', 
     address: '',
@@ -33,16 +35,24 @@ const CustomersPage = () => {
 
   const handleOpenModal = (customer = null) => {
     if (customer) {
-      setForm(customer);
+      setForm({
+        name: customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim(),
+        firstName: customer.firstName || '',
+        lastName: customer.lastName || '',
+        phone: customer.phone || '',
+        customerType: customer.customerType || 'Individual',
+        address: customer.address || (customer.addresses?.[0] ? `${customer.addresses[0].address1}, ${customer.addresses[0].city}` : ''),
+        pan: customer.pan || '',
+        gst: customer.gst || ''
+      });
       setEditId(customer._id);
     } else {
-      setForm({ name: '', phone: '', customerType: 'Individual', address: '', pan: '', gst: '' });
+      setForm({ name: '', firstName: '', lastName: '', phone: '', customerType: 'Individual', address: '', pan: '', gst: '' });
       setEditId(null);
     }
     setIsModalOpen(true);
   };
 
-  // Explicitly trigger the device generation wizard per customer
   const handleOpenDeviceModal = (customerId) => {
     setTargetedCustomerId(customerId);
     setIsDeviceModalOpen(true);
@@ -50,10 +60,15 @@ const CustomersPage = () => {
 
   const handleSave = (e) => {
     e.preventDefault();
+    const payload = {
+      ...form,
+      name: form.name.trim(),
+    };
+
     if (editId) {
-      dispatch(updateCustomer({ id: editId, data: form }));
+      dispatch(updateCustomer({ id: editId, data: payload }));
     } else {
-      dispatch(addCustomer(form));
+      dispatch(addCustomer(payload));
     }
     setIsModalOpen(false);
     setEditId(null);
@@ -65,7 +80,7 @@ const CustomersPage = () => {
 
     const filtered = items.filter((c) => {
       const term = searchTerm.toLowerCase();
-      const name = c.name?.toLowerCase() || '';
+      const name = (c.name || `${c.firstName || ''} ${c.lastName || ''}`).toLowerCase();
       const phone = c.phone?.toLowerCase() || '';
       const address = c.address?.toLowerCase() || '';
       const gst = c.gst?.toLowerCase() || '';
@@ -76,11 +91,12 @@ const CustomersPage = () => {
 
     return filtered.sort((a, b) => {
       if (sortBy === 'name') {
-        return (a.name || '').localeCompare(b.name || '');
+        const nameA = a.name || `${a.firstName || ''} ${a.lastName || ''}`;
+        const nameB = b.name || `${b.firstName || ''} ${b.lastName || ''}`;
+        return nameA.localeCompare(nameB);
       } else if (sortBy === 'type') {
         return (a.customerType || '').localeCompare(b.customerType || '');
       } else {
-        // Default: 'newest' (by createdAt or _id timestamp fallback)
         return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
       }
     });
@@ -158,86 +174,91 @@ const CustomersPage = () => {
                   </td>
                 </tr>
               ) : (
-                filteredAndSortedCustomers.map((c) => (
-                  <tr key={c._id} className="hover:bg-zinc-800/30 transition-colors group">
-                    <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm space-y-2">
-                      <div className="font-semibold text-zinc-100">{c.name}</div>
-                      {c?.gst && <div className="font-semibold text-zinc-400 text-[10px] border rounded-full p-[2px] px-1 bg-blue-900 inline-block">{c?.gst}</div>}
-                      {c?.pan && <div className="font-semibold text-zinc-400 text-[10px] border rounded-full p-[2px] px-1 bg-red-900 inline-block ml-1">{c?.pan}</div>}
-                    </td>
-                    <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-zinc-300 font-mono">
-                      {c.phone}
-                    </td>
-                    <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
-                      <div className="text-zinc-400 max-w-[200px] truncate hover:text-clip hover:whitespace-normal transition-all cursor-help" title={c.address}>
-                        {c.address}
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-medium border ${
-                        c.customerType === 'Corporate' 
-                          ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
-                          : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
-                      }`}>
-                        {c.customerType}
-                      </span>
-                    </td>
-                    
-                    {/* Devices Data Display */}
-                    <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
-                      {c.devices && c.devices.length > 0 ? (
-                        <div className="flex flex-wrap gap-1.5 max-w-[300px]">
-                          {c.devices.map((device, idx) => {
-                            const isPopulated = typeof device === 'object' && device !== null;
-                            const displayName = isPopulated ? device.deviceName : `Device ID: ...${device.slice(-4)}`;
-                            const repairStatus = isPopulated ? device.deviceRepairingStatus : 'unknown';
+                filteredAndSortedCustomers.map((c) => {
+                  const displayName = c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Unnamed Customer';
+                  const displayAddress = c.address || (c.addresses?.[0] ? `${c.addresses[0].address1}, ${c.addresses[0].city}` : 'No address');
 
-                            return (
-                              <span 
-                                key={isPopulated ? device._id : idx} 
-                                className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border ${
-                                  repairStatus === 'resolved' 
-                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                                    : repairStatus === 'rejected' 
-                                      ? 'bg-red-500/10 text-red-400 border-red-500/20' 
-                                      : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                }`}
-                                title={isPopulated ? `Status: ${repairStatus} | HWID: ${device.deviceHardwareId}` : 'Loading details...'}
-                              >
-                                {displayName}
-                              </span>
-                            );
-                          })}
+                  return (
+                    <tr key={c._id} className="hover:bg-zinc-800/30 transition-colors group">
+                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm space-y-2">
+                        <div className="font-semibold text-zinc-100">{displayName}</div>
+                        {c?.gst && <div className="font-semibold text-zinc-300 text-[10px] border rounded p-[2px] px-1 bg-blue-900 inline-block">GST: {c?.gst}</div>}
+                        {c?.pan && <div className="font-semibold text-zinc-300 text-[10px] border rounded p-[2px] px-1 bg-red-900 inline-block ml-1">PAN: {c?.pan}</div>}
+                      </td>
+                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-zinc-300 font-mono">
+                        {c.phone || 'N/A'}
+                      </td>
+                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
+                        <div className="text-zinc-400 max-w-[200px] truncate hover:text-clip hover:whitespace-normal transition-all cursor-help" title={displayAddress}>
+                          {displayAddress}
                         </div>
-                      ) : (
-                        <span className="text-xs text-zinc-500 italic">No Devices Linked</span>
-                      )}
-                    </td>
+                      </td>
+                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-medium border ${
+                          c.customerType === 'Corporate' 
+                            ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
+                            : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+                        }`}>
+                          {c.customerType || 'Individual'}
+                        </span>
+                      </td>
+                      
+                      {/* Devices Data Display */}
+                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
+                        {c.devices && c.devices.length > 0 ? (
+                          <div className="flex flex-wrap gap-1.5 max-w-[300px]">
+                            {c.devices.map((device, idx) => {
+                              const isPopulated = typeof device === 'object' && device !== null;
+                              const devName = isPopulated ? device.deviceName : `Device ID: ...${String(device).slice(-4)}`;
+                              const repairStatus = isPopulated ? device.deviceRepairingStatus : 'unknown';
 
-                    <td className="px-4 sm:px-6 py-3 text-right text-xs sm:text-sm font-medium">
-                      <div className="flex justify-end gap-2.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-wrap lg:flex-nowrap">
-                        <button 
-                          onClick={() => handleOpenDeviceModal(c._id)}
-                          className="text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
-                        >
-                          + Add Device
-                        </button>
-                        <button 
-                          onClick={() => handleOpenModal(c)}
-                          className="text-emerald-400 hover:text-emerald-300 transition-colors bg-emerald-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          onClick={() => { if(window.confirm('Delete customer?')) dispatch(deleteCustomer(c._id)) }}
-                          className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                              return (
+                                <span 
+                                  key={isPopulated ? device._id : idx} 
+                                  className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border ${
+                                    repairStatus === 'resolved' 
+                                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                                      : repairStatus === 'rejected' 
+                                        ? 'bg-red-500/10 text-red-400 border-red-500/20' 
+                                        : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                  }`}
+                                  title={isPopulated ? `Status: ${repairStatus} | HWID: ${device.deviceHardwareId}` : 'Loading details...'}
+                                >
+                                  {devName}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-zinc-500 italic">No Devices Linked</span>
+                        )}
+                      </td>
+
+                      <td className="px-4 sm:px-6 py-3 text-right text-xs sm:text-sm font-medium">
+                        <div className="flex justify-end gap-2.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-wrap lg:flex-nowrap">
+                          <button 
+                            onClick={() => handleOpenDeviceModal(c._id)}
+                            className="text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
+                          >
+                            + Add Device
+                          </button>
+                          <button 
+                            onClick={() => handleOpenModal(c)}
+                            className="text-emerald-400 hover:text-emerald-300 transition-colors bg-emerald-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => { if(window.confirm('Delete customer?')) dispatch(deleteCustomer(c._id)) }}
+                            className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -268,35 +289,40 @@ const CustomersPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">{form.customerType ==="Individual" ?"Full":"Corporate"} Name</label>
+                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">
+                    {form.customerType === "Individual" ? "Full" : "Corporate"} Name
+                  </label>
                   <input 
                     className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
                     value={form.name} 
                     onChange={e => setForm({...form, name: e.target.value})} 
-                    placeholder="John Doe"
+                    placeholder="John Doe / Company Name"
                     required 
                   />
                 </div>
-                {form.customerType ==="Corporate" && <><div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1"> Company GST</label>
-                  <input 
-                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
-                    value={form.gst} 
-                    onChange={e => setForm({...form, gst: e.target.value})} 
-                    placeholder="GSTIN...."
-                    required 
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">PAN</label>
-                  <input 
-                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
-                    value={form.pan} 
-                    onChange={e => setForm({...form, pan: e.target.value})} 
-                    placeholder="PAN Number"
-                    required 
-                  />
-                </div></>}
+
+                {form.customerType === "Corporate" && (
+                  <>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Company GST</label>
+                      <input 
+                        className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                        value={form.gst} 
+                        onChange={e => setForm({...form, gst: e.target.value})} 
+                        placeholder="GSTIN Number..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">PAN</label>
+                      <input 
+                        className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
+                        value={form.pan} 
+                        onChange={e => setForm({...form, pan: e.target.value})} 
+                        placeholder="PAN Number"
+                      />
+                    </div>
+                  </>
+                )}
                 
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Phone Number</label>
@@ -304,7 +330,7 @@ const CustomersPage = () => {
                     className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
                     value={form.phone} 
                     onChange={e => setForm({...form, phone: e.target.value})} 
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="+91 00000 00000"
                     required 
                   />
                 </div>
@@ -347,7 +373,7 @@ const CustomersPage = () => {
         onClose={() => {
           setIsDeviceModalOpen(false);
           setTargetedCustomerId('');
-          dispatch(getCustomers()); // Refetch profile map to instantly show the new device bubble badge row
+          dispatch(getCustomers());
         }}
         preSelectedCustomerId={targetedCustomerId}
       />

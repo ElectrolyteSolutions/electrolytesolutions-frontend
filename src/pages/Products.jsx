@@ -556,7 +556,7 @@ const ProductsPage = () => {
                     placeholder="ERP-983421" 
                     value={form.erpProductId} 
                     onChange={e => setForm({...form, erpProductId: e.target.value})} 
-                    required 
+                    // required 
                   />
                 </div>
               </div>

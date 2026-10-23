@@ -32,6 +32,7 @@ const Navbar = () => {
       case 'admin':
         return [
           { name: 'Dashboard', path: '/dashboard' },
+          { name: 'Orders', path: '/orders' },
           { name: 'Products', path: '/products' },
           { name: 'Devices', path: '/devices' },
           { name: 'Billing', path: '/billing' },

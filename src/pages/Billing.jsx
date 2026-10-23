@@ -120,7 +120,12 @@ const BillingPage = () => {
     setPurpose(bill.purpose);
     setSelectedDeviceId(bill.device?._id || bill.device || '');
     setServiceCharge(bill.serviceCharge || 0);
-    setCart(bill.items.map(item => ({ ...item, isExistingLineItem: true, discount: item.discount || 0 })));
+    setCart(bill.items.map((item, idx) => ({ 
+      ...item, 
+      rowKey: item._id || `existing-${item.productId || idx}-${Date.now()}`,
+      isExistingLineItem: true, 
+      discount: item.discount || 0 
+    })));
     setIsPaid(bill.isPaid !== undefined ? bill.isPaid : true);
     setDuplicateBillMatch(null);
     setActiveTab('checkout');
@@ -140,14 +145,15 @@ const BillingPage = () => {
     const targetProd = products.find(p => p._id === productId);
     if (!targetProd) return;
 
-    const existingItem = cart.find(item => item.productId === productId && !item.isCustomLineItem);
+    const existingItem = cart.find(item => item.productId === productId && !item.isCustomLineItem && !item.isExistingLineItem);
     if (existingItem) {
-      setCart(cart.map(item => (item.productId === productId && !item.isCustomLineItem)
+      setCart(cart.map(item => (item.rowKey === existingItem.rowKey)
         ? { ...item, orderedQuantity: item.orderedQuantity + 1 } : item
       ));
     } else {
       setCart([...cart, { 
         productId, 
+        rowKey: `${productId}-${Date.now()}-${Math.random()}`,
         name: targetProd.name, 
         price: targetProd.price, 
         baseRate: targetProd.baseRate || 0,
@@ -159,10 +165,11 @@ const BillingPage = () => {
     }
   };
 
-  const handleItemDiscountAdjust = (index, discountValue) => {
+  const handleItemDiscountAdjust = (targetRowKey, discountValue) => {
     const numericDiscount = Number(discountValue) || 0;
-    setCart(cart.map((item, idx) => {
-      if (idx === index) {
+    setCart(cart.map(item => {
+      const currentKey = item.rowKey || item._id || item.productId;
+      if (currentKey === targetRowKey) {
         if (numericDiscount > item.price) {
           alert("Discount cannot exceed original component rate value!");
           return item;
@@ -177,8 +184,10 @@ const BillingPage = () => {
     e.preventDefault();
     if (!customItemName.trim() || !customItemPrice) return alert("Enter charge description and selling price");
 
+    const customId = `CUSTOM-${Date.now()}`;
     const newCustomField = {
-      productId: `CUSTOM-${Date.now()}`, 
+      productId: customId, 
+      rowKey: `${customId}-${Math.random()}`,
       name: customItemName.trim(),
       price: Number(customItemPrice),
       baseRate: Number(customItemBaseRate || 0),
@@ -196,12 +205,12 @@ const BillingPage = () => {
     setCustomItemQuantity(1);
   };
 
-  const handleRemoveItem = (uniqueId) => {
-    const targetedItem = cart.find(item => item.productId === uniqueId);
+  const handleRemoveItem = (targetRowKey) => {
+    const targetedItem = cart.find(item => (item.rowKey || item._id || item.productId) === targetRowKey);
     if (editingBillId && targetedItem?.isExistingLineItem) {
       if (!window.confirm("This item is already saved to the database. Are you sure you want to drop it from this bill?")) return;
     }
-    setCart(cart.filter(item => item.productId !== uniqueId));
+    setCart(cart.filter(item => (item.rowKey || item._id || item.productId) !== targetRowKey));
   };
 
   const calculateTotal = () => {
@@ -230,19 +239,19 @@ const BillingPage = () => {
 
     if (editingBillId) {
       axios.put(
-  `${import.meta.env.VITE_API_URL}billings/${editingBillId}`,
-  completePayload,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  }
-)
-.then((res) => {
-  alert("Invoice updated successfully!");
-  handlePostSubmitCleanup(res.data);
-})
-.catch(err => alert(`Failed to update bill record: ${err.response?.data?.message || err.message}`));
+        `${import.meta.env.VITE_API_URL}billings/${editingBillId}`,
+        completePayload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+      .then((res) => {
+        alert("Invoice updated successfully!");
+        handlePostSubmitCleanup(res.data);
+      })
+      .catch(err => alert(`Failed to update bill record: ${err.response?.data?.message || err.message}`));
     } else {
       dispatch(createInvoice(completePayload)).then((res) => {
         if (!res.error) {
@@ -290,7 +299,7 @@ const BillingPage = () => {
   const handleCloseInspect = () => {
     setSelectedBill(null);
     setIsModalOpen(false);
-    setPrintTargetData(null)
+    setPrintTargetData(null);
   };
 
   return (
@@ -448,7 +457,7 @@ const BillingPage = () => {
                         <div key={p._id} className="bg-zinc-950 p-3 rounded-lg flex justify-between items-center gap-3 group hover:border-emerald-500/30 transition-all">
                           <div className="min-w-0 flex-1">
                             <div className="text-xs sm:text-sm font-semibold text-zinc-200 truncate">{p.name}</div>
-                            <div className="text-[11px] sm:text-xs text-zinc-500 truncate">₹{p.price} • Stock: {p.quantity} {currentCartQty > 0 && <span className="text-emerald-500 font-medium ml-1">({currentCartQty} added)</span>}</div>
+                            <div className="text-[11px] sm:text-xs text-zinc-500 truncate">₹{p.price} | Stock: {p.quantity} {currentCartQty > 0 && <span className="text-emerald-500 font-medium ml-1">({currentCartQty} added)</span>}</div>
                           </div>
                           <button onClick={() => handleAddItem(p._id)} disabled={isOutOfStock} className="bg-zinc-800 hover:bg-emerald-600 disabled:bg-zinc-900 disabled:text-zinc-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors shrink-0">
                             {isOutOfStock ? 'Maxed Out' : '+ Add'}
@@ -468,38 +477,41 @@ const BillingPage = () => {
                   {cart.length === 0 ? (
                     <div className="text-zinc-500 text-xs text-center py-12 italic">Cart manifest layout is empty</div>
                   ) : (
-                    cart.map((item, index) => (
-                      <div key={item.productId || index} className="flex flex-col gap-2.5 border p-3 rounded-xl bg-zinc-950 border-zinc-800/60">
-                        <div className="flex justify-between items-start gap-2">
-                          <div className="min-w-0 flex-1">
-                            <div className="text-xs sm:text-sm font-bold text-zinc-200 break-words">
-                              {item.name} 
-                              {item.isCustomLineItem && <span className="inline-block text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Custom</span>}
-                              {editingBillId && item.isExistingLineItem && <span className="inline-block text-[9px] bg-zinc-800 text-zinc-400 border border-zinc-700 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Saved Line</span>}
+                    cart.map((item) => {
+                      const uniqueKey = item.rowKey || item._id || item.productId;
+                      return (
+                        <div key={uniqueKey} className="flex flex-col gap-2.5 border p-3 rounded-xl bg-zinc-950 border-zinc-800/60">
+                          <div className="flex justify-between items-start gap-2">
+                            <div className="min-w-0 flex-1">
+                              <div className="text-xs sm:text-sm font-bold text-zinc-200 break-words">
+                                {item.name} 
+                                {item.isCustomLineItem && <span className="inline-block text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Custom</span>}
+                                {editingBillId && item.isExistingLineItem && <span className="inline-block text-[9px] bg-zinc-800 text-zinc-400 border border-zinc-700 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Saved Line</span>}
+                              </div>
+                              <div className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">Sell Price: ₹{item.price} | Qty: {item.orderedQuantity}</div>
                             </div>
-                            <div className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">Sell Price: ₹{item.price} • Qty: {item.orderedQuantity}</div>
+                            <div className="text-right flex flex-col items-end shrink-0">
+                              <span className="text-xs sm:text-sm font-black text-emerald-400">₹{(item.price - (item.discount || 0)) * item.orderedQuantity}</span>
+                              <button onClick={() => handleRemoveItem(uniqueKey)} className="text-[10px] text-red-500 hover:underline mt-1">Remove</button>
+                            </div>
                           </div>
-                          <div className="text-right flex flex-col items-end shrink-0">
-                            <span className="text-xs sm:text-sm font-black text-emerald-400">₹{(item.price - (item.discount || 0)) * item.orderedQuantity}</span>
-                            <button onClick={() => handleRemoveItem(item.productId)} className="text-[10px] text-red-500 hover:underline mt-1">Remove</button>
-                          </div>
-                        </div>
 
-                        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-900/80">
-                          <span className="text-[10px] uppercase tracking-wider text-amber-500 font-bold">Apply Row Discount:</span>
-                          <div className="relative flex items-center max-w-[110px] w-full">
-                            <span className="absolute left-2 text-zinc-500 text-xs font-mono">₹</span>
-                            <input 
-                              type="number"
-                              placeholder="0"
-                              value={item.discount || ''}
-                              onChange={(e) => handleItemDiscountAdjust(item.productId, e.target.value)}
-                              className="w-full bg-zinc-900 rounded px-2 py-1 pl-6 text-xs text-amber-400 font-mono focus:outline-none focus:border-amber-500/60"
-                            />
+                          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-900/80">
+                            <span className="text-[10px] uppercase tracking-wider text-amber-500 font-bold">Apply Row Discount:</span>
+                            <div className="relative flex items-center max-w-[110px] w-full">
+                              <span className="absolute left-2 text-zinc-500 text-xs font-mono">₹</span>
+                              <input 
+                                type="number"
+                                placeholder="0"
+                                value={item.discount === 0 ? '' : item.discount}
+                                onChange={(e) => handleItemDiscountAdjust(uniqueKey, e.target.value)}
+                                className="w-full bg-zinc-900 rounded px-2 py-1 pl-6 text-xs text-amber-400 font-mono focus:outline-none focus:border-amber-500/60"
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
 
                   {purpose === 'repair' && Number(serviceCharge) > 0 && (

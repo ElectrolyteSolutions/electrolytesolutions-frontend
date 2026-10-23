@@ -7,6 +7,7 @@ import Footer from './components/footer';
 import InvoiceTemplate from './components/InvoiceTemplate';
 import { getUserProfile, logout } from './features/authSlice';
 import PublicBillView from './pages/PublicBillView';
+import OrdersPage from './pages/Orders';
 
 // Lazy loaded pages
 const AuthLandingPage = lazy(() => import('./auth/landing'));
@@ -111,6 +112,7 @@ function App() {
                         {/* EVERYONE Routes (Admin, Store, Customer) */}
                         <Route path="/products" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><ProductsPage /></ProtectedRoute>} />
                         <Route path="/profile" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><ProfilePage /></ProtectedRoute>} />
+                        <Route path="/orders" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><OrdersPage /></ProtectedRoute>} />
 
                         {/* Fallback Catch-all: Route unknown URLs back to home */}
                         <Route path="*" element={<Navigate to="/" replace />} />
