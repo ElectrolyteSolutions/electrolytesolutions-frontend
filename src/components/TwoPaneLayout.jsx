@@ -1,9 +1,12 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 
-const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%' }) => {
+const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animationKey }) => {
   const [leftWidth, setLeftWidth] = useState(defaultLeftWidth);
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = useRef(null);
+
+  const hasLeft = Boolean(leftPane);
+  const hasRight = Boolean(rightPane);
 
   const startResizing = useCallback((e) => {
     e.preventDefault();
@@ -16,21 +19,19 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%' }) => {
 
   const resize = useCallback(
     (e) => {
-      if (!isResizing || !containerRef.current) return;
+      if (!isResizing || !containerRef.current || !hasLeft || !hasRight) return;
 
       const containerRect = containerRef.current.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       
-      // Calculate new width relative to the container
       const offsetX = clientX - containerRect.left;
       const newWidthPercentage = (offsetX / containerRect.width) * 100;
 
-      // Enforce min and max limits (e.g., between 25% and 75% width)
       if (newWidthPercentage >= 25 && newWidthPercentage <= 75) {
         setLeftWidth(`${newWidthPercentage}%`);
       }
     },
-    [isResizing]
+    [isResizing, hasLeft, hasRight]
   );
 
   useEffect(() => {
@@ -49,6 +50,27 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%' }) => {
     };
   }, [isResizing, resize, stopResizing]);
 
+  // Case 1: Only Right Pane exists
+  if (!hasLeft && hasRight) {
+    return (
+      <div ref={containerRef} className="flex flex-col w-full h-full min-h-[calc(100vh-120px)] overflow-hidden">
+        <div key={animationKey} className="w-full h-full overflow-y-auto custom-scrollbar animate-in slide-in-from-right-4 duration-300">
+          {rightPane}
+        </div>
+      </div>
+    );
+  }
+
+  // Case 2: Only Left Pane exists
+  if (hasLeft && !hasRight) {
+    return (
+      <div ref={containerRef} className="flex flex-col w-full h-full min-h-[calc(100vh-120px)] overflow-hidden">
+        <div className="w-full h-full overflow-y-auto custom-scrollbar">{leftPane}</div>
+      </div>
+    );
+  }
+
+  // Case 3: Both Panes exist (Resizable Split Layout)
   return (
     <div 
       ref={containerRef} 
@@ -62,7 +84,7 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%' }) => {
         {leftPane}
       </div>
 
-      {/* Resizer Handle (Hidden on small mobile screens) */}
+      {/* Resizer Handle */}
       <div
         onMouseDown={startResizing}
         onTouchStart={startResizing}
@@ -70,15 +92,17 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%' }) => {
           isResizing ? 'bg-white/20' : 'hover:bg-white/10'
         }`}
       >
-        <div className={`h-8 w-0.5 rounded-full transition-colors ${isResizing ? 'bg-white' : 'bg-vercel-card group-hover:bg-zinc-500'}`} />
+        <div className={`h-8 w-0.5 rounded-full transition-colors ${isResizing ? 'bg-white' : 'bg-zinc-800 group-hover:bg-zinc-500'}`} />
       </div>
 
-      {/* Right Pane */}
+      {/* Right Pane (Keyed to trigger slide animation on change) */}
       <div 
         style={{ width: window.innerWidth >= 1024 ? `calc(100% - ${leftWidth} - 8px)` : '100%' }}
-        className="flex border-l-1 border-zinc-800 flex-col h-full overflow-y-auto custom-scrollbar pl-0 lg:pl-3 lg:mt-0 transition-none"
+        className="flex flex-col h-full overflow-none custom-scrollbar pl-0 lg:pl-3 lg:mt-0 transition-none"
       >
-        {rightPane}
+        <div key={animationKey} className="h-full flex flex-col animate-in slide-in-from-right-4 duration-300 overflow-none">
+          {rightPane}
+        </div>
       </div>
     </div>
   );

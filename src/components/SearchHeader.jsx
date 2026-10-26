@@ -1,6 +1,5 @@
 import VercelDropdown from "./DropdownBox";
-
-const Header = ({ searchTerm, setSearchTerm, statusFilter, setStatusFilter,statusOptions }) => {
+const Header = ({placeholder, searchTerm, setSearchTerm, statusFilter, setStatusFilter,statusOptions }) => {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 w-full">
       <div className="flex-1 relative">
@@ -19,7 +18,7 @@ const Header = ({ searchTerm, setSearchTerm, statusFilter, setStatusFilter,statu
         </svg>
         <input
           type="text"
-          placeholder="Search by order number, customer name, or payment ID..."
+          placeholder={placeholder}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full bg-vercel-card text-zinc-100 placeholder-zinc-500 pl-10 pr-4 py-2 rounded-md border-1 border-zinc-800 focus:outline-none focus:border-white text-sm transition-all"
