@@ -119,7 +119,7 @@ const CustomersPage = () => {
       </header>
 
       {/* Search & Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-zinc-900 p-4 rounded-xl shadow-md border border-zinc-800">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-vercel-secondary p-4 rounded-xl shadow-md border border-zinc-800">
         <div className="flex-1">
           <input
             type="text"
@@ -144,11 +144,11 @@ const CustomersPage = () => {
       </div>
 
       {/* Table Section */}
-      <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
+      <div className="bg-vercel-secondary rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
         <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
           <table className="w-full text-left border-collapse min-w-[950px]">
             <thead>
-              <tr className="bg-zinc-800/50 border-b border-zinc-800">
+              <tr className="bg-vercel-card/50 border-b border-zinc-800">
                 <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Customer Name</th>
                 <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Contact Info</th>
                 <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Address</th>
@@ -179,7 +179,7 @@ const CustomersPage = () => {
                   const displayAddress = c.address || (c.addresses?.[0] ? `${c.addresses[0].address1}, ${c.addresses[0].city}` : 'No address');
 
                   return (
-                    <tr key={c._id} className="hover:bg-zinc-800/30 transition-colors group">
+                    <tr key={c._id} className="hover:bg-vercel-card/30 transition-colors group">
                       <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm space-y-2">
                         <div className="font-semibold text-zinc-100">{displayName}</div>
                         {c?.gst && <div className="font-semibold text-zinc-300 text-[10px] border rounded p-[2px] px-1 bg-blue-900 inline-block">GST: {c?.gst}</div>}
@@ -267,9 +267,9 @@ const CustomersPage = () => {
 
       {/* Customer Profile Modal Overlay */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[95vh] flex flex-col border border-zinc-800">
-            <div className="px-5 sm:px-6 py-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30 shrink-0">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-vercel-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-vercel-secondary w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[95vh] flex flex-col border border-zinc-800">
+            <div className="px-5 sm:px-6 py-3 border-b border-zinc-800 flex justify-between items-center bg-vercel-card/30 shrink-0">
               <h3 className="text-base sm:text-lg font-bold text-white">{editId ? 'Update Profile' : 'Register Customer'}</h3>
               <button onClick={() => setIsModalOpen(false)} className="text-zinc-500 hover:text-white transition-colors text-2xl leading-none">&times;</button>
             </div>
@@ -351,7 +351,7 @@ const CustomersPage = () => {
                 <button 
                   type="button" 
                   onClick={() => setIsModalOpen(false)} 
-                  className="flex-1 px-4 py-2.5 rounded-lg text-zinc-300 font-semibold bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors text-xs sm:text-sm"
+                  className="flex-1 px-4 py-2.5 rounded-lg text-zinc-300 font-semibold bg-vercel-secondary hover:bg-vercel-card border border-zinc-800 transition-colors text-xs sm:text-sm"
                 >
                   Cancel
                 </button>

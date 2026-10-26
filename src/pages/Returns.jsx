@@ -78,7 +78,7 @@ const ReturnsPage = () => {
 
       {/* VIEW STEP 1: INITIAL SEARCH ENTRY LOOKUP CONTAINER */}
       {viewState === 'lookup' && (
-        <div className="max-w-md mx-auto bg-zinc-900 border border-zinc-800 p-5 sm:p-6 rounded-xl shadow-xl space-y-4 mt-8 sm:mt-12">
+        <div className="max-w-md mx-auto bg-vercel-secondary border border-zinc-800 p-5 sm:p-6 rounded-xl shadow-xl space-y-4 mt-8 sm:mt-12">
           <h2 className="text-xs sm:text-sm font-bold text-zinc-300 uppercase tracking-wider text-center">Scan or Input Bill ID</h2>
           <form onSubmit={handleLookupBill} className="space-y-3">
             <input 
@@ -103,7 +103,7 @@ const ReturnsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in duration-200">
           
           {/* Main Select list area mapping block */}
-          <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
+          <div className="lg:col-span-2 bg-vercel-secondary border border-zinc-800 rounded-xl p-4 sm:p-5 shadow-xl space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-zinc-800 pb-3">
               <h3 className="font-bold text-zinc-200 text-sm sm:text-md">Items Linked with Bill #{activeBill._id.slice(-8).toUpperCase()}</h3>
               <button 
@@ -121,7 +121,7 @@ const ReturnsPage = () => {
                   <div 
                     key={item.productId} 
                     onClick={() => handleToggleSelection(item)}
-                    className={`p-3 sm:p-4 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2 cursor-pointer transition-all ${isChecked ? 'bg-red-500/5 border-red-500/40 shadow-inner' : 'bg-zinc-950 border-zinc-800 hover:bg-zinc-900/60'}`}
+                    className={`p-3 sm:p-4 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2 cursor-pointer transition-all ${isChecked ? 'bg-red-500/5 border-red-500/40 shadow-inner' : 'bg-zinc-950 border-zinc-800 hover:bg-vercel-secondary/60'}`}
                   >
                     <div className="flex items-center gap-3 w-full sm:w-auto min-w-0">
                       <div className={`w-4 h-4 rounded flex items-center justify-center border transition-all shrink-0 ${isChecked ? 'bg-red-600 border-red-500 text-white' : 'border-zinc-700'}`}>
@@ -140,7 +140,7 @@ const ReturnsPage = () => {
                         <select
                           value={returnCart[item.productId]}
                           onChange={(e) => handleQuantityAdjust(item.productId, e.target.value)}
-                          className="bg-zinc-900 border border-zinc-700 rounded text-xs text-zinc-100 px-2 py-1.5 sm:py-1 font-bold focus:outline-none"
+                          className="bg-vercel-secondary border border-zinc-700 rounded text-xs text-zinc-100 px-2 py-1.5 sm:py-1 font-bold focus:outline-none"
                         >
                           {[...Array(item.orderedQuantity).keys()].map(n => (
                             <option key={n + 1} value={n + 1}>{n + 1}</option>
@@ -155,7 +155,7 @@ const ReturnsPage = () => {
           </div>
 
           {/* Right Summary Dashboard Widget Form */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-5 shadow-xl flex flex-col justify-between h-fit min-h-[250px] sm:min-h-[300px]">
+          <div className="bg-vercel-secondary border border-zinc-800 rounded-xl p-4 sm:p-5 shadow-xl flex flex-col justify-between h-fit min-h-[250px] sm:min-h-[300px]">
             <div>
               <h3 className="font-bold text-zinc-300 text-xs sm:text-sm tracking-wide uppercase border-b border-zinc-800 pb-2">Refund Manifest</h3>
               <div className="text-[11px] sm:text-xs space-y-1.5 py-3 border-b border-zinc-800/60 font-mono text-zinc-400">
@@ -194,7 +194,7 @@ const ReturnsPage = () => {
                 type="button"
                 onClick={handleExecuteReturnWorkflow}
                 disabled={Object.keys(returnCart).length === 0}
-                className="w-full bg-red-600 hover:bg-red-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white font-bold py-2.5 sm:py-3 rounded-lg tracking-wide text-xs uppercase transition-all shadow-lg"
+                className="w-full bg-red-600 hover:bg-red-500 disabled:bg-vercel-card disabled:text-zinc-600 text-white font-bold py-2.5 sm:py-3 rounded-lg tracking-wide text-xs uppercase transition-all shadow-lg"
               >
                 Execute Cash Refund & Restock
               </button>
@@ -207,11 +207,11 @@ const ReturnsPage = () => {
       {/* VIEW STEP 3: TRANSACTION SUCCESS PREVIEW PRINT MANAGER CONTAINER */}
       {viewState === 'print' && finalizedReturnRecord && (
         <div className="space-y-4 animate-in fade-in duration-300 w-full">
-          <div className="flex flex-col sm:flex-row gap-3 justify-between items-center max-w-2xl mx-auto bg-zinc-900 border border-zinc-800 p-4 rounded-xl w-full">
+          <div className="flex flex-col sm:flex-row gap-3 justify-between items-center max-w-2xl mx-auto bg-vercel-secondary border border-zinc-800 p-4 rounded-xl w-full">
             <span className="text-xs sm:text-sm font-semibold text-red-400 text-center sm:text-left">🎉 Return Logged and Cash Disbursed!</span>
             <button 
               onClick={() => { setFinalizedReturnRecord(null); setViewState('lookup'); setSearchBillId(''); }}
-              className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-4 py-2 rounded-lg transition-all font-bold"
+              className="w-full sm:w-auto bg-vercel-card hover:bg-zinc-700 text-white text-xs px-4 py-2 rounded-lg transition-all font-bold"
             >
               ← Process Another Return
             </button>

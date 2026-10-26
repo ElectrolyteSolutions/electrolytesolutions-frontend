@@ -308,7 +308,7 @@ const BillingPage = () => {
       {/* Navigation Switcher header grid */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
         <div><h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Billing Registry</h1></div>
-        <div className="inline-flex w-full sm:w-auto p-1 bg-zinc-900 rounded-xl space-x-1">
+        <div className="inline-flex w-full sm:w-auto p-1 bg-vercel-secondary rounded-xl space-x-1">
           <button onClick={() => { setActiveTab('checkout'); handleCancelEditMode(); }} className={`flex-1 sm:flex-none text-center px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all ${activeTab === 'checkout' && !editingBillId ? 'bg-emerald-600 text-white shadow' : 'text-zinc-400'}`}>POS Console</button>
           <button onClick={() => setActiveTab('history')} className={`flex-1 sm:flex-none text-center px-4 py-2 rounded-lg font-medium text-xs sm:text-sm transition-all ${activeTab === 'history' ? 'bg-emerald-600 text-white shadow' : 'text-zinc-400'}`}>Invoice History Log</button>
         </div>
@@ -316,9 +316,9 @@ const BillingPage = () => {
 
       {activeTab === 'print' && printTargetData && (
         <div className="space-y-4 animate-in fade-in duration-300">
-          <div className="flex flex-col sm:flex-row gap-3 justify-between items-center max-w-2xl mx-auto bg-zinc-900 p-4 rounded-xl w-full">
+          <div className="flex flex-col sm:flex-row gap-3 justify-between items-center max-w-2xl mx-auto bg-vercel-secondary p-4 rounded-xl w-full">
             <span className="text-xs sm:text-sm font-semibold text-emerald-400 text-center sm:text-left">🎉 Transaction Processed Successfully!</span>
-            <button onClick={() => { setPrintTargetData(null); setActiveTab('checkout'); }} className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold">← Back to New Transaction</button>
+            <button onClick={() => { setPrintTargetData(null); setActiveTab('checkout'); }} className="w-full sm:w-auto bg-vercel-card hover:bg-zinc-700 text-white text-xs px-4 py-2 rounded-lg transition-colors font-bold">← Back to New Transaction</button>
           </div>
           <div className="overflow-x-auto">
             <InvoiceTemplate billData={printTargetData} onClose={handleCloseInspect} />
@@ -336,7 +336,7 @@ const BillingPage = () => {
               </div>
               <div className="flex gap-2 w-full md:w-auto shrink-0">
                 <button onClick={() => handleLoadExistingBillToEdit(duplicateBillMatch)} className="flex-1 md:flex-none text-center bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-xs px-4 py-2 rounded-lg transition-colors shadow-md">Edit Bill</button>
-                <button onClick={() => setDuplicateBillMatch(null)} className="flex-1 md:flex-none text-center bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs px-3 py-2 rounded-lg transition-colors">Ignore & New</button>
+                <button onClick={() => setDuplicateBillMatch(null)} className="flex-1 md:flex-none text-center bg-vercel-secondary hover:bg-vercel-card text-zinc-300 text-xs px-3 py-2 rounded-lg transition-colors">Ignore & New</button>
               </div>
             </div>
           )}
@@ -352,7 +352,7 @@ const BillingPage = () => {
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 animate-in fade-in duration-300">
-            <div className="lg:col-span-2 bg-zinc-900 p-4 sm:p-6 rounded-xl space-y-6 shadow-xl">
+            <div className="lg:col-span-2 bg-vercel-secondary p-4 sm:p-6 rounded-xl space-y-6 shadow-xl">
               <h2 className="text-lg sm:text-xl font-bold tracking-tight text-emerald-400 border-b border-zinc-800 pb-3">{editingBillId ? 'Modify Invoice Console' : 'POS Console'}</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -445,7 +445,7 @@ const BillingPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[250px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800">
                   {filteredProductsList.length === 0 ? (
-                    <div className="col-span-full py-8 text-center text-zinc-500 text-xs italic bg-zinc-950/40 border border-zinc-900 rounded-lg">
+                    <div className="col-span-full py-8 text-center text-zinc-500 text-xs italic bg-zinc-950/40 border border-vercel-secondary rounded-lg">
                       No inventory components found matching "{productSearchKeyword}".
                     </div>
                   ) : (
@@ -459,7 +459,7 @@ const BillingPage = () => {
                             <div className="text-xs sm:text-sm font-semibold text-zinc-200 truncate">{p.name}</div>
                             <div className="text-[11px] sm:text-xs text-zinc-500 truncate">₹{p.price} | Stock: {p.quantity} {currentCartQty > 0 && <span className="text-emerald-500 font-medium ml-1">({currentCartQty} added)</span>}</div>
                           </div>
-                          <button onClick={() => handleAddItem(p._id)} disabled={isOutOfStock} className="bg-zinc-800 hover:bg-emerald-600 disabled:bg-zinc-900 disabled:text-zinc-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors shrink-0">
+                          <button onClick={() => handleAddItem(p._id)} disabled={isOutOfStock} className="bg-vercel-card hover:bg-emerald-600 disabled:bg-vercel-secondary disabled:text-zinc-700 text-white px-3 py-1.5 rounded text-xs font-bold transition-colors shrink-0">
                             {isOutOfStock ? 'Maxed Out' : '+ Add'}
                           </button>
                         </div>
@@ -470,7 +470,7 @@ const BillingPage = () => {
               </div>
             </div>
 
-            <div className="bg-zinc-900 p-4 sm:p-6 rounded-xl flex flex-col justify-between shadow-xl min-h-[500px]">
+            <div className="bg-vercel-secondary p-4 sm:p-6 rounded-xl flex flex-col justify-between shadow-xl min-h-[500px]">
               <div>
                 <h2 className="text-base sm:text-lg font-bold text-zinc-200 tracking-tight border-b border-zinc-800 pb-3">Live Invoice Manifest</h2>
                 <div className="space-y-4 my-4 max-h-[340px] overflow-y-auto pr-1 sm:pr-2">
@@ -486,7 +486,7 @@ const BillingPage = () => {
                               <div className="text-xs sm:text-sm font-bold text-zinc-200 break-words">
                                 {item.name} 
                                 {item.isCustomLineItem && <span className="inline-block text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Custom</span>}
-                                {editingBillId && item.isExistingLineItem && <span className="inline-block text-[9px] bg-zinc-800 text-zinc-400 border border-zinc-700 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Saved Line</span>}
+                                {editingBillId && item.isExistingLineItem && <span className="inline-block text-[9px] bg-vercel-card text-zinc-400 border border-zinc-700 px-1.5 py-0.5 rounded uppercase ml-1.5 font-mono">Saved Line</span>}
                               </div>
                               <div className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">Sell Price: ₹{item.price} | Qty: {item.orderedQuantity}</div>
                             </div>
@@ -496,7 +496,7 @@ const BillingPage = () => {
                             </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-900/80">
+                          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-vercel-secondary/80">
                             <span className="text-[10px] uppercase tracking-wider text-amber-500 font-bold">Apply Row Discount:</span>
                             <div className="relative flex items-center max-w-[110px] w-full">
                               <span className="absolute left-2 text-zinc-500 text-xs font-mono">₹</span>
@@ -505,7 +505,7 @@ const BillingPage = () => {
                                 placeholder="0"
                                 value={item.discount === 0 ? '' : item.discount}
                                 onChange={(e) => handleItemDiscountAdjust(uniqueKey, e.target.value)}
-                                className="w-full bg-zinc-900 rounded px-2 py-1 pl-6 text-xs text-amber-400 font-mono focus:outline-none focus:border-amber-500/60"
+                                className="w-full bg-vercel-secondary rounded px-2 py-1 pl-6 text-xs text-amber-400 font-mono focus:outline-none focus:border-amber-500/60"
                               />
                             </div>
                           </div>
@@ -528,7 +528,7 @@ const BillingPage = () => {
                     <span className="text-xs font-bold text-zinc-300">Payment Flag Status</span>
                     <span className="text-[10px] text-zinc-500">Is this bill cleared?</span>
                   </div>
-                  <div className="inline-flex w-full sm:w-auto p-0.5 bg-zinc-900 rounded-lg space-x-1">
+                  <div className="inline-flex w-full sm:w-auto p-0.5 bg-vercel-secondary rounded-lg space-x-1">
                     <button 
                       type="button"
                       onClick={() => setIsPaid(true)}
@@ -564,7 +564,7 @@ const BillingPage = () => {
         <div className="space-y-4 animate-in fade-in duration-300">
           
           {/* History Search & Sort Controls Toolbar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-zinc-900 p-4 rounded-xl shadow-md border border-zinc-800">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-vercel-secondary p-4 rounded-xl shadow-md border border-zinc-800">
             <div className="flex-1">
               <input
                 type="text"
@@ -588,11 +588,11 @@ const BillingPage = () => {
             </div>
           </div>
 
-          <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
+          <div className="bg-vercel-secondary rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
             <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
               <table className="w-full text-left border-collapse min-w-[900px]">
                 <thead>
-                  <tr className="bg-zinc-800/50 border-b border-zinc-800">
+                  <tr className="bg-vercel-card/50 border-b border-zinc-800">
                     <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Invoice ID</th>
                     <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Account Profile</th>
                     <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Workflow Intent</th>
@@ -609,7 +609,7 @@ const BillingPage = () => {
                     <tr><td colSpan="7" className="px-6 py-12 text-center text-zinc-500 text-sm italic">{bills.length === 0 ? "No recorded invoices tracked inside the database system." : "No invoices match your search criteria."}</td></tr>
                   ) : (
                     filteredAndSortedBills.map((bill) => (
-                      <tr key={bill._id} className="hover:bg-zinc-800/30 transition-colors group">
+                      <tr key={bill._id} className="hover:bg-vercel-card/30 transition-colors group">
                         <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm font-mono text-zinc-400 select-all">{bill?.billNumber}</td>
                         <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
                           <div className="font-semibold text-zinc-200">{bill.customer?.name || 'Profile Dropped'}</div>

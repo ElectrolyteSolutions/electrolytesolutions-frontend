@@ -21,7 +21,7 @@ const RefundVoucherTemplate = ({ refundData }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto my-4 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl text-zinc-100">
+    <div className="max-w-2xl mx-auto my-4 p-2 bg-vercel-secondary border border-zinc-800 rounded-lg shadow-xl text-zinc-100">
       
       {/* Action Header bar */}
       <div className="flex justify-between items-center mb-3 border-b border-zinc-800 pb-2 px-2">
@@ -35,7 +35,7 @@ const RefundVoucherTemplate = ({ refundData }) => {
       </div>
 
       {/* --- PRINT CONTAINER START --- */}
-      <div ref={printRef} className="bg-white text-zinc-900 p-5 rounded-md font-sans tracking-tight text-[11px]">
+      <div ref={printRef} className="bg-white text-vercel-secondary p-5 rounded-md font-sans tracking-tight text-[11px]">
         <style dangerouslySetInnerHTML={{__html: `
           @media print { 
             @page { size: A4 portrait; margin: 8mm; } 
@@ -84,7 +84,7 @@ const RefundVoucherTemplate = ({ refundData }) => {
         <div className="my-2.5 p-2 bg-red-50/20 border border-red-100/40 rounded text-[10px] flex justify-between items-center">
           <div>
             <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Refund Target Customer:</span>
-            <div className="font-bold text-zinc-900 text-xs">{refundData.customer?.name || 'Walk-in Client'}</div>
+            <div className="font-bold text-vercel-secondary text-xs">{refundData.customer?.name || 'Walk-in Client'}</div>
             <div className="text-zinc-600 font-mono text-[9px] mt-0.5">Ph: {refundData.customer?.phone || 'N/A'}</div>
           </div>
           <div className="text-right">
@@ -129,7 +129,7 @@ const RefundVoucherTemplate = ({ refundData }) => {
           <div className="w-1/2 space-y-1 text-zinc-600 text-right">
             <div className="flex justify-between pl-12 text-[10px]">
               <span>Taxable Refund Base:</span>
-              <span className="text-zinc-900 font-mono">₹{absoluteGrandRefund.toFixed(2)}</span>
+              <span className="text-vercel-secondary font-mono">₹{absoluteGrandRefund.toFixed(2)}</span>
             </div>
             <div className="flex justify-between items-center bg-red-600 text-white px-3 py-1.5 rounded text-[11px] font-bold mt-1.5 shadow-sm">
               <span>Total Cash Refunded:</span>

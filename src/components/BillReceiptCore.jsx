@@ -17,7 +17,7 @@ const BillReceiptCore = ({
   const grossTotal = (invoice.items || []).reduce((sum, item) => sum + (item.subTotal || 0), 0) + (invoice.serviceCharge || 0);
 
   return (
-    <div className="w-full bg-white text-zinc-900 overflow-x-hidden">
+    <div className="w-full bg-white text-vercel-secondary overflow-x-hidden">
       <head><title>{invoice?.billNumber}</title></head>
       {/* Optional Control Actions bar */}
       {showControls && (
@@ -46,7 +46,7 @@ const BillReceiptCore = ({
       )}
 
       <div className="w-full pb-2 bg-white">
-        <div className="bg-white text-zinc-900 p-4 sm:p-5 rounded-md font-sans tracking-tight text-[11px] w-full">
+        <div className="bg-white text-vercel-secondary p-4 sm:p-5 rounded-md font-sans tracking-tight text-[11px] w-full">
           
           {/* Branded Identity Header Block */}
           <div className="flex justify-between items-start border-b border-zinc-300 pb-2">
@@ -70,10 +70,10 @@ const BillReceiptCore = ({
             </div>
             
             <div className="text-right">
-              <p className="font-bold font-mono text-zinc-900 text-[11px] uppercase">GSTIN: {displayedGstin}</p>
+              <p className="font-bold font-mono text-vercel-secondary text-[11px] uppercase">GSTIN: {displayedGstin}</p>
               <h2 className="text-xs font-black text-zinc-950 uppercase tracking-wider   rounded inline-block mt-1">Tax Invoice</h2>
               <div className="text-[10px] text-zinc-600  font-mono">
-                <div className="text-[9px] text-zinc-900  font-bold  rounded uppercase tracking-wide inline-block mb-1">Purpose: {invoice.purpose}</div>
+                <div className="text-[9px] text-vercel-secondary  font-bold  rounded uppercase tracking-wide inline-block mb-1">Purpose: {invoice.purpose}</div>
                 <div>Date: {invoice.lastUpdated ? invoice.lastUpdated.split(',')[0] : new Date(invoice.createdAt || Date.now()).toLocaleDateString()}</div>
               </div>
             </div>
@@ -87,7 +87,7 @@ const BillReceiptCore = ({
           <div className="grid grid-cols-2 gap-4 my-2 border-b border-zinc-100">
             <div>
               <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Billed To:</span>
-              <div className="font-bold text-zinc-900 text-xs flex items-center gap-1.5">
+              <div className="font-bold text-vercel-secondary text-xs flex items-center gap-1.5">
                 {resolvedCustomer?.name || 'Walk-in Client'}
                 <span className="text-[8px] bg-zinc-100 text-zinc-600 border px-1 rounded font-normal uppercase tracking-tight">
                   {resolvedCustomer?.customerType || 'Individual'}
@@ -105,7 +105,7 @@ const BillReceiptCore = ({
               {invoice.purpose === 'repair' && resolvedDevice ? (
                 <div className="bg-zinc-50 p-2 rounded text-left border border-zinc-200 w-full max-w-[260px] space-y-1">
                   <div className="font-bold text-zinc-400 text-[8px] uppercase tracking-wide leading-none">Hardware Asset Profile</div>
-                  <div className="text-zinc-900 text-[11px] font-black leading-none">{resolvedDevice.deviceName}</div>
+                  <div className="text-vercel-secondary text-[11px] font-black leading-none">{resolvedDevice.deviceName}</div>
                   <div className="text-zinc-600 font-mono text-[9px]">HWID: {resolvedDevice.deviceHardwareId}</div>
                   
                   {resolvedDevice.issues && resolvedDevice.issues.length > 0 && (
@@ -185,7 +185,7 @@ const BillReceiptCore = ({
                 return (
                   <tr className="bg-amber-50/40 border-t border-dashed border-zinc-200">
                     <td className="px-2 py-2 font-mono text-amber-600">*</td>
-                    <td className="px-2 py-2 font-medium text-zinc-900">
+                    <td className="px-2 py-2 font-medium text-vercel-secondary">
                       <div>Diagnostic /On-Site Convenience Fee /Technical Service Fee /Installation Charge</div>
                       <div className="text-[8px] text-zinc-400 italic">Non-refundable labor line charge</div>
                     </td>

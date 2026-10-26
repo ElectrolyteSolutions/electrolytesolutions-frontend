@@ -92,11 +92,11 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-zinc-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh] border border-zinc-800">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-vercel-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-vercel-secondary w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh] border border-zinc-800">
         
         {/* Modal Header */}
-        <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30 shrink-0">
+        <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-vercel-card/30 shrink-0">
           <h3 className="text-base sm:text-lg font-bold text-white">Repair Registration</h3>
           <button type="button" onClick={onClose} className="text-zinc-500 hover:text-white transition-colors text-2xl leading-none">&times;</button>
         </div>
@@ -185,7 +185,7 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
               <button 
                 type="button"
                 onClick={handleAddIssue}
-                className="shrink-0 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 sm:px-4 rounded-lg font-bold transition-all text-xs sm:text-sm"
+                className="shrink-0 bg-vercel-card hover:bg-zinc-700 text-zinc-200 px-3 sm:px-4 rounded-lg font-bold transition-all text-xs sm:text-sm"
               >
                 + Add
               </button>
@@ -217,7 +217,7 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
             <button 
               type="button" 
               onClick={onClose} 
-              className="flex-1 px-4 py-2.5 rounded-lg text-zinc-300 font-semibold bg-zinc-950 border border-zinc-800 hover:bg-zinc-800 transition-colors text-xs sm:text-sm"
+              className="flex-1 px-4 py-2.5 rounded-lg text-zinc-300 font-semibold bg-zinc-950 border border-zinc-800 hover:bg-vercel-card transition-colors text-xs sm:text-sm"
             >
               Cancel
             </button>

@@ -245,7 +245,7 @@ const ProductsPage = () => {
       </header>
 
       {/* Filtering Subbar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 border-zinc-700 p-3 sm:p-4 rounded-xl bg-zinc-900 shadow">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 border-zinc-700 p-3 sm:p-4 rounded-xl bg-vercel-secondary shadow">
         <div className="lg:col-span-2 relative">
           <label className="block text-[10px] uppercase font-bold tracking-wider text-zinc-500 mb-1.5 ml-0.5">Component Text Search</label>
           <input 
@@ -273,23 +273,23 @@ const ProductsPage = () => {
       </div>
 
       {/* Table Section */}
-      <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-xl w-full">
+      <div className="bg-vercel-secondary rounded-xl overflow-hidden shadow-xl w-full">
         <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
           <table className="w-full text-left border-collapse min-w-[900px]">
             <thead>
-              <tr className="bg-zinc-900 border-b border-zinc-800 text-xs font-semibold text-zinc-400 uppercase tracking-wider select-none">
+              <tr className="bg-vercel-secondary border-b border-zinc-800 text-xs font-semibold text-zinc-400 uppercase tracking-wider select-none">
                 <th className="px-4 sm:px-6 py-3 w-12 sm:w-16">S.No</th>
                 <th className="px-4 sm:px-6 py-3 w-16 text-zinc-400">Media</th>
-                <th onClick={() => handleSortToggle('name')} className="px-4 sm:px-6 py-3 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors">
+                <th onClick={() => handleSortToggle('name')} className="px-4 sm:px-6 py-3 cursor-pointer hover:bg-vercel-card/30 text-zinc-200 transition-colors">
                   <div className="flex items-center">Product Name & SKU {renderSortIndicatorArrow('name')}</div>
                 </th>
-                <th onClick={() => handleSortToggle('price')} className="px-4 sm:px-6 py-3 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors">
+                <th onClick={() => handleSortToggle('price')} className="px-4 sm:px-6 py-3 cursor-pointer hover:bg-vercel-card/30 text-zinc-200 transition-colors">
                   <div className="flex items-center justify-end pr-4">MRP / Original {renderSortIndicatorArrow('price')}</div>
                 </th>
-                <th onClick={() => handleSortToggle('hsn')} className="px-4 sm:px-6 py-3 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors">
+                <th onClick={() => handleSortToggle('hsn')} className="px-4 sm:px-6 py-3 cursor-pointer hover:bg-vercel-card/30 text-zinc-200 transition-colors">
                   <div className="flex items-center justify-end pr-4">HSN {renderSortIndicatorArrow('hsn')}</div>
                 </th>
-                <th onClick={() => handleSortToggle('quantity')} className="px-4 sm:px-6 py-3 cursor-pointer hover:bg-zinc-800/30 text-zinc-200 transition-colors">
+                <th onClick={() => handleSortToggle('quantity')} className="px-4 sm:px-6 py-3 cursor-pointer hover:bg-vercel-card/30 text-zinc-200 transition-colors">
                   <div className="flex items-center">Stock Volume {renderSortIndicatorArrow('quantity')}</div>
                 </th>
                 {!isCustomer && <th className="px-4 sm:px-6 py-3 text-zinc-400">ERP ID</th>}
@@ -314,7 +314,7 @@ const ProductsPage = () => {
                 </tr>
               ) : (
                 items.map((p, i) => (
-                  <tr key={p._id} className="hover:bg-zinc-800/20 transition-colors group">
+                  <tr key={p._id} className="hover:bg-vercel-card/20 transition-colors group">
                     <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm font-mono text-zinc-500">{i + 1}</td>
                     
                     {/* Image Thumbnail Preview in Row */}
@@ -326,7 +326,7 @@ const ProductsPage = () => {
                           className="w-10 h-10 object-cover rounded-lg border border-zinc-700 bg-zinc-950" 
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-lg bg-zinc-800/50 border border-zinc-700/50 flex items-center justify-center text-[10px] text-zinc-500">
+                        <div className="w-10 h-10 rounded-lg bg-vercel-card/50 border border-zinc-700/50 flex items-center justify-center text-[10px] text-zinc-500">
                           No Img
                         </div>
                       )}
@@ -397,9 +397,9 @@ const ProductsPage = () => {
 
       {/* Modal Form Handling All Schema Fields + Collections Picker + Types Dropdown */}
       {isModalOpen && !isCustomer && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
-            <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/30 shrink-0">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-vercel-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-vercel-secondary w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh]">
+            <div className="p-3 border-b border-zinc-800 flex justify-between items-center bg-vercel-card/30 shrink-0">
               <h3 className="text-base sm:text-lg font-bold text-white">{editId ? 'Edit ERP Product Record' : 'Add New ERP Product'}</h3>
               <button onClick={handleCloseModal} className="text-zinc-500 hover:text-white transition-colors text-2xl leading-none">&times;</button>
             </div>
@@ -469,14 +469,14 @@ const ProductsPage = () => {
                         placeholder="Collection Title (e.g. Battery Packs)" 
                         value={newCollectionTitle}
                         onChange={e => setNewCollectionTitle(e.target.value)}
-                        className="w-full bg-zinc-900 rounded px-2.5 py-1.5 text-xs text-white border border-zinc-700"
+                        className="w-full bg-vercel-secondary rounded px-2.5 py-1.5 text-xs text-white border border-zinc-700"
                       />
                       <input 
                         type="text" 
                         placeholder="ERP Collection ID (Optional)" 
                         value={newCollectionErpId}
                         onChange={e => setNewCollectionErpId(e.target.value)}
-                        className="w-full bg-zinc-900 rounded px-2.5 py-1.5 text-xs text-white border border-zinc-700 font-mono"
+                        className="w-full bg-vercel-secondary rounded px-2.5 py-1.5 text-xs text-white border border-zinc-700 font-mono"
                       />
                       <button 
                         type="button"
@@ -626,7 +626,7 @@ const ProductsPage = () => {
                 {form.images.length > 0 ? (
                   <div className="flex flex-wrap gap-2 pt-2">
                     {form.images.map((url, index) => (
-                      <div key={index} className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 pl-2 pr-1.5 py-1 rounded-lg">
+                      <div key={index} className="flex items-center gap-2 bg-vercel-secondary border border-zinc-800 pl-2 pr-1.5 py-1 rounded-lg">
                         <img src={url} alt={`Preview ${index}`} className="w-6 h-6 object-cover rounded bg-zinc-950" />
                         <span className="text-[11px] text-zinc-300 font-mono max-w-[120px] truncate">{url}</span>
                         <button 
@@ -678,7 +678,7 @@ const ProductsPage = () => {
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-4 py-2 rounded-lg text-xs font-semibold transition-colors"
+                  className="bg-vercel-card hover:bg-zinc-700 text-zinc-300 px-4 py-2 rounded-lg text-xs font-semibold transition-colors"
                 >
                   Cancel
                 </button>

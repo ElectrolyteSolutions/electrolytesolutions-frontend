@@ -78,7 +78,7 @@ const DashboardPage = () => {
 
         {/* Profile Card Widget */}
         {profileData && (
-          <div className="bg-zinc-900 border border-zinc-800/80 p-3.5 rounded-xl shadow-lg flex flex-wrap items-center gap-4 text-xs">
+          <div className="bg-vercel-secondary border border-zinc-800/80 p-3.5 rounded-xl shadow-lg flex flex-wrap items-center gap-4 text-xs">
             <div>
               <span className="text-[10px] text-zinc-500 uppercase tracking-wider block font-bold">Contact Info</span>
               <span className="text-zinc-200 font-medium">{profileData.email} {profileData.phone && `• ${profileData.phone}`}</span>
@@ -103,7 +103,7 @@ const DashboardPage = () => {
             )}
             <button 
               onClick={() => navigate('/profile')} 
-              className="ml-auto bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              className="ml-auto bg-vercel-card hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
             >
               Edit Profile
             </button>
@@ -130,7 +130,7 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Metric 1: Financial Gross Settled Paid Revenue */}
-        <div className="bg-zinc-900 border border-zinc-800/60 p-4 rounded-xl flex items-center justify-between shadow-xl relative overflow-hidden group hover:border-emerald-500/30 transition-all">
+        <div className="bg-vercel-secondary border border-zinc-800/60 p-4 rounded-xl flex items-center justify-between shadow-xl relative overflow-hidden group hover:border-emerald-500/30 transition-all">
           <div className="space-y-1.5 w-full z-10">
             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Gross Settled Revenue</span>
             <div className="text-2xl font-black text-emerald-400 font-mono">₹{grossPaidRevenue.toLocaleString()}</div>
@@ -143,7 +143,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Metric 2: Net Profit Ledger */}
-        <div className="bg-zinc-900 border border-zinc-800/60 p-4 rounded-xl flex items-center justify-between shadow-xl relative overflow-hidden group hover:border-indigo-500/30 transition-all">
+        <div className="bg-vercel-secondary border border-zinc-800/60 p-4 rounded-xl flex items-center justify-between shadow-xl relative overflow-hidden group hover:border-indigo-500/30 transition-all">
           <div className="space-y-1.5 w-full z-10">
             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Net Realized Profit</span>
             <div className="text-2xl font-black text-indigo-400 font-mono">₹{settledProfit.toLocaleString()}</div>
@@ -156,11 +156,11 @@ const DashboardPage = () => {
         </div>
 
         {/* Metric 3: Inventory Valuation Assets */}
-        <div className="bg-zinc-900 border border-zinc-800/60 p-4 rounded-xl flex items-center justify-between shadow-xl relative overflow-hidden group hover:border-purple-500/30 transition-all">
+        <div className="bg-vercel-secondary border border-zinc-800/60 p-4 rounded-xl flex items-center justify-between shadow-xl relative overflow-hidden group hover:border-purple-500/30 transition-all">
           <div className="space-y-1.5 w-full z-10">
             <div className="flex justify-between items-center">
               <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Inventory Assets (Base)</span>
-              <span className="text-[10px] font-bold bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">{totalStockUnits} Units</span>
+              <span className="text-[10px] font-bold bg-vercel-card px-1.5 py-0.5 rounded text-zinc-300">{totalStockUnits} Units</span>
             </div>
             <div className="text-2xl font-black text-purple-400 font-mono">₹{totalStockBaseValue.toLocaleString()}</div>
             <div className="flex justify-between items-center pt-2 border-t border-zinc-800/80">
@@ -172,7 +172,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Metric 4: Operational Matrix */}
-        <div className="bg-zinc-900 border border-zinc-800/60 p-4 rounded-xl flex items-center justify-between shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-all">
+        <div className="bg-vercel-secondary border border-zinc-800/60 p-4 rounded-xl flex items-center justify-between shadow-xl relative overflow-hidden group hover:border-blue-500/30 transition-all">
           <div className="space-y-1.5 w-full z-10">
             <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Active Repairs (Pending)</span>
             <div className="text-2xl font-black text-amber-400 font-mono">{activeRepairs}</div>
@@ -190,7 +190,7 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
         
         {/* Left Side: Critical Out of Stock Alerts */}
-        <div className="bg-zinc-900 border border-zinc-800/60 rounded-xl p-4 shadow-xl space-y-4 lg:col-span-1">
+        <div className="bg-vercel-secondary border border-zinc-800/60 rounded-xl p-4 shadow-xl space-y-4 lg:col-span-1">
           <div className="flex justify-between items-center border-b border-zinc-800 pb-2">
             <h3 className="text-sm font-bold tracking-tight text-zinc-200 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
@@ -217,14 +217,14 @@ const DashboardPage = () => {
         </div>
 
         {/* Right Side: Process Distribution Breakdown */}
-        <div className="bg-zinc-900 border border-zinc-800/60 rounded-xl p-4 shadow-xl space-y-4 lg:col-span-2">
+        <div className="bg-vercel-secondary border border-zinc-800/60 rounded-xl p-4 shadow-xl space-y-4 lg:col-span-2">
           <h3 className="text-sm font-bold text-zinc-200 border-b border-zinc-800 pb-2">Workflow Funnel Allocations</h3>
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-center">
             <div className="bg-zinc-950 p-4 rounded-xl space-y-1 border border-zinc-800/60">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Direct Sales</span>
               <div className="text-2xl font-black text-white font-mono">{purchaseCount}</div>
-              <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden mt-2">
+              <div className="w-full bg-vercel-card h-1.5 rounded-full overflow-hidden mt-2">
                 <div className="bg-emerald-500 h-full" style={{ width: `${bills.length ? (purchaseCount / bills.length) * 100 : 0}%` }}></div>
               </div>
             </div>
@@ -232,7 +232,7 @@ const DashboardPage = () => {
             <div className="bg-zinc-950 p-4 rounded-xl space-y-1 border border-zinc-800/60">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Service Repairs</span>
               <div className="text-2xl font-black text-white font-mono">{repairCount}</div>
-              <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden mt-2">
+              <div className="w-full bg-vercel-card h-1.5 rounded-full overflow-hidden mt-2">
                 <div className="bg-amber-500 h-full" style={{ width: `${bills.length ? (repairCount / bills.length) * 100 : 0}%` }}></div>
               </div>
             </div>
@@ -240,7 +240,7 @@ const DashboardPage = () => {
             <div className="bg-zinc-950 p-4 rounded-xl space-y-1 border border-zinc-800/60">
               <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Pricing Quotes</span>
               <div className="text-2xl font-black text-white font-mono">{quoteCount}</div>
-              <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden mt-2">
+              <div className="w-full bg-vercel-card h-1.5 rounded-full overflow-hidden mt-2">
                 <div className="bg-blue-500 h-full" style={{ width: `${bills.length ? (quoteCount / bills.length) * 100 : 0}%` }}></div>
               </div>
             </div>
@@ -254,8 +254,8 @@ const DashboardPage = () => {
       </div>
 
       {/* --- GRID ROW 3: RECENT TRANSACTION ARCHIVE LEDGER --- */}
-      <div className="bg-zinc-900 border border-zinc-800/60 rounded-xl shadow-xl overflow-hidden">
-        <div className="px-4 sm:px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-800/20">
+      <div className="bg-vercel-secondary border border-zinc-800/60 rounded-xl shadow-xl overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-vercel-card/20">
           <h3 className="text-sm font-bold text-zinc-200">Recent Invoice Actions</h3>
           <button onClick={() => navigate('/billing')} className="text-xs text-blue-400 hover:underline cursor-pointer">View All Billing Logs</button>
         </div>
@@ -283,7 +283,7 @@ const DashboardPage = () => {
                 </tr>
               ) : (
                 bills.filter(bill => !bill?.isPaid).map((bill) => (
-                  <tr key={bill._id} className="hover:bg-zinc-800/20 transition-all">
+                  <tr key={bill._id} className="hover:bg-vercel-card/20 transition-all">
                     <td className="px-4 sm:px-6 py-3.5 font-mono text-zinc-400 select-all text-[11px] sm:text-xs tracking-wider">{bill._id}</td>
                     <td className="px-4 sm:px-6 py-3.5">
                       <div className="font-semibold text-zinc-200">{bill.customer?.name || "Unassigned Account"}</div>

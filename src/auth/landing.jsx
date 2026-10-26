@@ -68,7 +68,7 @@ const AuthLandingPage = () => {
     <div className="flex min-h-screen bg-zinc-950 font-sans">
       
       {/* LEFT HALF: Tech Branding Image Overlay (Hidden on Mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-900 overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-vercel-secondary overflow-hidden">
         <img 
           src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop" 
           alt="Hardware Circuitry" 
@@ -124,7 +124,7 @@ const AuthLandingPage = () => {
           )}
 
           {/* Auth Form */}
-          <form onSubmit={handleAuthSubmit} className="space-y-4 bg-zinc-900/40 p-6 sm:p-8 rounded-2xl border border-zinc-800/80 shadow-2xl backdrop-blur-sm">
+          <form onSubmit={handleAuthSubmit} className="space-y-4 bg-vercel-secondary/40 p-6 sm:p-8 rounded-2xl border border-zinc-800/80 shadow-2xl backdrop-blur-sm">
             
             {/* Registration Only Fields */}
             {!isLoginView && (
@@ -189,7 +189,7 @@ const AuthLandingPage = () => {
             <button 
               type="submit" 
               disabled={isLoading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-800 disabled:text-zinc-500 text-white font-bold py-3.5 rounded-lg text-sm tracking-wider uppercase transition-all shadow-lg shadow-indigo-900/20 mt-6 flex justify-center items-center gap-2 cursor-pointer"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-vercel-card disabled:text-zinc-500 text-white font-bold py-3.5 rounded-lg text-sm tracking-wider uppercase transition-all shadow-lg shadow-indigo-900/20 mt-6 flex justify-center items-center gap-2 cursor-pointer"
             >
               {isLoading ? (
                 <span className="animate-pulse">Processing...</span>

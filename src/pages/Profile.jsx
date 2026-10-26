@@ -154,7 +154,7 @@ const ProfilePage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* SECTION 1: Edit Profile Form */}
-        <div className="bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-xl border border-zinc-800/60">
+        <div className="bg-vercel-secondary p-4 sm:p-6 rounded-xl shadow-xl border border-zinc-800/60">
           <h3 className="text-base sm:text-lg font-bold text-white mb-4">Edit Profile & Business Details</h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -324,7 +324,7 @@ const ProfilePage = () => {
         </div>
 
         {/* SECTION 2: Active Sessions Management */}
-        <div className="bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-xl border border-zinc-800/60 flex flex-col justify-between">
+        <div className="bg-vercel-secondary p-4 sm:p-6 rounded-xl shadow-xl border border-zinc-800/60 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-base sm:text-lg font-bold text-white">Active Login Sessions</h3>

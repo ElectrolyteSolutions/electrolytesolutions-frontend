@@ -92,7 +92,7 @@ const PublicBillView = () => {
   if (error || !bill) {
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center p-4">
-        <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-lg max-w-md w-full text-center space-y-3">
+        <div className="bg-vercel-secondary border border-zinc-800 p-6 rounded-lg max-w-md w-full text-center space-y-3">
           <div className="text-2xl">⚠️</div>
           <h2 className="text-sm font-bold uppercase tracking-wider text-red-400">Access Error</h2>
           <p className="text-xs text-zinc-400">{error || 'Bill not found or link has expired.'}</p>
@@ -147,7 +147,7 @@ const PublicBillView = () => {
       `}} />
 
       {/* Public Action Controls Toolbar */}
-      <div className="w-full max-w-[800px] flex flex-wrap justify-between items-center gap-3 bg-zinc-900 border border-zinc-800 px-4 py-3 rounded-xl no-print shadow-lg">
+      <div className="w-full max-w-[800px] flex flex-wrap justify-between items-center gap-3 bg-vercel-secondary border border-zinc-800 px-4 py-3 rounded-xl no-print shadow-lg">
         <div>
           <h1 className="text-sm font-bold text-white">Public Secure Bill View</h1>
           <p className="text-[10px] text-zinc-400 font-mono">Invoice ID: {bill?.billNumber || bill?._id}</p>
@@ -156,7 +156,7 @@ const PublicBillView = () => {
         <div className="flex flex-wrap items-center gap-2 ml-auto">
           {/* <button 
             onClick={() => setIsGstinMasked(!isGstinMasked)}
-            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700 cursor-pointer"
+            className="bg-vercel-card hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700 cursor-pointer"
             title="Toggle GSTIN Masking"
           >
             {isGstinMasked ? '👁️ Unmask GSTIN' : '🔒 Mask GSTIN'}
@@ -164,7 +164,7 @@ const PublicBillView = () => {
 
           <button 
             onClick={handleDownloadPdf}
-            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow border border-zinc-700 cursor-pointer"
+            className="bg-vercel-card hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow border border-zinc-700 cursor-pointer"
           >
             📥 Download PDF
           </button>

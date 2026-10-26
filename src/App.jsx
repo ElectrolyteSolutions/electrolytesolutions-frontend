@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-route
 import { useDispatch, useSelector } from 'react-redux';
 
 import Navbar from './components/navbar';
-import Footer from './components/footer';
 import InvoiceTemplate from './components/InvoiceTemplate';
 import { getUserProfile, logout } from './features/authSlice';
 import PublicBillView from './pages/PublicBillView';
@@ -19,57 +18,65 @@ const ProductsPage = lazy(() => import('./pages/Products'));
 const ReturnsPage = lazy(() => import('./pages/Returns'));
 const ProfilePage = lazy(() => import('./pages/Profile'));
 
-// (Optional) Dummy component for the new Profile route so it doesn't crash before you build it!
-
 // ⚡ SECURITY WRAPPER: Enforces login AND Role permissions
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { role } = useSelector(state => state?.auth);
-    const dispatch =useDispatch()
+    const dispatch = useDispatch();
  
-    // 1. Not logged in? Kick to login screen.
     if (!role) {
-        dispatch(logout())
+        dispatch(logout());
         return <Navigate to="/" replace />; 
     }
 
-    
-    // 2. Logged in, but wrong role? Kick to their safest default page.
     if (allowedRoles && !allowedRoles?.includes(role)) {
         if (role === 'admin') return <Navigate to="/dashboard" replace />;
         if (role === 'store') return <Navigate to="/billing" replace />;
-        return <Navigate to="/products" replace />; // Default for customers
+        return <Navigate to="/products" replace />;
     }
     
     return children;
 };
 
-// LAYOUT WRAPPER: Hides the Navbar and Footer on the Login screen
+// LAYOUT WRAPPER: Adjusts margins for sidebar vs auth screen
 const AppLayout = ({ children }) => {
     const location = useLocation();
-    const isAuthPage = location.pathname === '/' || location.pathname.split('/')[1] === 'bills' ;
-
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const curLoc = location.pathname.split('/')[1] || 'Dashboard';
+    const isAuthPage = location.pathname === '/' || curLoc === 'bills';
 
     return (
-        <div className="flex flex-col min-h-screen bg-zinc-950">
-            {!isAuthPage && <Navbar />}
-            <main className={`flex-grow ${!isAuthPage ? 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full' : 'w-full'}`}>
-                {children}
-            </main>
-            {!isAuthPage && <Footer />}
+        <div className="flex min-h-screen bg-vercel-black text-white">
+            {/* Vercel-style Sidebar (Hidden on auth/public bill views) */}
+            {!isAuthPage && <Navbar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />}
+
+            {/* Main Content Area: Automatically adjusts left padding based on whether the sidebar is collapsed or expanded */}
+            <div className={`flex flex-col flex-grow min-h-screen transition-all duration-300 ${
+                !isAuthPage 
+                    ? (isCollapsed ? 'lg:pl-20 pt-16 lg:pt-0' : 'lg:pl-64 pt-16 lg:pt-0') 
+                    : 'w-full'
+            }`}>
+                <main className={`flex flex-col flex-grow h-screen overflow-hidden ${!isAuthPage ? 'w-full' : 'w-full'}`}>
+                    <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full border-b border-zinc-800 px-6 py-4 overflow-hidden shrink-0 bg-vercel-black">
+                        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight capitalize">{curLoc}</h1>
+                    </header>
+                    
+                    {/* Only scrollable section */}
+                    <div className='flex-grow p-6 overflow-y-auto custom-scrollbar bg-vercel-black'>
+                        {children}
+                    </div>
+                </main>
+            </div>
         </div>
     );
 };
 
-
-
 function App() {
-    // We grab the user here so we can auto-redirect them away from the login screen if they are already signed in.
     const { token, role } = useSelector(state => state.auth);
-    const dispatch=useDispatch()
+    const dispatch = useDispatch();
 
-    useEffect(()=>{
-        dispatch(getUserProfile())
-    },[dispatch])
+    useEffect(() => {
+        dispatch(getUserProfile());
+    }, [dispatch]);
 
     return (
         <BrowserRouter>
@@ -82,8 +89,6 @@ function App() {
                     }
                 >
                     <Routes>
-                        {/* 🔓 PUBLIC ROUTE / AUTO-REDIRECT */}
-                        {/* If they have a token, automatically send them to their dashboard so they don't see the login page again */}
                         <Route path="/bills/:token" element={<PublicBillView />} />
 
                         <Route 
@@ -97,8 +102,6 @@ function App() {
                             } 
                         />
 
-                        {/* 🔒 PROTECTED ERP ROUTES */}
-                        
                         {/* ADMIN ONLY Routes */}
                         <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><DashboardPage /></ProtectedRoute>} />
                         <Route path="/customers" element={<ProtectedRoute allowedRoles={['admin','store']}><CustomersPage /></ProtectedRoute>} />
@@ -109,12 +112,11 @@ function App() {
                         <Route path="/returns" element={<ProtectedRoute allowedRoles={['admin', 'store']}><ReturnsPage /></ProtectedRoute>} />
                         <Route path="/invoice" element={<ProtectedRoute allowedRoles={['admin', 'store']}><InvoiceTemplate /></ProtectedRoute>} />
 
-                        {/* EVERYONE Routes (Admin, Store, Customer) */}
+                        {/* EVERYONE Routes */}
                         <Route path="/products" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><ProductsPage /></ProtectedRoute>} />
                         <Route path="/profile" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><ProfilePage /></ProtectedRoute>} />
                         <Route path="/orders" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><OrdersPage /></ProtectedRoute>} />
 
-                        {/* Fallback Catch-all: Route unknown URLs back to home */}
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                 </Suspense>

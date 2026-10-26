@@ -126,7 +126,7 @@ const InvoiceTemplate = ({ billData, onClose }) => {
   const displayedGstin = isGstinMasked ? getMaskedGstin(fullGstin) : fullGstin;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-vercel-black/70 backdrop-blur-sm animate-in fade-in duration-200">
       
       {/* Strict 1-Page Single-Target Print Engine CSS */}
       <style dangerouslySetInnerHTML={{__html: `
@@ -170,10 +170,10 @@ const InvoiceTemplate = ({ billData, onClose }) => {
         }
       `}} />
 
-      <div className="bg-zinc-900 w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] border border-zinc-800">
+      <div className="bg-vercel-secondary w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] border border-zinc-800">
         
         {/* Modal Header Bar with Controls */}
-        <div className="px-4 sm:px-6 py-3 border-b border-zinc-800 flex flex-wrap justify-between items-center gap-3 bg-zinc-900 shrink-0">
+        <div className="px-4 sm:px-6 py-3 border-b border-zinc-800 flex flex-wrap justify-between items-center gap-3 bg-vercel-secondary shrink-0">
           <div className="min-w-0 pr-2">
             <h3 className="text-base sm:text-lg font-bold text-white truncate">Invoice & Billing Statement</h3>
             <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase mt-0.5 truncate">Invoice ID: {billData?.billNumber || billData?._id}</p>
@@ -182,7 +182,7 @@ const InvoiceTemplate = ({ billData, onClose }) => {
           <div className="flex flex-wrap items-center gap-2 ml-auto">
             <button 
               onClick={() => setIsGstinMasked(!isGstinMasked)}
-              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
+              className="bg-vercel-card hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
               title="Toggle GSTIN Masking"
             >
               {isGstinMasked ? '👁️ Unmask GSTIN' : '🔒 Mask GSTIN'}
@@ -197,7 +197,7 @@ const InvoiceTemplate = ({ billData, onClose }) => {
 
             <button 
               onClick={handleDownloadPdf}
-              className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
+              className="bg-vercel-card hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
             >
               📥 Download PDF
             </button>
@@ -214,7 +214,7 @@ const InvoiceTemplate = ({ billData, onClose }) => {
         </div>
 
         {/* Modal Body Container */}
-        <div className="overflow-y-auto flex-1 text-zinc-900 scrollbar-thin bg-zinc-950 p-4">
+        <div className="overflow-y-auto flex-1 text-vercel-secondary scrollbar-thin bg-zinc-950 p-4">
           <div className="w-full overflow-x-hidden flex justify-center">
             <div ref={printRef} id="printable-invoice-receipt" className="w-full overflow-hidden bg-white rounded-lg shadow-inner p-2">
               <BillReceiptCore 

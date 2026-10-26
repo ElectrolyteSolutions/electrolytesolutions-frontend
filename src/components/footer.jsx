@@ -39,7 +39,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-zinc-900 border-t border-zinc-800 text-zinc-400">
+    <footer className="bg-vercel-secondary border-t border-zinc-800 text-zinc-400">
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:py-16 lg:px-8">
         
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">

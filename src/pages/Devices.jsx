@@ -158,7 +158,7 @@ const DevicesPage = () => {
       </header>
 
       {/* Search & Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-zinc-900 p-4 rounded-xl shadow-md border border-zinc-800">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-vercel-secondary p-4 rounded-xl shadow-md border border-zinc-800">
         <div className="flex-1">
           <input
             type="text"
@@ -195,12 +195,12 @@ const DevicesPage = () => {
               className={`px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide whitespace-nowrap transition-all border flex items-center gap-2 ${
                 isActive
                   ? 'bg-blue-600/10 text-blue-400 border-blue-500/30 shadow-sm'
-                  : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:bg-zinc-800 hover:text-zinc-200'
+                  : 'bg-vercel-secondary text-zinc-400 border-zinc-800 hover:bg-vercel-card hover:text-zinc-200'
               }`}
             >
               <span>{tab.label}</span>
               <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                isActive ? 'bg-blue-500/20 text-blue-300' : 'bg-zinc-800 text-zinc-400'
+                isActive ? 'bg-blue-500/20 text-blue-300' : 'bg-vercel-card text-zinc-400'
               }`}>
                 {count}
               </span>
@@ -210,11 +210,11 @@ const DevicesPage = () => {
       </div>
 
       {/* Table Section */}
-      <div className="bg-zinc-900 rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
+      <div className="bg-vercel-secondary rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
         <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
           <table className="w-full text-left border-collapse min-w-[950px]">
             <thead>
-              <tr className="bg-zinc-800/50 border-b border-zinc-800">
+              <tr className="bg-vercel-card/50 border-b border-zinc-800">
                 <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Device / HWID</th>
                 <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Type</th>
                 <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Customer</th>
@@ -246,13 +246,13 @@ const DevicesPage = () => {
                     : (device.deviceType || 'Unknown');
 
                   return (
-                    <tr key={device._id} className="hover:bg-zinc-800/30 transition-colors group">
+                    <tr key={device._id} className="hover:bg-vercel-card/30 transition-colors group">
                       <td className="px-4 sm:px-6 py-3">
                         <div className="text-xs sm:text-sm font-semibold text-zinc-100">{device.deviceName}</div>
                         <div className="text-[11px] sm:text-xs font-mono text-zinc-500 mt-0.5">{device.deviceHardwareId}</div>
                       </td>
                       <td className="px-4 sm:px-6 py-3">
-                        <span className="inline-block bg-zinc-800 text-zinc-300 text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wider">
+                        <span className="inline-block bg-vercel-card text-zinc-300 text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wider">
                           {displayType}
                         </span>
                       </td>
@@ -276,9 +276,9 @@ const DevicesPage = () => {
                           onChange={(e) => handleStatusChange(device, e.target.value)}
                           className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 sm:py-1.5 rounded-full border bg-zinc-950 focus:outline-none focus:ring-2 cursor-pointer transition-all ${getStatusStyles(device.deviceRepairingStatus)}`}
                         >
-                          <option value="in-progress" className="bg-zinc-900 text-amber-400">In Progress</option>
-                          <option value="resolved" className="bg-zinc-900 text-emerald-400">Resolved</option>
-                          <option value="rejected" className="bg-zinc-900 text-red-400">Rejected</option>
+                          <option value="in-progress" className="bg-vercel-secondary text-amber-400">In Progress</option>
+                          <option value="resolved" className="bg-vercel-secondary text-emerald-400">Resolved</option>
+                          <option value="rejected" className="bg-vercel-secondary text-red-400">Rejected</option>
                         </select>
                       </td>
 
