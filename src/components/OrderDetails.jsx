@@ -38,7 +38,7 @@ const tableHeadData = ["Item Name", "Qty", "Rate", "Total"];
    
 
   return (
-    <div className="flex flex-col h-fit w-full overflow-x-none">
+    <div className="flex flex-col h-full w-full overflow-x-none">
       {/* Header */}
       <div className="pb-3 border-b border-zinc-800 flex justify-between items-center">
         <div>

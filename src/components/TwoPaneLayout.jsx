@@ -74,12 +74,12 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
   return (
     <div 
       ref={containerRef} 
-      className="flex flex-col lg:flex-row w-full h-full min-h-[calc(100vh-120px)] relative select-none overflow-hidden"
+      className="flex flex-col lg:flex-row w-full h-48 relative select-none overflow-hidden"
     >
       {/* Left Pane */}
       <div 
         style={{ width: window.innerWidth >= 1024 ? leftWidth : '100%' }}
-        className="flex flex-col h-full overflow-y-auto custom-scrollbar pr-0 lg:pr-3 transition-none"
+        className="flex flex-col h-full overflow-none custom-scrollbar pr-0 lg:pr-3 transition-none"
       >
         {leftPane}
       </div>
