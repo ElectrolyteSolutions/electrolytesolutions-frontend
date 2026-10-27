@@ -32,11 +32,6 @@ const tableHeadData = ["Item Name", "Qty", "Rate", "Total"];
   });
 }
 
-
-
-
-   
-
   return (
     <div className="flex flex-col h-full w-full overflow-x-none">
       {/* Header */}

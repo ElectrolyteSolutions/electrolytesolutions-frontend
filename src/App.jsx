@@ -61,7 +61,7 @@ const AppLayout = ({ children }) => {
                     </header>
                     
                     {/* Only scrollable section */}
-                    <div className='flex-grow p-6 overflow-none custom-scrollbar bg-vercel-black '>
+                    <div className='flex-grow p-6 overflow-none h-[calc(100vh-120px)] custom-scrollbar bg-vercel-black '>
                         {children}
                     </div>
                 </main>

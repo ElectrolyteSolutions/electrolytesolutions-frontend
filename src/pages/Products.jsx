@@ -299,7 +299,7 @@ const ProductsPage = () => {
   }
 
   const leftPaneContent = (
-    <div className="space-y-4 w-full h-full flex flex-col pr-1">
+    <div className=" w-full h-full flex flex-col pr-1">
       <div className='flex flex-row gap-3 h-fit'>
         <Header 
           placeholder="Search Product by Name, SKU, ID, Description..."

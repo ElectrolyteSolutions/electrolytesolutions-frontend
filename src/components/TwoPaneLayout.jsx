@@ -53,8 +53,8 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
   // Case 1: Only Right Pane exists
   if (!hasLeft && hasRight) {
     return (
-      <div ref={containerRef} className="flex flex-col w-full h-full min-h-[calc(100vh-120px)] overflow-hidden">
-        <div key={animationKey} className="w-full h-full overflow-y-auto custom-scrollbar animate-in slide-in-from-right-4 duration-300">
+      <div ref={containerRef} className="flex flex-col w-full h-full  overflow-hidden">
+        <div key={animationKey} className="w-full h-full custom-scrollbar animate-in slide-in-from-right-4 duration-300">
           {rightPane}
         </div>
       </div>
@@ -64,8 +64,8 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
   // Case 2: Only Left Pane exists
   if (hasLeft && !hasRight) {
     return (
-      <div ref={containerRef} className="flex flex-col w-full h-full min-h-[calc(100vh-120px)] overflow-hidden">
-        <div className="w-full h-full overflow-y-auto custom-scrollbar">{leftPane}</div>
+      <div ref={containerRef} className="flex flex-col w-full h-full overflow-hidden">
+        <div className="w-full h-full custom-scrollbar">{leftPane}</div>
       </div>
     );
   }
@@ -74,7 +74,7 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
   return (
     <div 
       ref={containerRef} 
-      className="flex flex-col lg:flex-row w-full h-48 relative select-none overflow-hidden"
+      className="flex flex-col lg:flex-row w-full h-full relative select-none overflow-hidden"
     >
       {/* Left Pane */}
       <div 
