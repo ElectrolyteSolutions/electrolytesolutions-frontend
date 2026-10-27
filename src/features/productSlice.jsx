@@ -16,12 +16,10 @@ export const getProducts = createAsyncThunk(
   'products/get',
   async (filterParams = {}, thunkAPI) => {
     try {
-      // Destructure expected variables out to track configurations cleanly
       const { alert, search, sortBy, sortOrder, brand, modelName } = filterParams;
       
       const queryPayload = {};
 
-      // Hot-append active state parameters dynamically onto the URL query payload
       if (alert) queryPayload.alert = alert;
       if (search) queryPayload.search = search;
       if (sortBy) queryPayload.sortBy = sortBy;
@@ -29,7 +27,6 @@ export const getProducts = createAsyncThunk(
       if (brand) queryPayload.brand = brand;
       if (modelName) queryPayload.modelName = modelName;
 
-      // Pass the query dictionary configuration parameters along with auth headers into the config payload block
       const config = {
         ...getAuthConfig(thunkAPI),
         params: queryPayload,
@@ -38,7 +35,6 @@ export const getProducts = createAsyncThunk(
       const res = await axios.get(API_URL, config);
       return res.data;
     } catch (err) {
-      // Gracefully catch pipeline drops or connection timeouts safely
       const message = err.response?.data?.message || err.message;
       return thunkAPI.rejectWithValue(message);
     }
@@ -77,19 +73,70 @@ export const deleteProduct = createAsyncThunk('products/delete', async (id, thun
 
 const productSlice = createSlice({
     name: 'products',
-    initialState: { items: [], loading: false },
+    initialState: { 
+      items: [], 
+      status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+      error: null 
+    },
     extraReducers: (builder) => {
         builder
-            .addCase(getProducts.fulfilled, (state, action) => { state.items = action.payload; })
-            .addCase(addProduct.fulfilled, (state, action) => { state.items.unshift(action.payload); })
-            .addCase(deleteProduct.fulfilled, (state, action) => {
-                state.items = state.items.filter(i => i._id !== action.payload);
+            // Get Products
+            .addCase(getProducts.pending, (state) => {
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(getProducts.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.items = action.payload;
+            })
+            .addCase(getProducts.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            
+            // Add Product
+            .addCase(addProduct.pending, (state) => {
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(addProduct.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.items.unshift(action.payload);
+            })
+            .addCase(addProduct.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            
+            // Update Product
+            .addCase(updateProduct.pending, (state) => {
+                state.status = 'loading';
+                state.error = null;
             })
             .addCase(updateProduct.fulfilled, (state, action) => {
+                state.status = 'succeeded';
                 const index = state.items.findIndex(i => i._id === action.payload._id);
                 if (index !== -1) {
                   state.items[index] = action.payload;
                 }
+            })
+            .addCase(updateProduct.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
+            })
+            
+            // Delete Product
+            .addCase(deleteProduct.pending, (state) => {
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(deleteProduct.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.items = state.items.filter(i => i._id !== action.payload);
+            })
+            .addCase(deleteProduct.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload;
             });
     }
 });

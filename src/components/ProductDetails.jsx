@@ -1,0 +1,300 @@
+import React, { useState } from 'react';
+import Button from './Button';
+
+const ProductDetails = ({
+  form,
+  setForm,
+  editId,
+  handleSave,
+  handleAddNewClick,
+  availableCollections = [],
+  availableTypes = []
+}) => {
+  const [isCreatingCollection, setIsCreatingCollection] = useState(false);
+  const [newCollectionTitle, setNewCollectionTitle] = useState('');
+  const [creatingCollectionLoading, setCreatingCollectionLoading] = useState(false);
+  const [tempImageUrl, setTempImageUrl] = useState('');
+
+  const handleAddImage = () => {
+    if (!tempImageUrl.trim()) return;
+    setForm({ ...form, images: [...form.images, tempImageUrl.trim()] });
+    setTempImageUrl('');
+  };
+
+  const handleRemoveImage = (indexToRemove) => {
+    setForm({
+      ...form,
+      images: form.images.filter((_, index) => index !== indexToRemove)
+    });
+  };
+
+  return <form onSubmit={handleSave} className="overflow-hidden h-full">
+    <div className='d-flex flex-row justify-between align-items-center border-b-1 border-zinc-800 pb-3'>
+      <h3 className="text-sm font-medium text-vercel-primary line-clamp-2 w-2/4">
+        {editId ? (
+          <>Edit Mode: <span className='text-vercel-secondary'>{form.name || 'Product'}</span></>
+        ) : (
+          'Add New Product'
+        )}
+      </h3>
+      <button
+        type="submit"
+        className="w-fit bg-white hover:opacity-50 text-black px-3 py-2 rounded-md text-xs font-semibold transition-colors cursor-pointer"
+      >
+        {editId ? 'Updated Changes' : 'Save Product'}
+      </button>
+    </div>
+
+    <div className="mt-3 bg-vercel-surface rounded-md border-1 border-zinc-800 px-2 py-2 overflow-y-auto flex-1 custom-scrollbar space-y-2">
+
+      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md'>
+        <p className='text-xs'>Product Overview</p>
+        <div>
+          <label>Product Name</label>
+          <textarea rows={1} placeholder="e.g. iPhone OLED Panel"
+            value={form.name}
+            onChange={e => setForm({ ...form, name: e.target.value })}
+            required
+          />
+        </div>
+        <div>
+          <label >Brand</label>
+          <input
+            placeholder="e.g. Apple"
+            value={form.brand}
+            onChange={e => setForm({ ...form, brand: e.target.value })}
+          />
+        </div>
+      </div>
+
+
+      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md'>
+        <p className='text-xs'>Product Description</p>
+        <label >Product Images (Add Image URLs)</label>
+        <div className='d-flex flex-row justfy-between gap-2'>
+          <input
+            placeholder="https://example.com/image.jpg"
+            value={tempImageUrl}
+            onChange={e => setTempImageUrl(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={handleAddImage}
+            className="bg-white w-fit d-flex items-center justify-center text-black hover:bg-zinc-200 px-3 text-nowrap py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+             Add URL
+          </button>
+          </div>
+
+        {form.images.length > 0 ? (
+          <div className="flex flex-wrap gap-2 pt-2">
+            {form.images.map((url, index) => (
+              <div key={index} className="flex items-center gap-2 bg-black border border-zinc-800 pl-2 pr-1.5 py-1 rounded-md">
+                <img src={url} alt={`Preview ${index}`} className="w-5 h-5 object-cover rounded bg-zinc-950" />
+                <span className="text-[11px] text-zinc-300 font-mono max-w-[120px]">{url}</span>
+                <button type="button" onClick={() => handleRemoveImage(index)} className="text-red-400 text-xs font-bold px-1">&times;</button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[11px] text-zinc-500 italic">No image URLs added.</p>
+        )}
+        <div>
+          <label >Full Description</label>
+          <textarea
+            className="w-full bg-zinc-950 rounded-lg px-3 py-2 text-xs text-zinc-100 border border-zinc-800 resize-none focus:outline-none"
+            rows={2}
+            value={form.description}
+            onChange={e => setForm({ ...form, description: e.target.value })}
+          />
+        </div>
+      </div>
+
+      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
+        <p className='text-xs font-semibold text-zinc-300'>Product Type and Category</p>
+        <label className="text-[11px] mb-0 pb-0">Product Category</label>
+        {!isCreatingCollection ? (
+          <div className='d-flex gap-3'>
+
+            <select
+              value={form.collections[0] || ''}
+              onChange={e => setForm({ ...form, collections: [e.target.value] })}
+              className=""
+            >
+              <option value="">Select Category Collection</option>
+              {availableCollections.map(col => (
+                <option key={col._id} value={col._id}>{col.title}</option>
+              ))}
+            </select>
+            <button className='bg-vercel-primary text-vercel-black rounded-md text-xs font-bold text-nowrap px-3 flex gap-1 items-center justify-center' onClick={() => { setIsCreatingCollection(!isCreatingCollection) }} >
+              {!isCreatingCollection && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>}
+              {isCreatingCollection ? 'Cancel' : 'New Collection'}
+            </button>
+          </div>
+        ) : (
+          <div className="d-flex">
+            <input
+              type="text"
+              placeholder="Collection Title"
+              value={newCollectionTitle}
+              onChange={e => setNewCollectionTitle(e.target.value)}
+              className="w-full"
+            />
+
+
+            <button
+              type="button"
+              disabled={creatingCollectionLoading}
+              onClick={() => {
+                // Quick Collection handler if needed
+              }}
+              className="w-fit ml-2 bg-white text-nowrap px-3 text-black rounded py-1.5 text-xs font-bold transition-all cursor-pointer"
+            >
+              {creatingCollectionLoading ? 'Saving...' : 'Create'}
+            </button>
+            <button
+              type="button"
+              disabled={creatingCollectionLoading}
+              onClick={() => { setIsCreatingCollection(!isCreatingCollection) }}
+              className="w-fit ml-2 bg-white text-nowrap px-3 text-black rounded py-1.5 text-xs font-bold transition-all cursor-pointer"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+
+        <div>
+          <label>Product Type</label>
+          <select
+            value={form.type}
+            onChange={e => setForm({ ...form, type: e.target.value })}
+          >
+            <option value="">Select Product Type</option>
+            {availableTypes.map((t, index) => (
+              <option key={index} value={t?.type || "None"}>{t?.type || "None"}</option>
+            ))}
+          </select>
+        </div>
+
+
+
+
+      </div>
+
+      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md '>
+        <p className='text-xs font-semibold text-zinc-300'>Taxes and Inventory Mangement </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label >HSN Code</label>
+            <input
+
+              placeholder="e.g. 8517"
+              value={form.hsn}
+              onChange={e => setForm({ ...form, hsn: e.target.value })}
+            />
+          </div>
+          <div>
+            <label >SKU Code</label>
+            <input
+
+              placeholder="SKU-CODE"
+              value={form.sku}
+              onChange={e => setForm({ ...form, sku: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label >ERP Product ID</label>
+            <input
+              placeholder="ERP-983421"
+              value={form.erpProductId}
+              onChange={e => setForm({ ...form, erpProductId: e.target.value })}
+            />
+          </div>
+          <div>
+            <label >Quantity</label>
+            <input
+
+              type="number"
+              value={form.quantity}
+              onChange={e => setForm({ ...form, quantity: e.target.value })}
+              required
+            />
+          </div>
+        </div>
+        </div>
+        </div>
+
+      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md '>
+        <p className='text-xs font-semibold text-zinc-300'>Price ,Discounts and Rates</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div>
+            <label >MRP (₹)</label>
+            <input
+
+              type="number"
+              value={form.price}
+              onChange={e => setForm({ ...form, price: e.target.value })}
+              required
+            />
+          </div>
+          <div>
+            <label >Original Price</label>
+            <input
+
+              type="number"
+              value={form.orignalPrice}
+              onChange={e => setForm({ ...form, orignalPrice: e.target.value })}
+            />
+          </div>
+          <div>
+            <label >Base Rate</label>
+            <input
+
+              type="number"
+              value={form.baseRate}
+              onChange={e => setForm({ ...form, baseRate: e.target.value })}
+              required
+            />
+          </div>
+          
+        </div>
+      </div>
+
+      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md '>
+        <p className='text-xs font-semibold text-zinc-300'>SEO Management</p>
+          <div>
+            <label >Slug URL Parameter</label>
+            <input
+              placeholder="e.g. iphone-oled-panel"
+              value={form.slug}
+              onChange={e => setForm({ ...form, slug: e.target.value })}
+            />
+          </div>  
+
+        <p className='text-xs font-semibold text-zinc-300'>SEO Management</p>
+          <div>
+            <label >Slug URL Parameter</label>
+            <input
+              placeholder="e.g. iphone-oled-panel"
+              value={form.slug}
+              onChange={e => setForm({ ...form, slug: e.target.value })}
+            />
+          </div>  
+      </div>
+
+      
+
+
+  </form>
+
+};
+
+export default ProductDetails;

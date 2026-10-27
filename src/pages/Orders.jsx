@@ -7,6 +7,7 @@ import SkeletonLoader from '../components/SkeletonLoaderTable';
 import Badge from '../components/Badge';
 import GlobalTable from '../components/GlobalTable';
 import OrderDetails from '../components/OrderDetails';
+import { useToast } from '../context/ToastContext';
 
 const statusOptions = [
   { label: 'All Orders', value: 'all' },
@@ -17,29 +18,29 @@ const statusOptions = [
 ];
 
 const ordersTableHead = [
-  { label: '#Orders', value: 'orders',class:"w-20 max-w-20 min-w-20" },
-  { label: 'Customer', value: 'Paid',class:"w-32 max-w-32 min-w-32" },
-  { label: 'Date', value: 'date',class:"w-18 max-w-18 min-w-18" },
-  { label: 'Financial', value: 'financial',class:"w-18 max-w-18 min-w-18" },
-  { label: 'Fulfillment', value: 'fulfillment',class:"w-20 max-w-20 min-w-20" },
-  { label: 'Amount', value: 'amount',class:"w-18 max-w-18 min-w-18" }
+  { label: '#Orders', value: 'orders',class:" text-xs px-3 py-2 w-20 max-w-20 min-w-20" },
+  { label: 'Customer', value: 'Paid',class:" text-xs px-3 py-2 w-32 max-w-32 min-w-32" },
+  { label: 'Date', value: 'date',class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18" },
+  { label: 'Financial', value: 'financial',class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18" },
+  { label: 'Fulfillment', value: 'fulfillment',class:" text-xs px-3 py-2 w-20 max-w-20 min-w-20" },
+  { label: 'Amount', value: 'amount',class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18" }
 ];
 
 function ordersTableData (order) {
   return [
-    { label: '#Orders', value: `#${String(order.orderNumber || order._id)?.slice(-8)}` ,class:"rounded-l-md font-medium w-20 max-w-20 min-w-20" },
-    { label: 'Customer', value: order.customer?.name || `${order.customer?.firstName || ''} ${order.customer?.lastName || ''}`.trim() || 'Guest Customer',class: "w-32 max-w-32 min-w-32 font-medium max-w-[180px]" },
-    { label: 'Date', value: new Date(order.createdAt || Date.now()).toLocaleDateString() ,class:"w-18 max-w-18 min-w-18" },
-    { label: 'Financial', value: <Badge type={order?.financialStatus?.toLowerCase() === "paid" ? "dark":"light"} title={order?.financialStatus || 'Paid'}/> ,class:"w-18 max-w-18 min-w-18"},
-    { label: 'Fulfillment', value: order?.fulfillmentStatus || 'Unfulfilled',class:"w-20 max-w-20 min-w-20 text-[10px] uppercase font-bold text-zinc-400" },
-    { label: 'Amount', value: `Rs ${order?.totalAmount || order?.totalPrice || 0}` ,class:"w-18 max-w-18 min-w-18 font-medium text-white rounded-r-md" },
+    { label: '#Orders', value: `#${String(order.orderNumber || order._id)?.slice(-8)}` ,class:" text-xs px-3 py-2 rounded-l-md font-medium w-20 max-w-20 min-w-20" },
+    { label: 'Customer', value: order.customer?.name || `${order.customer?.firstName || ''} ${order.customer?.lastName || ''}`.trim() || 'Guest Customer',class: "text-xs px-3 py-2 w-32 max-w-32 min-w-32 font-medium max-w-[180px]" },
+    { label: 'Date', value: new Date(order.createdAt || Date.now()).toLocaleDateString() ,class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18" },
+    { label: 'Financial', value: <Badge type={order?.financialStatus?.toLowerCase() === "paid" ? "dark":"light"} title={order?.financialStatus || 'Paid'}/> ,class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18"},
+    { label: 'Fulfillment', value: order?.fulfillmentStatus || 'Unfulfilled',class:"px-3 py-2 w-20 max-w-20 min-w-20 text-[10px] uppercase font-bold text-zinc-400" },
+    { label: 'Amount', value: `Rs ${order?.totalAmount || order?.totalPrice || 0}` ,class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18 font-medium text-white rounded-r-md" },
   ];
 }
  
 const OrdersPage = () => {
   const dispatch = useDispatch();
   const { items: orders, status } = useSelector((state) => state.order);
-
+  const { addToast } = useToast()
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState(statusOptions[0]);
@@ -66,21 +67,18 @@ const OrdersPage = () => {
     }).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
   }, [orders, searchTerm, statusFilter]);
 
-  useEffect(() => {
-    if (filteredOrders.length > 0) {
-      const isStillPresent = filteredOrders.some(o => o._id === selectedOrder?._id);
-      // if (!selectedOrder || !isStillPresent) {
-      //   setSelectedOrder(filteredOrders[0]);
-      // }
-    } else {
-      setSelectedOrder(null);
-    }
-  }, [filteredOrders]);
 
-  const handleStatusChange = (orderId, newFulfillmentStatus) => {
-    dispatch(updateOrderStatus({ id: orderId, data: { fulfillmentStatus: newFulfillmentStatus } }));
-    if (selectedOrder && selectedOrder._id === orderId) {
-      setSelectedOrder(prev => ({ ...prev, fulfillmentStatus: newFulfillmentStatus }));
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      // .unwrap() lets you catch fulfilled or rejected states directly in the component
+      await dispatch(updateOrderStatus({ id: orderId, data: { fulfillmentStatus: newStatus } })).unwrap();
+      
+      // Success toast
+      addToast("Order status updated successfully!", "success");
+    } catch (error) {
+      // Error toast - cleanly extracting the error message if provided by your API/thunk
+      const errorMessage = error?.message || error || "Failed to update order status.";
+      addToast(errorMessage, "error");
     }
   };
 

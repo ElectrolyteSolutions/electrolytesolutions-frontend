@@ -21,6 +21,7 @@ export const getOrders = createAsyncThunk(
       const response = await axios.get(`${API_URL}`, getAuthConfig());
       return response.data;
     } catch (error) {
+      
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch orders');
     }
   }
