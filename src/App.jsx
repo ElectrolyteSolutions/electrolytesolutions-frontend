@@ -56,12 +56,12 @@ const AppLayout = ({ children }) => {
                     : 'w-full'
             }`}>
                 <main className={`flex flex-col flex-grow h-screen overflow-hidden ${!isAuthPage ? 'w-full' : 'w-full'}`}>
-                    <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full border-b border-zinc-800 px-6 py-4 overflow-hidden shrink-0 bg-vercel-black">
+                    {!isAuthPage && <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full border-b border-zinc-800 px-6 py-4 overflow-hidden shrink-0 bg-vercel-black">
                         <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight capitalize">{curLoc}</h1>
-                    </header>
-                    
+                    </header>}
+
                     {/* Only scrollable section */}
-                    <div className='flex-grow p-6 overflow-none h-[calc(100vh-120px)] custom-scrollbar bg-vercel-black '>
+                    <div className='flex-grow overflow-none h-[calc(100vh-120px)] custom-scrollbar bg-vercel-black '>
                         {children}
                     </div>
                 </main>

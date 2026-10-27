@@ -82,7 +82,7 @@ const OrdersPage = () => {
     }
   };
 
-  return (
+  return (<div className='h-full w-full p-6'>
     <ResizablePanes 
       leftPane={
         <div className="space-y-4 w-full h-full flex flex-col">
@@ -112,6 +112,7 @@ const OrdersPage = () => {
         />
       } 
     />
+    </div>
   );
 };
 
