@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getProducts, addProduct, updateProduct } from '../features/productSlice';
+import { getProducts, addProduct, updateProduct, deleteProduct } from '../features/productSlice';
 import ResizablePanes from '../components/TwoPaneLayout';
 import Header from '../components/SearchHeader';
 import Button from '../components/Button';
 import GlobalTable from '../components/GlobalTable';
 import ProductDetails from '../components/ProductDetails';
+import ConfirmModal from '../components/ConfirmModal';
+import { useToast } from '../context/ToastContext';
+import Badge from '../components/Badge';
 
 const statusOptions = [
   { value: "all", label: "All Products" },
@@ -14,14 +17,20 @@ const statusOptions = [
 
 const ProductsPage = () => {
   const dispatch = useDispatch();
-  const { items, status } = useSelector((state) => state.products);
+  const { items, status,error } = useSelector((state) => state.products);
+  const { addToast } = useToast();
   
   const { user } = useSelector((state) => state.auth);
   const isCustomer = user?.role === 'customer';
 
-  const [selectedProduct, setSelectedProduct] = useState(undefined); // undefined = nothing selected initially
+  const [selectedProduct, setSelectedProduct] = useState(undefined); 
   const [editId, setEditId] = useState(null);
-  const [isAddingNew, setIsAddingNew] = useState(false); // Track if we are in Add New mode
+  const [isAddingNew, setIsAddingNew] = useState(false); 
+  
+  // Delete Modal State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const [availableCollections, setAvailableCollections] = useState([]);
   const [availableTypes, setAvailableTypes] = useState([]);
@@ -34,7 +43,6 @@ const ProductsPage = () => {
     name: '', 
     description: '',
     brand: '',
-    sku: '',
     price: '', 
     orignalPrice: '',
     baseRate: '', 
@@ -43,6 +51,7 @@ const ProductsPage = () => {
     seoKeywords: '',
     hsn: '',
     type: '',
+    status:"",
     isCustomType: false
   });
 
@@ -50,6 +59,51 @@ const ProductsPage = () => {
   const [stockFilter, setStockFilter] = useState(statusOptions[0]); 
   const [currentSortBy, setCurrentSortBy] = useState('name'); 
   const [currentSortOrder, setCurrentSortOrder] = useState('asc'); 
+
+  // Inline Collection Creator State
+  const [isCreatingCollection, setIsCreatingCollection] = useState(false);
+  const [newCollectionTitle, setNewCollectionTitle] = useState('');
+  const [newCollectionErpId, setNewCollectionErpId] = useState('');
+  const [creatingCollectionLoading, setCreatingCollectionLoading] = useState(false);
+
+  const handleQuickCreateCollection = async () => {
+    if (!newCollectionTitle.trim()) return;
+    setCreatingCollectionLoading(true);
+    try {
+      const generatedErpId = newCollectionErpId.trim() || `ERP-COL-${Date.now().toString().slice(-6)}`;
+      const token = localStorage.getItem('token') || '';
+      
+      const res = await fetch(`${import.meta.env.VITE_API_URL}products/collections`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({
+          erpCollectionId: generatedErpId,
+          title: newCollectionTitle.trim(),
+          seo: { metaTitle: newCollectionTitle.trim(), metaDescription: `Shop ${newCollectionTitle.trim()}` }
+        })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        await fetchLookups();
+        setForm(prev => ({ ...prev, collections: [data._id || data.collection?._id] }));
+        setNewCollectionTitle('');
+        setNewCollectionErpId('');
+        setIsCreatingCollection(false);
+        addToast("Collection created successfully!", "success");
+      } else {
+        addToast(res.error || res.data.error || 'Failed to create collection', "error");
+      }
+    } catch (err) {
+      console.error("Error saving inline collection:", err);
+      addToast(err || 'Network error while creating collection.', "error");
+    } finally {
+      setCreatingCollectionLoading(false);
+    }
+  };
 
   useEffect(() => {
     const payloadQueryOptions = {
@@ -74,6 +128,7 @@ const ProductsPage = () => {
       setAvailableTypes(typeData);
     } catch (err) {
       console.error("Failed to load metadata lookups", err);
+      addToast(error || "Failed to load metadata lookups", "error");
     }
   };
 
@@ -87,7 +142,7 @@ const ProductsPage = () => {
   };
 
   const handleSelectProduct = (product) => {
-    setIsAddingNew(false); // Exit add mode when clicking a product
+    setIsAddingNew(false);
     setSelectedProduct(product);
     setForm({
       erpProductId: product.erpProductId || '',
@@ -95,7 +150,6 @@ const ProductsPage = () => {
       name: product.name || '',
       description: product.description || '',
       brand: product.brand || '',
-      sku: product.sku || '',
       price: product.price || '',
       orignalPrice: product.orignalPrice || '',
       baseRate: product.baseRate || '',
@@ -105,6 +159,7 @@ const ProductsPage = () => {
       seoKeywords: product.seo?.keywords ? product.seo.keywords.join(', ') : '',
       images: product?.images && product.images.length > 0 ? [...product.images] : [],
       hsn: product.hsn || '',
+      status: product.status,
       type: product.type || '',
       isCustomType: false
     });
@@ -112,8 +167,8 @@ const ProductsPage = () => {
   };
 
   const handleAddNewClick = () => {
-    setIsAddingNew(true); // Enable add new mode
-    setSelectedProduct(null); // Clear selected product so right pane renders
+    setIsAddingNew(true);
+    setSelectedProduct(null);
     setForm({ 
       erpProductId: '', 
       images: [],
@@ -121,7 +176,6 @@ const ProductsPage = () => {
       slug: '', 
       name: '', 
       description: '', 
-      sku: '', 
       brand: '',
       price: '', 
       orignalPrice: '', 
@@ -130,6 +184,7 @@ const ProductsPage = () => {
       seoMetaDescription: '', 
       seoKeywords: '',
       hsn: '',
+      status: 'Active',
       type: '',
       isCustomType: false
     });
@@ -150,12 +205,47 @@ const ProductsPage = () => {
     };
 
     if (editId) {
-      dispatch(updateProduct({ id: editId, data: payload })).then(() => refreshDataLogs());
+      dispatch(updateProduct({ id: editId, data: payload }))
+        .unwrap()
+        .then(() => {
+          addToast("Product updated successfully!", "success");
+          refreshDataLogs();
+        })
+        .catch((err) => addToast(error || "Failed to update product.", "error"));
     } else {
-      dispatch(addProduct(payload)).then(() => {
-        refreshDataLogs();
-        setIsAddingNew(false); // Hide right pane / reset after successful creation
-      });
+      dispatch(addProduct(payload))
+        .unwrap()
+        .then(() => {
+          addToast("Product created successfully!", "success");
+          refreshDataLogs();
+          setIsAddingNew(false);
+        })
+        .catch((err) => addToast(error || "Failed to create product.", "error"));
+    }
+  };
+
+  const promptDeleteProduct = (product) => {
+    setProductToDelete(product);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!productToDelete) return;
+    setIsDeleting(true);
+    try {
+      await dispatch(deleteProduct(productToDelete._id)).unwrap();
+      addToast(`Deleted "${productToDelete.name}" successfully.`, "success");
+      setIsDeleteModalOpen(false);
+      setProductToDelete(null);
+      if (editId === productToDelete._id) {
+        setSelectedProduct(undefined);
+        setEditId(null);
+      }
+      refreshDataLogs();
+    } catch (err) {
+      addToast(error || "Failed to delete product record.", "error");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -177,7 +267,6 @@ const ProductsPage = () => {
     { label: 'Product Type', value: 'type', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12", onClick: () => {} },
     { label: 'Category', value: 'collection', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12", onClick: () => {} },
     { label: 'HSN', value: 'hsn', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12", onClick: () => {} },
-    { label: 'Media', value: 'media', class: "text-xs px-3 py-2 w-6 max-w-6 min-w-6", onClick: () => {} },
   ];
 
   function productsTableData(p) {
@@ -199,18 +288,13 @@ const ProductsPage = () => {
         ), 
         class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4" 
       },    
-      { label: 'Status', value: p.status, class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8" },
+      { label: 'Status', value: <Badge title={p.status} 
+      type={p.status==="draft"?"dark":"light"}
+       ></Badge>, class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8" },
       { label: 'Type', value: p.type, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
       { label: 'Category', value: p?.collections?.map((col) => col.title).join(","), class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
       { label: 'HSN', value: p.hsn, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
-      { label: 'Media', value: (
-          <div className='w-fit flex text-[9px] items-center justify-left gap-1 text-vercel-secondary'>
-            {p.images && p.images.length > 0 && <img src={p.images[0]} alt={p.name} className="w-4 h-4 object-cover rounded-md border border-zinc-800 bg-zinc-950" />}
-            {p?.images?.length > 0 && `+${p?.images?.length - 1}`}
-          </div>
-        ), 
-        class: "text-xs px-3 py-2 w-6 max-w-6 min-w-6 rounded-r-md" 
-      }
+      
     ];
   }
 
@@ -225,7 +309,6 @@ const ProductsPage = () => {
           setStatusFilter={setStockFilter}
           statusOptions={statusOptions}
         />
-        {/* Hide Add New button when isAddingNew is true */}
         {!isCustomer && !isAddingNew && (
           <Button 
             onClick={handleAddNewClick} 
@@ -252,24 +335,44 @@ const ProductsPage = () => {
   );
 
   return (
-    <ResizablePanes
-      animationKey={editId || (isAddingNew ? 'new-product' : 'empty')}
-      leftPane={leftPaneContent}
-      rightPane={
-        (selectedProduct !== undefined || isAddingNew) ? (
-          <ProductDetails 
-            form={form}
-            setForm={setForm}
-            editId={editId}
-            handleSave={handleSave}
-            handleAddNewClick={handleAddNewClick}
-            availableCollections={availableCollections}
-            availableTypes={availableTypes}
-          />
-        ) : null
-      }
-      defaultLeftWidth="58%"
-    />
+    <>
+      <ResizablePanes
+        animationKey={editId || (isAddingNew ? 'new-product' : 'empty')}
+        leftPane={leftPaneContent}
+        rightPane={
+          (selectedProduct !== undefined || isAddingNew) ? (
+            <ProductDetails
+              form={form}
+              setForm={setForm}
+              editId={editId}
+              handleSave={handleSave}
+              availableCollections={availableCollections}
+              availableTypes={availableTypes}
+              isCreatingCollection={isCreatingCollection}
+              setIsCreatingCollection={setIsCreatingCollection}
+              newCollectionTitle={newCollectionTitle}
+              setNewCollectionTitle={setNewCollectionTitle}
+              creatingCollectionLoading={creatingCollectionLoading}
+              handleQuickCreateCollection={handleQuickCreateCollection}
+              promptDeleteProduct={()=>promptDeleteProduct(selectedProduct)}
+            />
+          ) : null
+        }
+        defaultLeftWidth="58%"
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title={`Delete "${productToDelete?.name || 'Product'}"?`}
+        description="This action cannot be undone. This will permanently remove the product record from your active ERP ledger database."
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        isDestructive={true}
+        loading={isDeleting}
+        onConfirm={handleConfirmDelete}
+      />
+    </>
   );
 };
 
