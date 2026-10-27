@@ -28,7 +28,7 @@ const ProductDetails = ({
     });
   };
 
-  return <form onSubmit={handleSave} className="overflow-hidden h-full">
+  return <form onSubmit={handleSave} className="overflow-hidden">
     <div className='d-flex flex-row justify-between align-items-center border-b-1 border-zinc-800 pb-3'>
       <h3 className="text-sm font-medium text-vercel-primary line-clamp-2 w-2/4">
         {editId ? (
@@ -45,10 +45,10 @@ const ProductDetails = ({
       </button>
     </div>
 
-    <div className="mt-3 bg-vercel-surface rounded-md border-1 border-zinc-800 px-2 py-2 overflow-y-auto flex-1 custom-scrollbar space-y-2">
-
-      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md'>
+    <div className="mt-3 h-screen bg-vercel-surface rounded-md border-1 border-zinc-800 px-2 py-2 overflow-y-scroll space-y-2">
+        {/* Product Overview */}
         <p className='text-xs'>Product Overview</p>
+        <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md'>
         <div>
           <label>Product Name</label>
           <textarea rows={1} placeholder="e.g. iPhone OLED Panel"
@@ -67,9 +67,12 @@ const ProductDetails = ({
         </div>
       </div>
 
+      
 
-      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md'>
+      {/* Product Description */}
+
         <p className='text-xs'>Product Description</p>
+      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md'>
         <label >Product Images (Add Image URLs)</label>
         <div className='d-flex flex-row justfy-between gap-2'>
           <input
@@ -89,32 +92,30 @@ const ProductDetails = ({
           </button>
           </div>
 
-        {form.images.length > 0 ? (
           <div className="flex flex-wrap gap-2 pt-2">
             {form.images.map((url, index) => (
-              <div key={index} className="flex items-center gap-2 bg-black border border-zinc-800 pl-2 pr-1.5 py-1 rounded-md">
-                <img src={url} alt={`Preview ${index}`} className="w-5 h-5 object-cover rounded bg-zinc-950" />
-                <span className="text-[11px] text-zinc-300 font-mono max-w-[120px]">{url}</span>
-                <button type="button" onClick={() => handleRemoveImage(index)} className="text-red-400 text-xs font-bold px-1">&times;</button>
+              <div key={index} className="border-1 border-zinc-800 rounded-md relative p-2">
+                <button type="button" onClick={() => handleRemoveImage(index)} className="text-zinc-400 text-lg font-bold absolute top-0 right-2 m-0 p-0">&times;</button>
+                <img src={url} alt={`Preview ${index}`} className="w-24 h-24 object-cover rounded-md bg-zinc-950" />
               </div>
             ))}
           </div>
-        ) : (
-          <p className="text-[11px] text-zinc-500 italic">No image URLs added.</p>
-        )}
+    
         <div>
           <label >Full Description</label>
           <textarea
             className="w-full bg-zinc-950 rounded-lg px-3 py-2 text-xs text-zinc-100 border border-zinc-800 resize-none focus:outline-none"
-            rows={2}
+            rows={10}
             value={form.description}
             onChange={e => setForm({ ...form, description: e.target.value })}
           />
         </div>
       </div>
 
-      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
+      {/* Product Type and Category */}
+
         <p className='text-xs font-semibold text-zinc-300'>Product Type and Category</p>
+      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
         <label className="text-[11px] mb-0 pb-0">Product Category</label>
         {!isCreatingCollection ? (
           <div className='d-flex gap-3'>
@@ -186,8 +187,8 @@ const ProductDetails = ({
 
       </div>
 
-      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md '>
         <p className='text-xs font-semibold text-zinc-300'>Taxes and Inventory Mangement </p>
+      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md '>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div>
             <label >HSN Code</label>
@@ -230,15 +231,14 @@ const ProductDetails = ({
           </div>
         </div>
         </div>
-        </div>
+        
 
-      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md '>
         <p className='text-xs font-semibold text-zinc-300'>Price ,Discounts and Rates</p>
+      <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md '>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           <div>
             <label >MRP (₹)</label>
             <input
-
               type="number"
               value={form.price}
               onChange={e => setForm({ ...form, price: e.target.value })}
@@ -248,7 +248,6 @@ const ProductDetails = ({
           <div>
             <label >Original Price</label>
             <input
-
               type="number"
               value={form.orignalPrice}
               onChange={e => setForm({ ...form, orignalPrice: e.target.value })}
@@ -268,29 +267,38 @@ const ProductDetails = ({
         </div>
       </div>
 
+      <p className='text-xs font-semibold text-zinc-300'>SEO Management</p>
       <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md '>
-        <p className='text-xs font-semibold text-zinc-300'>SEO Management</p>
           <div>
             <label >Slug URL Parameter</label>
             <input
               placeholder="e.g. iphone-oled-panel"
               value={form.slug}
               onChange={e => setForm({ ...form, slug: e.target.value })}
+            />
+          </div>  
+          <div>
+            <label >SEO Meta Description</label>
+            <input
+              placeholder="e.g. iphone-oled-panel"
+              value={form.seoMetaDescription}
+              onChange={e => setForm({ ...form, seoMetaDescription: e.target.value })}
+            />
+          </div>  
+          <div>
+            <label >SEO Keywords</label>
+            <input
+              placeholder="e.g. iphone-oled-panel"
+              value={form.seoKeywords}
+              onChange={e => setForm({ ...form, seoKeywords: e.target.value })}
             />
           </div>  
 
-        <p className='text-xs font-semibold text-zinc-300'>SEO Management</p>
-          <div>
-            <label >Slug URL Parameter</label>
-            <input
-              placeholder="e.g. iphone-oled-panel"
-              value={form.slug}
-              onChange={e => setForm({ ...form, slug: e.target.value })}
-            />
-          </div>  
+       
+      </div>
       </div>
 
-      
+
 
 
   </form>
