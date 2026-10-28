@@ -13,7 +13,7 @@ const PasswordField = ({ isLoginView, password, setPassword }) => {
   return (
     <div>
       <div className="flex justify-between items-center mb-1.5 ml-0.5 mr-0.5">
-        <label >Password</label>
+        <label>Password</label>
         {isLoginView && (
           <button 
             type="button" 
