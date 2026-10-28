@@ -314,6 +314,7 @@ const ProductDetails = ({
             <label >Profit</label>
             <input
               value={`${(((form.price - form.baseRate) / form.price) * 100).toFixed(2)}%`}
+              // hhh
               disabled
             />
           </div>
