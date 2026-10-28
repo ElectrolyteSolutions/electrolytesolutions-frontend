@@ -125,7 +125,7 @@ const AuthLandingPage = () => {
   return (
     <div className="h-screen w-screen bg-vercel-black d-flex items-center justify-center">
           <form onSubmit={handleAuthSubmit} className="rounded-md bg-vercel-card p-3 space-y-2 border-1 border-zinc-800 items-center">
-            <p className='text-center font-bold'>Welcome to Electrolyte Solutions</p>
+            <p className='text-center font-semibold text-sm'>Welcome to Electrolyte Solutions</p>
             {/* Registration Only Fields */}
             {!isLoginView && (
               <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
