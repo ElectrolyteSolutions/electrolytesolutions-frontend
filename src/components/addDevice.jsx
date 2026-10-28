@@ -71,7 +71,7 @@ const RegisterDeviceModal = ({ isOpen, onClose, preSelectedCustomerId = '' }) =>
     const payload = { 
       ...form, 
       issues: finalIssuesArray,
-      customDeviceType: form.deviceType === 'other' ? form.customDeviceType.trim() : ''
+      deviceType: form.deviceType === 'other' ? form.customDeviceType.trim() : ''
     };
 
     dispatch(addDevice(payload));

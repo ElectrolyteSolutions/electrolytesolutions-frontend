@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 
 
 @layer base {
@@ -35,7 +35,8 @@ select::picker(select),
 div {
   appearance: base-select;
   scrollbar-width: 8px; 
-  scrollbar-color: transparent !important; 
+  scrollbar-color: transparent !important;
+  font-family: 'Inter', sans-serif; 
 }
 
 @supports selector(::-webkit-scrollbar) {
@@ -116,13 +117,13 @@ div {
 
 
   input{
-    @apply w-full bg-zinc-950 rounded-lg p-2 text-xs text-zinc-100 border border-zinc-800 focus:outline-none focus:border-white
+    @apply w-full bg-zinc-950 rounded-md p-2 text-xs text-zinc-100 border border-zinc-800 focus:outline-none focus:border-white
   }
   input:hover {
     @apply outline-none border-white bg-vercel-hover ring-1 ring-white;
   }
   textarea{
-    @apply w-full bg-zinc-950 rounded-lg p-2 text-xs text-zinc-100 border border-zinc-800 focus:outline-none focus:border-white
+    @apply w-full bg-zinc-950 rounded-md p-2 text-xs text-zinc-100 border border-zinc-800 focus:outline-none focus:border-white
   }
   textarea:hover {
     @apply outline-none border-white bg-vercel-hover ring-1 ring-white;
