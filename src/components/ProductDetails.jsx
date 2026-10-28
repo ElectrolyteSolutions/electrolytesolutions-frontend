@@ -313,7 +313,7 @@ const ProductDetails = ({
           <div>
             <label >Profit</label>
             <input
-              value={`${((form.baseRate / form.price) * 100).toFixed(2)}%`}
+              value={`${(((form.price - form.baseRate) / form.price) * 100).toFixed(2)}%`}
               disabled
             />
           </div>
