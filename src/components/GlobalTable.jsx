@@ -10,7 +10,7 @@ const GlobalTable = ({ title = "title", filteredList, status, selectedItem, setS
       <div className="bg-vercel-card rounded-md overflow-hidden shadow-xl border-1 border-zinc-800 w-full flex flex-col h-fit max-h-full min-h-0 shrink">
         
         {/* Scrollable Container */}
-        <div className="overflow-y-auto overflow-x-auto w-full max-h-full custom-scrollbar">
+        <div className=" overflow-x-auto w-full max-h-full custom-scrollbar">
           <table className="w-full text-left border-collapse min-w-[700px]">
             <thead className="sticky top-0 z-10 bg-vercel-surface backdrop-blur-sm">
               <tr className="border-b border-zinc-800 text-sm font-semibold text-vercel-secondary text-left">

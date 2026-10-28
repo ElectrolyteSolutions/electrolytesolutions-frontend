@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Button from './Button';
 
 const ProductDetails = ({
   form,
@@ -32,7 +31,7 @@ const ProductDetails = ({
     });
   };
 
-  return <form onSubmit={handleSave} className="flex flex-col h-full w-full overflow-x-none">
+  return <form onSubmit={handleSave} className="flex flex-col h-full w-full overflow-x-none px-3 py-6">
     <div className='d-flex flex-row justify-between align-items-center border-b-1 border-zinc-800 pb-3'>
       <h3 className="text-sm font-medium text-vercel-primary line-clamp-2 w-2/4">
         {editId ? (

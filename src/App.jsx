@@ -7,6 +7,8 @@ import InvoiceTemplate from './components/InvoiceTemplate';
 import { getUserProfile, logout } from './features/authSlice';
 import PublicBillView from './pages/PublicBillView';
 import OrdersPage from './pages/Orders';
+import logourl from './assets/icon.png';
+
 
 // Lazy loaded pages
 const AuthLandingPage = lazy(() => import('./auth/landing'));
@@ -45,12 +47,12 @@ const AppLayout = ({ children }) => {
     const isAuthPage = location.pathname === '/' || curLoc === 'bills';
 
     return (
-        <div className="flex min-h-screen bg-vercel-black text-white">
+        <div className="flex min-h-screen bg-vercel-black text-white overflow-none">
             {/* Vercel-style Sidebar (Hidden on auth/public bill views) */}
             {!isAuthPage && <Navbar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />}
 
             {/* Main Content Area: Automatically adjusts left padding based on whether the sidebar is collapsed or expanded */}
-            <div className={`flex flex-col flex-grow min-h-screen transition-all duration-300 ${
+            <div className={`flex flex-col flex-grow min-h-screen transition-all overflow-none duration-300 ${
                 !isAuthPage 
                     ? (isCollapsed ? 'lg:pl-20 pt-16 lg:pt-0' : 'lg:pl-64 pt-16 lg:pt-0') 
                     : 'w-full'
@@ -83,8 +85,9 @@ function App() {
             <AppLayout>
                 <Suspense 
                     fallback={
-                        <div className="flex items-center justify-center h-[80vh] text-zinc-400">
-                            <div className="animate-pulse font-bold tracking-wider">Loading System Modules...</div>
+                        <div className="flex items-center justify-center flex-col item-center h-full w-full animate-pulse text-zinc-400">
+                            <img src={logourl} className='h-12 w-12'></img>
+                            <div className="font-normal text-xs">Loading...</div>
                         </div>
                     }
                 >

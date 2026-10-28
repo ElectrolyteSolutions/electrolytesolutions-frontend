@@ -305,9 +305,9 @@ const ProductsPage = () => {
           placeholder="Search Product by Name, SKU, ID, Description..."
           searchTerm={searchTerm} 
           setSearchTerm={setSearchTerm}
-          statusFilter={stockFilter.label}
-          setStatusFilter={setStockFilter}
-          statusOptions={statusOptions}
+          statusFilter={[stockFilter.label]}
+          setStatusFilter={[setStockFilter]}
+          statusOptions={[statusOptions]}
         />
         {!isCustomer && !isAddingNew && (
           <Button 

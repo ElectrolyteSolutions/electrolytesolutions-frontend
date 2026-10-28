@@ -13,7 +13,7 @@ const PasswordField = ({ isLoginView, password, setPassword }) => {
   return (
     <div>
       <div className="flex justify-between items-center mb-1.5 ml-0.5 mr-0.5">
-        <label className="text-sm font-medium text-vercel-primary">Password</label>
+        <label >Password</label>
         {isLoginView && (
           <button 
             type="button" 
@@ -169,13 +169,13 @@ const AuthLandingPage = () => {
             
             <PasswordField isLoginView={isLoginView} password={password} setPassword={setPassword} />
             <div className="text-center pt-2">
-              <p className="text-zinc-500 text-xs sm:text-xs font-medium">
+              <p className="text-zinc-500 text-[10px] font-medium">
                 {isLoginView ? "Don't have system access? " : "Already have an assigned role? "}
                 <button 
                   type="button" 
                   // onClick={toggleView}
                   onClick={()=>{alert('Come Back Later')}}
-                  className="font-medium text-xs text-vercel-blue hover:text-indigo-300 hover:underline transition-all"
+                  className="font-medium text-[10px] text-vercel-blue hover:text-indigo-300 hover:underline transition-all"
                 >
                   {isLoginView ? 'Request Account' : 'Login Here'}
                 </button>

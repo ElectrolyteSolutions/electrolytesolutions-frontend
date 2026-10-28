@@ -24,6 +24,18 @@ export const getDevices = createAsyncThunk('devices/get', async (_, thunkAPI) =>
   }
 });
 
+// Fetch devices grouped by type for a specific customer
+export const getDeviceByType = createAsyncThunk('deviceByType/get', async (customerId, thunkAPI) => {
+  try {
+    // Hits the backend endpoint tailored for the grouped aggregation pipeline
+    const res = await axios.get(`${API_URL}/type`, getAuthConfig(thunkAPI));
+    return res.data;
+  } catch (err) {
+    const message = err.response?.data?.message || err.response?.data || "Failed to fetch grouped devices";
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
 // Register a new device
 export const addDevice = createAsyncThunk('devices/add', async (data, thunkAPI) => {
   try {
@@ -63,11 +75,11 @@ const deviceSlice = createSlice({
   name: 'devices',
   initialState: { 
     items: [], 
+    groupedItems: [], // Stores the [{type: "...", devices: [], count: x}] array structure
     status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null 
   },
   reducers: {
-    // Optional: Reset error state when closing modals
     clearDeviceError: (state) => {
       state.error = null;
     }
@@ -87,12 +99,25 @@ const deviceSlice = createSlice({
         state.error = action.payload;
       })
 
+      // GET DEVICE BY TYPE (GROUPED)
+      .addCase(getDeviceByType.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getDeviceByType.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.groupedItems = action.payload; // Saves the structured response data
+      })
+      .addCase(getDeviceByType.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+
       // ADD DEVICE
       .addCase(addDevice.fulfilled, (state, action) => {
         state.items.unshift(action.payload);
       })
 
-      // UPDATE DEVICE (Handles status changes: in-progress -> resolved)
+      // UPDATE DEVICE
       .addCase(updateDevice.fulfilled, (state, action) => {
         const index = state.items.findIndex((d) => d._id === action.payload._id);
         if (index !== -1) {

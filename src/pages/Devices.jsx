@@ -1,69 +1,107 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'; 
-import { getDevices, updateDevice, deleteDevice } from '../features/deviceSlice'; 
-import RegisterDeviceModal from '../components/addDevice'; 
-import EditDeviceModal from '../components/editDevice'; 
+import { getDevices, addDevice, updateDevice, deleteDevice, getDeviceByType } from '../features/deviceSlice'; 
+import { getCustomers } from '../features/customerSlice';
+import ResizablePanes from '../components/TwoPaneLayout';
+import Header from '../components/SearchHeader';
+import Button from '../components/Button';
+import GlobalTable from '../components/GlobalTable';
+import Badge from '../components/Badge';
+import DeviceDetails from '../components/Devicedetails';
+import { useToast } from '../context/ToastContext'; // Imported Toast Context
+
+const statusOptions = [
+  { value: "all", label: "All Statuses" },
+  { value: "in-progress", label: "In Progress" },
+  { value: "resolved", label: "Resolved" },
+  { value: "rejected", label: "Rejected" }
+];
+
+const deviceTypeTabs = [
+  { value: 'all', label: 'All Devices' },
+  { value: 'mobile', label: 'Mobile' },
+  { value: 'tablet', label: 'Tablet' },
+  { value: 'laptop', label: 'Laptop' },
+  { value: 'desktop', label: 'Desktop' },
+  { value: 'printer', label: 'Printer' },
+  { value: 'speaker', label: 'Speaker' },
+  { value: 'other', label: 'Other' },
+];
 
 const DevicesPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items, status } = useSelector(state => state.devices);
+  const { addToast } = useToast(); // Initialized Toast Hook
+  const { items, groupedItems, error, status } = useSelector(state => state.devices);
+  const customers = useSelector(state => state.customers.items);
   
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedDeviceToEdit, setSelectedDeviceToEdit] = useState(null);
+  const [selectedDevice, setSelectedDevice] = useState(undefined); 
+  const [editId, setEditId] = useState(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
 
-  // Search, Type Tab, and Sort State
+  // Search, Status Filter, Type Tab, and Sort State
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDeviceTypeTab, setSelectedDeviceTypeTab] = useState('all'); // 'all' | 'mobile' | 'tablet' | ...
-  const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'name' | 'status' | 'type'
+  const [statusFilter, setStatusFilter] = useState(statusOptions[0]); 
+  const [selectedDeviceTypeTab, setSelectedDeviceTypeTab] = useState(deviceTypeTabs[0]); 
+  const [availableDeviceTypeList, setAvailableDeviceTypeList] = useState([]); 
+  const [sortBy, setSortBy] = useState('newest'); 
+
+  // Form state
+  const [form, setForm] = useState({ 
+    owner: '',
+    deviceName: '',
+    deviceType: 'mobile',
+    customDeviceType: '',
+    issues: [],
+    deviceHardwareId: '',
+    deviceRepairingStatus: 'in-progress'
+  });
 
   useEffect(() => {
     dispatch(getDevices());
-  }, [dispatch]);
-
-  // Handle inline status dropdown updates
-  const handleStatusChange = (device, newStatus) => {
-    dispatch(updateDevice({ id: device._id, data: { ...device, deviceRepairingStatus: newStatus } }))
-      .unwrap()
-      .then(() => {
-        dispatch(getDevices());
-      })
-      .catch((err) => alert(`Status synchronization failed: ${err.message || err}`));
-  };
-
-  // Inline styling matcher for status micro-badges
-  const getStatusStyles = (statusVal) => {
-    switch (statusVal) {
-      case 'resolved':
-        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 focus:ring-emerald-500/30';
-      case 'rejected':
-        return 'bg-red-500/10 text-red-400 border-red-500/30 focus:ring-red-200/30';
-      default:
-        return 'bg-amber-500/10 text-amber-400 border-amber-500/30 focus:ring-amber-500/30';
+    dispatch(getDeviceByType());
+    if (customers.length === 0) {
+      dispatch(getCustomers());
     }
-  };
+  }, [dispatch, customers.length]);
 
-  // Triggers device asset record cleanup
-  const handleDeleteRecord = (deviceId) => {
+  useEffect(() => {
+    if (groupedItems && Array.isArray(groupedItems)) {
+      setAvailableDeviceTypeList(groupedItems.map((item) => ({
+        value: item.type, 
+        label: item.type
+      })));
+    }
+  }, [groupedItems]);
+
+  const handleDeleteRecord = (deviceId, e) => {
+    if (e) e.stopPropagation();
     if (window.confirm("Are you sure you want to completely remove this device from repair tracking?")) {
       dispatch(deleteDevice(deviceId))
         .unwrap()
-        .then(() => dispatch(getDevices()))
-        .catch((err) => alert(`Failed to delete device: ${err.message || err}`));
+        .then(() => {
+          dispatch(getDevices());
+          dispatch(getDeviceByType());
+          addToast("Device record deleted successfully.", "success");
+          if (editId === deviceId) {
+            setSelectedDevice(undefined);
+            setEditId(null);
+          }
+        })
+        .catch((err) => {
+          const errMsg = err.message || err;
+          addToast(`Failed to delete device: ${errMsg}`, "error");
+        });
     }
   };
 
-  // Opens the edit modal for a specific device
-  const handleOpenEdit = (device) => {
-    setSelectedDeviceToEdit(device);
-    setIsEditModalOpen(true);
-  };
-
-  // Safe router navigation passing deep parameters across browser tabs
-  const handleProceedToBilling = (device) => {
-    if (!device.owner) return alert("Cannot bill an unassigned customer account asset.");
+  const handleProceedToBilling = (device, e) => {
+    e.stopPropagation();
+    if (!device.owner) {
+      addToast("Cannot bill an unassigned customer account asset.", "warning");
+      return;
+    }
     
     navigate('/billing', { 
       state: { 
@@ -74,29 +112,96 @@ const DevicesPage = () => {
     });
   };
 
-  // Compute Counts per Device Type Tab
-  const typeCounts = useMemo(() => {
-    if (!items) return {};
-    const counts = { all: items.length };
-    items.forEach((device) => {
-      const type = device.deviceType || 'other';
-      counts[type] = (counts[type] || 0) + 1;
+  const handleSelectDevice = (device) => {
+    setIsAddingNew(false);
+    setSelectedDevice(device);
+    setForm({
+      owner: device.owner?._id || device.owner || '',
+      deviceName: device.deviceName || '',
+      deviceType: device.deviceType || 'mobile',
+      customDeviceType: device.customDeviceType || '',
+      issues: device.issues ? [...device.issues] : [],
+      deviceHardwareId: device.deviceHardwareId || '',
+      deviceRepairingStatus: device.deviceRepairingStatus || 'in-progress'
     });
-    return counts;
-  }, [items]);
+    setEditId(device._id);
+  };
 
-  // Filter and Sort Logic
+  const handleAddNewClick = () => {
+    setIsAddingNew(true);
+    setSelectedDevice(null);
+    setForm({ 
+      owner: '',
+      deviceName: '',
+      deviceType: 'mobile',
+      customDeviceType: '',
+      issues: [],
+      deviceHardwareId: '',
+      deviceRepairingStatus: 'in-progress'
+    });
+    setEditId(null);
+  };
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    if (!form.owner) {
+      addToast('Please assign a customer profile', "warning");
+      return;
+    }
+    if (form.deviceType === 'other' && !form.customDeviceType.trim()) {
+      addToast('Please specify a custom device type name.', "warning");
+      return;
+    }
+    if (form.issues.length === 0) {
+      addToast('Please describe at least one device fault or hardware issue.', "warning");
+      return;
+    }
+
+    const payload = { 
+      ...form, 
+      deviceType: form.deviceType === 'other' ? form.customDeviceType.trim() : ''
+    };
+
+    if (editId) {
+      dispatch(updateDevice({ id: editId, data: payload }))
+        .unwrap()
+        .then(() => {
+          dispatch(getDevices());
+          dispatch(getDeviceByType());
+          addToast("Device repair record updated successfully!", "success");
+        })
+        .catch((err) => {
+          const errMsg = err.message || err;
+          addToast(`Failed to update device: ${errMsg}`, "error");
+        });
+    } else {
+      dispatch(addDevice(payload))
+        .unwrap()
+        .then(() => {
+          dispatch(getDevices());
+          dispatch(getDeviceByType());
+          addToast("Device registered successfully!", "success");
+          setIsAddingNew(false);
+        })
+        .catch((err) => {
+          const errMsg = err.message || err;
+          addToast(`Failed to add device: ${errMsg}`, "error");
+        });
+    }
+  };
+
   const filteredAndSortedDevices = useMemo(() => {
     if (!items) return [];
 
-    // Filter by tab category & search query
     const filtered = items.filter((device) => {
-      // 1. Device Type Tab Filter
-      if (selectedDeviceTypeTab !== 'all' && device.deviceType !== selectedDeviceTypeTab) {
+      if (selectedDeviceTypeTab?.value !== 'all' && device.deviceType !== selectedDeviceTypeTab?.value) {
         return false;
       }
 
-      // 2. Search Query Filter
+      if (statusFilter?.value !== 'all' && device.deviceRepairingStatus !== statusFilter?.value) {
+        return false;
+      }
+
       const term = searchTerm.toLowerCase();
       const deviceName = device.deviceName?.toLowerCase() || '';
       const hwId = device.deviceHardwareId?.toLowerCase() || '';
@@ -115,7 +220,6 @@ const DevicesPage = () => {
       );
     });
 
-    // Sort results
     return filtered.sort((a, b) => {
       if (sortBy === 'name') {
         return (a.deviceName || '').localeCompare(b.deviceName || '');
@@ -127,213 +231,97 @@ const DevicesPage = () => {
         return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
       }
     });
-  }, [items, searchTerm, selectedDeviceTypeTab, sortBy]);
+  }, [items, searchTerm, statusFilter, selectedDeviceTypeTab, sortBy]);
 
-  // Tab definitions configuration
-  const deviceTypeTabs = [
-    { key: 'all', label: 'All Devices' },
-    { key: 'mobile', label: 'Mobile' },
-    { key: 'tablet', label: 'Tablet' },
-    { key: 'laptop', label: 'Laptop' },
-    { key: 'desktop', label: 'Desktop' },
-    { key: 'printer', label: 'Printer' },
-    { key: 'speaker', label: 'Speaker' },
-    { key: 'other', label: 'Other' },
+  const deviceTableHead = [
+    { label: '#', value: 'sno', class: "text-xs px-3 py-2 w-2 max-w-2 min-w-2" },
+    { label: 'Device Name', value: 'name', class: "text-xs px-3 py-2 w-24 max-w-24 min-w-24" },
+    { label: 'Hardware ID', value: 'name', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
+    { label: 'Device Type', value: 'type', class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8" },
+    { label: 'Customer Name', value: 'customer', class: "text-xs px-3 py-2 w-20 max-w-20 min-w-20" },
+    { label: 'Faults /Issues', value: 'issues', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
+    { label: 'Status', value: 'status', class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4" },
   ];
 
-  return (
-    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full">
-      
-      {/* Header */}
-      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Device Repair Tracking</h1>
-        </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-blue-500/20"
-        >
-          <span>+</span> Register Device
-        </button>
-      </header>
+  function deviceTableData(d) {
+    return [
+      { label: '#', value: d.sno || '', class: "text-xs px-3 py-2 w-2 max-w-2 min-w-2 rounded-l-md" },
+      { label: 'DeviceHWID', value: d.deviceName, class: "text-xs px-3 py-2 w-24 max-w-24 min-w-24" },
+      { label: 'HWID', value: d.deviceHardwareId, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
+      { label: 'Type', value: d?.deviceType || "-", class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8 capitalize"},
+      { label: 'Customer', value: d.owner?.name || "-", class: "text-xs px-3 py-2 w-20 max-w-20 min-w-20" },
+      { 
+        label: 'Faults /Issues', 
+        value: d.issues && d.issues.length > 0 ? d.issues.slice(0, 2).join(", ") + (d.issues.length > 2 ? "..." : "") : <span>No faults</span>, 
+        class: "text-[10px] px-3 py-2 w-12 max-w-12 min-w-12" 
+      },
+      { 
+        label: 'Status', 
+        value: <Badge title={d?.deviceRepairingStatus} type={d?.deviceRepairingStatus === ("resolved") ? "dark" : "light"}></Badge>,
+        class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4" 
+      }
+    ];
+  }
 
-      {/* Search & Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-vercel-secondary p-4 rounded-xl shadow-md border border-zinc-800">
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search by device, hardware ID, customer, type, or issues..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-zinc-950 text-zinc-100 placeholder-zinc-500 px-4 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-blue-500 text-xs sm:text-sm transition-all"
-          />
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Sort By:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="bg-zinc-950 text-zinc-200 text-xs sm:text-sm px-3 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-blue-500 cursor-pointer"
-          >
-            <option value="newest">Newest First</option>
-            <option value="name">Device Name</option>
-            <option value="type">Device Type</option>
-            <option value="status">Status Flow</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Device Type Navigation Tabs with Dynamic Counts */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-zinc-800 w-full">
-        {deviceTypeTabs.map((tab) => {
-          const isActive = selectedDeviceTypeTab === tab.key;
-          const count = typeCounts[tab.key] || 0;
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setSelectedDeviceTypeTab(tab.key)}
-              className={`px-3.5 py-2 rounded-lg text-xs font-semibold tracking-wide whitespace-nowrap transition-all border flex items-center gap-2 ${
-                isActive
-                  ? 'bg-blue-600/10 text-blue-400 border-blue-500/30 shadow-sm'
-                  : 'bg-vercel-secondary text-zinc-400 border-zinc-800 hover:bg-vercel-card hover:text-zinc-200'
-              }`}
-            >
-              <span>{tab.label}</span>
-              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-                isActive ? 'bg-blue-500/20 text-blue-300' : 'bg-vercel-card text-zinc-400'
-              }`}>
-                {count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Table Section */}
-      <div className="bg-vercel-secondary rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
-        <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
-          <table className="w-full text-left border-collapse min-w-[950px]">
-            <thead>
-              <tr className="bg-vercel-card/50 border-b border-zinc-800">
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Device / HWID</th>
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Type</th>
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Customer</th>
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Issue Matrix Faults</th>
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Status Flow</th>
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Workflow Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800">
-              {status === 'loading' ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-zinc-500 italic">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                      Loading telemetry arrays...
-                    </div>
-                  </td>
-                </tr>
-              ) : filteredAndSortedDevices.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-zinc-500 text-sm italic">
-                    {items.length === 0 ? "No devices currently under repair." : "No devices match your active filters/search."}
-                  </td>
-                </tr>
-              ) : (
-                filteredAndSortedDevices.map((device) => {
-                  const displayType = device.deviceType === 'other' && device.customDeviceType 
-                    ? device.customDeviceType 
-                    : (device.deviceType || 'Unknown');
-
-                  return (
-                    <tr key={device._id} className="hover:bg-vercel-card/30 transition-colors group">
-                      <td className="px-4 sm:px-6 py-3">
-                        <div className="text-xs sm:text-sm font-semibold text-zinc-100">{device.deviceName}</div>
-                        <div className="text-[11px] sm:text-xs font-mono text-zinc-500 mt-0.5">{device.deviceHardwareId}</div>
-                      </td>
-                      <td className="px-4 sm:px-6 py-3">
-                        <span className="inline-block bg-vercel-card text-zinc-300 text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded uppercase tracking-wider">
-                          {displayType}
-                        </span>
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-zinc-300">
-                        {device.owner?.name || <span className="text-zinc-600 italic">No Owner Assigned</span>}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-zinc-400">
-                        {device.issues && device.issues.length > 0 ? (
-                          <div className="truncate max-w-[150px] sm:max-w-[200px]" title={device.issues.join(", ")}>
-                            {device.issues.slice(0, 3).join(", ") + (device.issues.length > 3 ? "..." : "")}
-                          </div>
-                        ) : (
-                          <span className="text-zinc-600 italic">No issues reported</span>
-                        )}
-                      </td>
-                      
-                      {/* Status Dropdown */}
-                      <td className="px-4 sm:px-6 py-3">
-                        <select
-                          value={device.deviceRepairingStatus}
-                          onChange={(e) => handleStatusChange(device, e.target.value)}
-                          className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 sm:py-1.5 rounded-full border bg-zinc-950 focus:outline-none focus:ring-2 cursor-pointer transition-all ${getStatusStyles(device.deviceRepairingStatus)}`}
-                        >
-                          <option value="in-progress" className="bg-vercel-secondary text-amber-400">In Progress</option>
-                          <option value="resolved" className="bg-vercel-secondary text-emerald-400">Resolved</option>
-                          <option value="rejected" className="bg-vercel-secondary text-red-400">Rejected</option>
-                        </select>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-4 sm:px-6 py-3 text-right text-xs sm:text-sm font-medium">
-                        <div className="flex justify-end items-center gap-3 min-h-[32px] flex-wrap lg:flex-nowrap">
-                          {device.deviceRepairingStatus === 'resolved' && (
-                            <button 
-                              onClick={() => handleProceedToBilling(device)}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] sm:text-xs px-3 py-1.5 rounded-lg shadow-md shadow-emerald-600/10 transition-all shrink-0"
-                            >
-                              Proceed to Billing →
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleOpenEdit(device)}
-                            className="text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 lg:bg-transparent px-2 py-1.5 lg:p-0 rounded text-[11px] sm:text-xs font-semibold lg:opacity-0 lg:group-hover:opacity-100 duration-150 shrink-0"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteRecord(device._id)}
-                            className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 lg:bg-transparent px-2 py-1.5 lg:p-0 rounded text-[11px] sm:text-xs font-semibold lg:opacity-0 lg:group-hover:opacity-100 duration-150 shrink-0"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Modals */}
-      <RegisterDeviceModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
-
-      {isEditModalOpen && (
-        <EditDeviceModal 
-          isOpen={isEditModalOpen} 
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setSelectedDeviceToEdit(null);
-          }} 
-          device={selectedDeviceToEdit}
+  const leftPaneContent = (
+    <div className="w-full h-full flex flex-col">
+      <div className="flex flex-row gap-2 h-fit items-center">
+        <Header 
+          placeholder="Search by device name, hardware ID, customer..."
+          searchTerm={searchTerm} 
+          setSearchTerm={setSearchTerm} 
+          statusFilter={[statusFilter.label, selectedDeviceTypeTab?.label]} 
+          setStatusFilter={[setStatusFilter, setSelectedDeviceTypeTab]}
+          statusOptions={[statusOptions, deviceTypeTabs]}
         />
-      )}
+        {!isAddingNew && (
+          <Button 
+            onClick={handleAddNewClick}
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+            }
+            label="Add Device" 
+          />
+        )}
+      </div>
+
+      <GlobalTable
+        title="Service Device"
+        tableHead={deviceTableHead}
+        filteredList={filteredAndSortedDevices.map((d, idx) => ({ ...d, sno: idx + 1 }))}
+        status={status}
+        selectedItem={selectedDevice}
+        setSelectedItem={handleSelectDevice}
+        tableData={deviceTableData}
+      />
+    </div>
+  );
+
+  return (
+    <div className='h-full w-full p-6'>
+      <ResizablePanes
+        animationKey={editId || (isAddingNew ? 'new-device' : 'empty')}
+        leftPane={leftPaneContent}
+        rightPane={
+          (selectedDevice !== undefined || isAddingNew) ? (
+            <DeviceDetails 
+              selectedDevice={selectedDevice}
+              form={form}
+              setForm={setForm}
+              editId={editId}
+              handleSave={handleSave}
+              handleAddNewClick={handleAddNewClick}
+              handleDeleteRecord={handleDeleteRecord}
+              availableCustomers={customers}
+              availableTypes={availableDeviceTypeList}
+            />
+          ) : null
+        }
+        defaultLeftWidth="58%"
+      />
     </div>
   );
 };
-
-export default DevicesPage;
+export default DevicesPage

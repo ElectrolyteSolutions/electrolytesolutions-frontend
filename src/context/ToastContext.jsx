@@ -21,6 +21,19 @@ export const ToastProvider = ({ children }) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  // Helper function to assign matching border color based on status type
+  const getBorderColor = (type) => {
+    switch (type) {
+      case 'success':
+        return 'border-emerald-500/50 shadow-emerald-500/10';
+      case 'error':
+        return 'border-red-500/50 shadow-red-500/10';
+      case 'info':
+      default:
+        return 'border-zinc-700 shadow-white/5';
+    }
+  };
+
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>
       {children}
@@ -29,7 +42,9 @@ export const ToastProvider = ({ children }) => {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto flex items-center justify-between gap-3 bg-zinc-950 text-zinc-100 px-4 py-3 rounded-xl border ${toast.type === 'success' && "border-red-500"} ${toast.type === 'error' && "border-red-500"} ${toast.type === 'info' && "border-white"}border-zinc-800 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200`}
+            className={`pointer-events-auto flex items-center justify-between gap-3 bg-vercel-card text-zinc-100 px-4 py-3 rounded-md border-1 ${getBorderColor(
+              toast.type
+            )} shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200`}
           >
             <div className="flex items-center gap-2.5 text-xs font-medium">
               {toast.type === 'success' && (

@@ -85,14 +85,14 @@ const OrdersPage = () => {
   return (<div className='h-full w-full p-6'>
     <ResizablePanes 
       leftPane={
-        <div className="space-y-4 w-full h-full flex flex-col">
+        <div className=" w-full h-full flex flex-col">
           <Header
             placeholder="Search by order number, customer name, or payment ID..."
             searchTerm={searchTerm} 
             setSearchTerm={setSearchTerm} 
-            statusFilter={statusFilter} 
-            setStatusFilter={setStatusFilter}
-            statusOptions={statusOptions} 
+            statusFilter={[statusFilter]} 
+            setStatusFilter={[setStatusFilter]}
+            statusOptions={[statusOptions]} 
           />
           <GlobalTable
             title='Orders' 
