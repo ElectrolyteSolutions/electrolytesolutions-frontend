@@ -77,6 +77,7 @@ const tableHeadData = ["Item Name", "Qty", "Rate", "Total"];
           items={[
             {key:"Name:", value: customerName || '' },
             {key:"Email:", value: selectedOrder.customer?.email || 'N/A'},
+            {key:"Phone:", value: selectedOrder.customer?.phone || 'N/A'},
             {key:"Customer Type:", value: selectedOrder.customer?.customerType || 'Individual'}
           ]}
         />
