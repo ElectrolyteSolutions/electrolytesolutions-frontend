@@ -53,6 +53,19 @@ export const deleteCustomer = createAsyncThunk('customers/delete', async (id, th
   }
 });
 
+export const checkEmailAvailability = createAsyncThunk('customers/checkEmail', async (email, thunkAPI) => {
+  try {
+    const res = await axios.get(`${API_URL}/check-email-availability`, {
+      ...getAuthConfig(thunkAPI),
+      params: { email }
+    });
+    return res.data;
+  } catch (err) {
+    const message = err.response?.data?.message || err.message;
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
 // --- Slice ---
 
 const customerSlice = createSlice({

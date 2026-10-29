@@ -115,7 +115,9 @@ div {
     display: none !important;
   }
 
-
+  a{
+    @apply no-underline
+  }
   input{
     @apply w-full bg-zinc-950 rounded-md p-2 text-xs text-zinc-100 border border-zinc-800 focus:outline-none focus:border-white
   }

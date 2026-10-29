@@ -358,7 +358,7 @@ const ProductsPage = () => {
             />
           ) : null
         }
-        defaultLeftWidth="58%"
+        defaultLeftWidth="68%"
       />
 
       <ConfirmModal

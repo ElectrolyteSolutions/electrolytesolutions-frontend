@@ -4,6 +4,7 @@ import CustomList from './CustomList';
 import { formatIsoDate } from '../functions/formatIsoDate';
 
 const DeviceDetails = ({
+  page=null,
   form,
   setForm,
   editId,
@@ -15,7 +16,7 @@ const DeviceDetails = ({
   selectedDevice
 }) => {
   const [currentIssueInput, setCurrentIssueInput] = useState('');
-
+  const isCustomer = page === "customer"? true :false
   const handleAddIssue = (e) => {
     if (e) e.preventDefault();
     const trimmedInput = currentIssueInput.trim();

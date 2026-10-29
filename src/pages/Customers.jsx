@@ -1,61 +1,97 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCustomers, addCustomer, deleteCustomer, updateCustomer } from '../features/customerSlice';
-import RegisterDeviceModal from '../components/addDevice';
+import { getCustomers, addCustomer, updateCustomer, deleteCustomer } from '../features/customerSlice';
+import ResizablePanes from '../components/TwoPaneLayout';
+import Header from '../components/SearchHeader';
+import Button from '../components/Button';
+import GlobalTable from '../components/GlobalTable';
+import ConfirmModal from '../components/ConfirmModal';
+import { useToast } from '../context/ToastContext';
+import CustomerDetails from '../components/CustomerDetails';
+import Badge from '../components/Badge';
+
+const statusOptions = [
+  { value: "all", label: "All Customers" },
+  { value: "corporate", label: "Corporate Only" }
+];
 
 const CustomersPage = () => {
   const dispatch = useDispatch();
-  const { items, status } = useSelector((state) => state.customers);
-  
-  // Standard profile modal states
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { items, status, error } = useSelector((state) => state.customers);
+  const { addToast } = useToast();
+
+  const [selectedCustomer, setSelectedCustomer] = useState(undefined);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ 
-    name: '', 
+  const [isAddingNew, setIsAddingNew] = useState(false);
+
+  // Delete Modal State
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Device Registration states
+
+  const [form, setForm] = useState({
+    name: '',
     firstName: '',
     lastName: '',
-    phone: '', 
-    customerType: 'Individual', 
+    phone: '',
+    customerType: 'Individual',
     address: '',
     pan: '',
     gst: ''
   });
 
-  // Device Registration states
-  const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
-  const [targetedCustomerId, setTargetedCustomerId] = useState('');
-
-  // Search and Sort State
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'name' | 'type'
+  const [customerFilter, setCustomerFilter] = useState(statusOptions[0]);
+  const [currentSortBy, setCurrentSortBy] = useState('newest'); // 'newest' | 'name' | 'type'
+  const [currentSortOrder, setCurrentSortOrder] = useState('desc');
 
   useEffect(() => {
     dispatch(getCustomers());
   }, [dispatch]);
 
-  const handleOpenModal = (customer = null) => {
-    if (customer) {
-      setForm({
-        name: customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim(),
-        firstName: customer.firstName || '',
-        lastName: customer.lastName || '',
-        phone: customer.phone || '',
-        customerType: customer.customerType || 'Individual',
-        address: customer.address || (customer.addresses?.[0] ? `${customer.addresses[0].address1}, ${customer.addresses[0].city}` : ''),
-        pan: customer.pan || '',
-        gst: customer.gst || ''
-      });
-      setEditId(customer._id);
+  const handleSortToggle = (targetField) => {
+    if (currentSortBy === targetField) {
+      setCurrentSortOrder(currentSortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      setForm({ name: '', firstName: '', lastName: '', phone: '', customerType: 'Individual', address: '', pan: '', gst: '' });
-      setEditId(null);
+      setCurrentSortBy(targetField);
+      setCurrentSortOrder('asc');
     }
-    setIsModalOpen(true);
   };
 
-  const handleOpenDeviceModal = (customerId) => {
-    setTargetedCustomerId(customerId);
-    setIsDeviceModalOpen(true);
+  const handleSelectCustomer = (customer) => {
+    setIsAddingNew(false);
+    setSelectedCustomer(customer);
+    setForm({
+      name: customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim(),
+      firstName: customer.firstName || '',
+      lastName: customer.lastName || '',
+      phone: customer.phone || '',
+      customerType: customer.customerType || 'Individual',
+      address: customer.address || (customer.addresses?.[0] ? `${customer.addresses[0].address1}, ${customer.addresses[0].city}` : ''),
+      pan: customer.pan || '',
+      email: customer.email || '',
+      gst: customer.gst || ''
+    });
+    setEditId(customer._id);
+  };
+
+  const handleAddNewClick = () => {
+    setIsAddingNew(true);
+    setSelectedCustomer(null);
+    setForm({
+      name: '',
+      firstName: '',
+      lastName: '',
+      phone: '',
+      customerType: 'Individual',
+      address: '',
+      email:'',
+      pan: '',
+      gst: ''
+    });
+    setEditId(null);
   };
 
   const handleSave = (e) => {
@@ -66,15 +102,67 @@ const CustomersPage = () => {
     };
 
     if (editId) {
-      dispatch(updateCustomer({ id: editId, data: payload }));
+      dispatch(updateCustomer({ id: editId, data: payload }))
+        .unwrap()
+        .then(() => {
+          addToast("Customer updated successfully!", "success");
+          refreshDataLogs();
+          setSelectedItem(null)
+        })
+        .catch((err) => addToast(error || "Failed to update customer.", "error"));
     } else {
-      dispatch(addCustomer(payload));
+      dispatch(addCustomer(payload))
+        .unwrap()
+        .then(() => {
+          addToast("Customer registered successfully!", "success");
+          refreshDataLogs();
+          setIsAddingNew(false);
+          setForm({
+          name: '',
+          firstName: '',
+          lastName: '',
+          phone: '',
+          email:'',
+          customerType: 'Individual',
+          address: '',
+          pan: '',
+          gst: ''
+        })
+        })
+        .catch((err) => addToast(error || "Failed to register customer.", "error"));
     }
-    setIsModalOpen(false);
-    setEditId(null);
   };
 
-  // Filter and Sort Logic for Customers
+  const promptDeleteCustomer = (customer) => {
+    setCustomerToDelete(customer);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!customerToDelete) return;
+    setIsDeleting(true);
+    try {
+      await dispatch(deleteCustomer(customerToDelete._id)).unwrap();
+      addToast(`Deleted "${customerToDelete.name || 'Customer'}" successfully.`, "success");
+      setIsDeleteModalOpen(false);
+      setCustomerToDelete(null);
+      if (editId === customerToDelete._id) {
+        setSelectedCustomer(undefined);
+        setEditId(null);
+      }
+      refreshDataLogs();
+    } catch (err) {
+      addToast(error || "Failed to delete customer record.", "error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const refreshDataLogs = () => {
+    dispatch(getCustomers());
+  };
+
+  // Filter and Sort Logic
   const filteredAndSortedCustomers = useMemo(() => {
     if (!items) return [];
 
@@ -86,298 +174,131 @@ const CustomersPage = () => {
       const gst = c.gst?.toLowerCase() || '';
       const pan = c.pan?.toLowerCase() || '';
 
-      return name.includes(term) || phone.includes(term) || address.includes(term) || gst.includes(term) || pan.includes(term);
+      const matchesSearch = name.includes(term) || phone.includes(term) || address.includes(term) || gst.includes(term) || pan.includes(term);
+      const matchesFilter = customerFilter.value === 'all' || (customerFilter.value === 'corporate' && c.customerType === 'Corporate');
+
+      return matchesSearch && matchesFilter;
     });
 
     return filtered.sort((a, b) => {
-      if (sortBy === 'name') {
+      if (currentSortBy === 'name') {
         const nameA = a.name || `${a.firstName || ''} ${a.lastName || ''}`;
         const nameB = b.name || `${b.firstName || ''} ${b.lastName || ''}`;
-        return nameA.localeCompare(nameB);
-      } else if (sortBy === 'type') {
-        return (a.customerType || '').localeCompare(b.customerType || '');
+        return currentSortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      } else if (currentSortBy === 'type') {
+        const typeA = a.customerType || '';
+        const typeB = b.customerType || '';
+        return currentSortOrder === 'asc' ? typeA.localeCompare(typeB) : typeB.localeCompare(typeA);
       } else {
-        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        const dateA = new Date(a.createdAt || 0);
+        const dateB = new Date(b.createdAt || 0);
+        return currentSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
       }
     });
-  }, [items, searchTerm, sortBy]);
+  }, [items, searchTerm, customerFilter, currentSortBy, currentSortOrder]);
 
-  return (
-    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500 max-w-[1400px] mx-auto w-full">
-      
-      {/* Header Section */}
-      <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Customer Management</h1>
-        </div>
-        <button 
-          onClick={() => handleOpenModal()}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all shadow-lg shadow-emerald-500/20"
-        >
-          <span>+</span> Register Customer
-        </button>
-      </header>
+  const customerTableHead = [
+    { label: '#', value: 'sno', class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4", onClick: () => {} },
+    { label: 'Customer Name', value: 'name', class: "text-xs px-3 py-2 w-38 min-w-38 max-w-38 cursor-pointer", onClick: () => handleSortToggle('name') },
+    { label: 'Phone', value: 'phone', class: "text-xs px-3 py-2 w-26 min-w-26 max-w-26", onClick: () => {} },
+    { label: 'Email', value: 'phone', class: "text-xs px-3 py-2 w-32 min-w-32 max-w-32", onClick: () => {} },
+    { label: 'Type', value: 'type', class: "text-xs px-3 py-2 w-22 min-w-22 max-w-22", onClick: () => {handleSortToggle('type')} },
+    { label: 'Address', value: 'devices', class: "text-xs px-3 py-2 w-42 min-w-42 max-w-42", onClick: () => {} },
+    { label: 'Devices ', value: 'devices', class: "text-xs px-3 py-2 w-16 min-w-16 max-w-16", onClick: () => {} },
+    { label: 'Orders ', value: 'devices', class: "text-xs px-3 py-2 w-16 min-w-16 max-w-16", onClick: () => {} },
+    { label: 'GST', value: 'gst', class: "text-xs px-3 py-2 w-16 min-w-16 max-w-16 cursor-pointer", onClick: () => {} },
+    { label: 'PAN', value: 'pan', class: "text-xs px-3 py-2 w-28 min-w-28 max-w-28", onClick: () => {} },
+  ];
 
-      {/* Search & Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-vercel-secondary p-4 rounded-xl shadow-md border border-zinc-800">
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search by name, phone, address, GST, or PAN..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-zinc-950 text-zinc-100 placeholder-zinc-500 px-4 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-emerald-500 text-xs sm:text-sm transition-all"
+  function customerTableData(c) {
+    const displayName = c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Unnamed Customer';
+    const displayAddress = c.address || (c.addresses?.[0] ? `${c.addresses[0].address1}, ${c.addresses[0].city}` : 'No address');
+
+    return [
+      { label: '#', value: c.sno || '', class: "text-xs pl-3 pr-0 py-2 rounded-l-md w-4 max-w-4 min-w-4" },
+      { label: 'Customer Name', value: displayName, class: "text-xs px-3 py-2 w-38 min-w-38 max-w-38"
+      },
+      { label: 'Phone', value: c.phone || "-", class: "text-xs px-3 py-2 w-26 min-w-26 max-w-26" },
+      { label: 'Email', value: c.email || "-", class: "text-xs px-3 py-2 w-32 min-w-32 max-w-32" },
+      { label: 'Type', value: <Badge type={c?.customerType === 'Corporate' ? 'light' : 'dark'} title={c?.customerType || 'Individual'}></Badge>,
+        class: "text-xs px-3 py-2 w-22 min-w-22 max-w-22"
+      },
+      { label: 'Address', value: displayAddress ,class: "text-xs px-3 py-2 w-42 min-w-42 max-w-42" },
+      { label: 'Devices', value: c.devices?.length || 0 ,class: "text-xs px-3 py-2 w-16 min-w-16 max-w-16" },
+      { label: 'Orders', value: c.orders?.length || 0 ,class: "text-xs px-3 py-2 w-16 min-w-16 max-w-16" },
+      { label: 'GST', value: c.gst || "-" ,class: "text-xs px-3 py-2 w-28 min-w-28 max-w-28" },
+      { label: 'PAN', value: c?.pan || "-" ,class: "text-xs px-3 py-2 w-20 min-w-20 max-w-20" }
+    ];
+  }
+
+  const leftPaneContent = (
+    <div className="p-6 w-full h-full flex flex-col pr-1">
+      <div className='flex flex-row gap-3 h-fit items-center'>
+        <Header 
+          placeholder="Search by name, phone, address, GST, or PAN..."
+          searchTerm={searchTerm} 
+          setSearchTerm={setSearchTerm}
+          statusFilter={[customerFilter.label]}
+          setStatusFilter={[setCustomerFilter]}
+          statusOptions={[statusOptions]}
+        />
+        {!isAddingNew && (
+          <Button 
+            onClick={handleAddNewClick} 
+            icon={
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+            } 
+            label="Register Customer" 
           />
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Sort By:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="bg-zinc-950 text-zinc-200 text-xs sm:text-sm px-3 py-2 rounded-lg border border-zinc-800 focus:outline-none focus:border-emerald-500 cursor-pointer"
-          >
-            <option value="newest">Newest First</option>
-            <option value="name">Customer Name</option>
-            <option value="type">Customer Type</option>
-          </select>
-        </div>
+        )}
       </div>
 
-      {/* Table Section */}
-      <div className="bg-vercel-secondary rounded-xl overflow-hidden shadow-xl w-full border border-zinc-800">
-        <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">
-          <table className="w-full text-left border-collapse min-w-[950px]">
-            <thead>
-              <tr className="bg-vercel-card/50 border-b border-zinc-800">
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Customer Name</th>
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Contact Info</th>
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Address</th>
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Type</th>
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Registered Devices</th>
-                <th className="px-4 sm:px-6 py-3 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800">
-              {status === 'loading' ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-zinc-500 italic">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                      Syncing client database...
-                    </div>
-                  </td>
-                </tr>
-              ) : filteredAndSortedCustomers.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-zinc-500 text-sm italic">
-                    {items.length === 0 ? "No customers found in the system database." : "No customers match your search criteria."}
-                  </td>
-                </tr>
-              ) : (
-                filteredAndSortedCustomers.map((c) => {
-                  const displayName = c.name || `${c.firstName || ''} ${c.lastName || ''}`.trim() || 'Unnamed Customer';
-                  const displayAddress = c.address || (c.addresses?.[0] ? `${c.addresses[0].address1}, ${c.addresses[0].city}` : 'No address');
-
-                  return (
-                    <tr key={c._id} className="hover:bg-vercel-card/30 transition-colors group">
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm space-y-2">
-                        <div className="font-semibold text-zinc-100">{displayName}</div>
-                        {c?.gst && <div className="font-semibold text-zinc-300 text-[10px] border rounded p-[2px] px-1 bg-blue-900 inline-block">GST: {c?.gst}</div>}
-                        {c?.pan && <div className="font-semibold text-zinc-300 text-[10px] border rounded p-[2px] px-1 bg-red-900 inline-block ml-1">PAN: {c?.pan}</div>}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm text-zinc-300 font-mono">
-                        {c.phone || 'N/A'}
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
-                        <div className="text-zinc-400 max-w-[200px] truncate hover:text-clip hover:whitespace-normal transition-all cursor-help" title={displayAddress}>
-                          {displayAddress}
-                        </div>
-                      </td>
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-medium border ${
-                          c.customerType === 'Corporate' 
-                            ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' 
-                            : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
-                        }`}>
-                          {c.customerType || 'Individual'}
-                        </span>
-                      </td>
-                      
-                      {/* Devices Data Display */}
-                      <td className="px-4 sm:px-6 py-3 text-xs sm:text-sm">
-                        {c.devices && c.devices.length > 0 ? (
-                          <div className="flex flex-wrap gap-1.5 max-w-[300px]">
-                            {c.devices.map((device, idx) => {
-                              const isPopulated = typeof device === 'object' && device !== null;
-                              const devName = isPopulated ? device.deviceName : `Device ID: ...${String(device).slice(-4)}`;
-                              const repairStatus = isPopulated ? device.deviceRepairingStatus : 'unknown';
-
-                              return (
-                                <span 
-                                  key={isPopulated ? device._id : idx} 
-                                  className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border ${
-                                    repairStatus === 'resolved' 
-                                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                                      : repairStatus === 'rejected' 
-                                        ? 'bg-red-500/10 text-red-400 border-red-500/20' 
-                                        : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                  }`}
-                                  title={isPopulated ? `Status: ${repairStatus} | HWID: ${device.deviceHardwareId}` : 'Loading details...'}
-                                >
-                                  {devName}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          <span className="text-xs text-zinc-500 italic">No Devices Linked</span>
-                        )}
-                      </td>
-
-                      <td className="px-4 sm:px-6 py-3 text-right text-xs sm:text-sm font-medium">
-                        <div className="flex justify-end gap-2.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-wrap lg:flex-nowrap">
-                          <button 
-                            onClick={() => handleOpenDeviceModal(c._id)}
-                            className="text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
-                          >
-                            + Add Device
-                          </button>
-                          <button 
-                            onClick={() => handleOpenModal(c)}
-                            className="text-emerald-400 hover:text-emerald-300 transition-colors bg-emerald-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
-                          >
-                            Edit
-                          </button>
-                          <button 
-                            onClick={() => { if(window.confirm('Delete customer?')) dispatch(deleteCustomer(c._id)) }}
-                            className="text-red-400 hover:text-red-300 transition-colors bg-red-500/10 lg:bg-transparent px-2 py-1 lg:p-0 rounded text-[11px] lg:text-xs font-semibold shrink-0"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Customer Profile Modal Overlay */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 bg-vercel-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-vercel-secondary w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 max-h-[95vh] flex flex-col border border-zinc-800">
-            <div className="px-5 sm:px-6 py-3 border-b border-zinc-800 flex justify-between items-center bg-vercel-card/30 shrink-0">
-              <h3 className="text-base sm:text-lg font-bold text-white">{editId ? 'Update Profile' : 'Register Customer'}</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-zinc-500 hover:text-white transition-colors text-2xl leading-none">&times;</button>
-            </div>
-            
-            <form onSubmit={handleSave} className="p-4 sm:p-6 space-y-4 overflow-y-auto flex-1 scrollbar-thin">
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Customer Category</label>
-                  <select 
-                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all appearance-none cursor-pointer"
-                    value={form.customerType} 
-                    onChange={e => setForm({...form, customerType: e.target.value})}
-                  >
-                    <option value="Individual">Individual</option>
-                    <option value="Corporate">Corporate</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">
-                    {form.customerType === "Individual" ? "Full" : "Corporate"} Name
-                  </label>
-                  <input 
-                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
-                    value={form.name} 
-                    onChange={e => setForm({...form, name: e.target.value})} 
-                    placeholder="John Doe / Company Name"
-                    required 
-                  />
-                </div>
-
-                {form.customerType === "Corporate" && (
-                  <>
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Company GST</label>
-                      <input 
-                        className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
-                        value={form.gst} 
-                        onChange={e => setForm({...form, gst: e.target.value})} 
-                        placeholder="GSTIN Number..."
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">PAN</label>
-                      <input 
-                        className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all"
-                        value={form.pan} 
-                        onChange={e => setForm({...form, pan: e.target.value})} 
-                        placeholder="PAN Number"
-                      />
-                    </div>
-                  </>
-                )}
-                
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Phone Number</label>
-                  <input 
-                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
-                    value={form.phone} 
-                    onChange={e => setForm({...form, phone: e.target.value})} 
-                    placeholder="+91 00000 00000"
-                    required 
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-400 uppercase mb-1.5 ml-1">Full Address</label>
-                  <textarea 
-                    className="w-full bg-zinc-950 rounded-lg px-3.5 py-2.5 text-xs sm:text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all min-h-[80px]"
-                    value={form.address} 
-                    onChange={e => setForm({...form, address: e.target.value})} 
-                    placeholder="Street, City, Zip Code"
-                    required 
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-4 sm:pt-6">
-                <button 
-                  type="button" 
-                  onClick={() => setIsModalOpen(false)} 
-                  className="flex-1 px-4 py-2.5 rounded-lg text-zinc-300 font-semibold bg-vercel-secondary hover:bg-vercel-card border border-zinc-800 transition-colors text-xs sm:text-sm"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="flex-1 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-all text-xs sm:text-sm shadow-lg shadow-emerald-500/20"
-                >
-                  {editId ? 'Save Changes' : 'Register'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* DYNAMIC INTEGRATED REUSABLE DEVICE REGISTRATION MODAL */}
-      <RegisterDeviceModal
-        isOpen={isDeviceModalOpen}
-        onClose={() => {
-          setIsDeviceModalOpen(false);
-          setTargetedCustomerId('');
-          dispatch(getCustomers());
-        }}
-        preSelectedCustomerId={targetedCustomerId}
+      <GlobalTable
+        title="Customer Directory"
+        tableHead={customerTableHead}
+        filteredList={filteredAndSortedCustomers.map((c, idx) => ({ ...c, sno: idx + 1 }))}
+        status={status}
+        selectedItem={selectedCustomer}
+        setSelectedItem={handleSelectCustomer}
+        tableData={customerTableData}
       />
     </div>
+  );
+
+  return (
+    <>
+      <ResizablePanes
+        animationKey={editId || (isAddingNew ? 'new-customer' : 'empty')}
+        leftPane={leftPaneContent}
+        rightPane={
+          (selectedCustomer !== undefined || isAddingNew) ? (
+            <CustomerDetails
+              customer={selectedCustomer}
+              form={form}
+              setForm={setForm}
+              editId={editId}
+              handleSave={handleSave}
+              promptDeleteCustomer={() => promptDeleteCustomer(selectedCustomer)}
+            />
+          ) : null
+        }
+        defaultLeftWidth="68%"
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title={`Delete "${customerToDelete?.name || 'Customer'}"?`}
+        description="This action cannot be undone. This will permanently remove the customer record from your active system database."
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        isDestructive={true}
+        loading={isDeleting}
+        onConfirm={handleConfirmDelete}
+      />
+    </>
   );
 };
 

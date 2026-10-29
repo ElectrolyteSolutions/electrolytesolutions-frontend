@@ -8,8 +8,8 @@ import Header from '../components/SearchHeader';
 import Button from '../components/Button';
 import GlobalTable from '../components/GlobalTable';
 import Badge from '../components/Badge';
-import DeviceDetails from '../components/DeviceDetails';
 import { useToast } from '../context/ToastContext'; // Imported Toast Context
+import DeviceDetails from '../components/DeviceDetails';
 
 const statusOptions = [
   { value: "all", label: "All Statuses" },
@@ -319,7 +319,7 @@ const DevicesPage = () => {
             />
           ) : null
         }
-        defaultLeftWidth="58%"
+        defaultLeftWidth="68%"
       />
     </div>
   );
