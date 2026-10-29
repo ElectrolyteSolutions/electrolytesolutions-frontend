@@ -9,6 +9,13 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
   const hasLeft = Boolean(leftPane);
   const hasRight = Boolean(rightPane) && !isRightCollapsed;
 
+  // Whenever a new item is clicked/selected (changing the animationKey or rightPane), automatically un-collapse!
+  useEffect(() => {
+    if (rightPane) {
+      setIsRightCollapsed(false);
+    }
+  }, [animationKey, rightPane]);
+
   const startResizing = useCallback((e) => {
     e.preventDefault();
     setIsResizing(true);
@@ -71,7 +78,7 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
           <button
             type="button"
             onClick={() => setIsRightCollapsed(false)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white p-2 rounded-l-md border border-zinc-700 shadow-lg transition-all"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white p-2 rounded-l-md border border-zinc-700 shadow-lg transition-all cursor-pointer"
             title="Expand panel"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -114,7 +121,7 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
             e.stopPropagation();
             setIsRightCollapsed(true);
           }}
-          className="absolute opacity-0 group-hover:opacity-100 bg-zinc-900 hover:bg-zinc-700 text-zinc-300 hover:text-white p-1 rounded shadow transition-all z-20"
+          className="absolute opacity-0 group-hover:opacity-100 bg-zinc-900 hover:bg-zinc-700 text-zinc-300 hover:text-white p-1 rounded shadow transition-all z-20 cursor-pointer"
           title="Collapse right panel"
         >
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">

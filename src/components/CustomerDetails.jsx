@@ -12,7 +12,6 @@ const CustomerDetails = ({
   promptDeleteCustomer,
   customer
 }) => {
-    console.log(customer)
   const dispatch = useDispatch();
   const [emailStatus, setEmailStatus] = useState(null); // 'checking' | 'available' | 'taken' | null
   const [emailMsg, setEmailMsg] = useState('');
