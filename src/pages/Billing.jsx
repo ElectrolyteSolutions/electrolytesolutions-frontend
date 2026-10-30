@@ -8,6 +8,8 @@ import { createInvoice, getBills } from '../features/billingSlice';
 import ResizablePanes from '../components/TwoPaneLayout';
 import InvoiceTemplate from '../components/InvoiceModal'; 
 import Button from '../components/Button';
+import MiniTable from '../components/MiniTable';
+import { Trash } from 'lucide-react';
 
 const BillingPage = () => {
   const dispatch = useDispatch();
@@ -263,14 +265,14 @@ const BillingPage = () => {
       <div className="bg-vercel-surface p-4 rounded-md space-y-6 border-1 border-zinc-800">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div>
-            <label >Target Customer</label>
+            <label>Target Customer</label>
             <select value={selectedCustomerId} disabled={!!editingBillId} onChange={(e) => { setSelectedCustomerId(e.target.value); setCart([]); setSelectedDeviceId(''); setDuplicateBillMatch(null); }}>
               <option value="">Select Customer / Party Profile</option>
               {customers.map(c => <option key={c._id} value={c._id}>{c.name} ({c.phone})</option>)}
             </select>
           </div>
           <div>
-            <label >Intent Purpose</label>
+            <label>Intent Purpose</label>
             <select value={purpose} disabled={!!editingBillId} onChange={(e) => { setPurpose(e.target.value); if (e.target.value !== 'repair') setServiceCharge(0); setDuplicateBillMatch(null); }}>
               <option value="purchase">Standard Sale (Purchase)</option>
               <option value="repair">Service/Hardware Repair</option>
@@ -284,14 +286,14 @@ const BillingPage = () => {
             <p className='text-xs m-0'>Service / Onsite Repair/ Reassembly Labour Charges</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div>
-              <label >Linked Hardware Target</label>
+              <label>Linked Hardware Target</label>
               <select value={selectedDeviceId} disabled={!!editingBillId} onChange={(e) => setSelectedDeviceId(e.target.value)} required>
                 <option value="">Select Profile Associated Device</option>
                 {currentCustomer?.devices?.map(d => <option key={d._id} value={d._id}>{typeof d === 'object' ? d.deviceName : d}</option>)}
               </select>
             </div>
             <div>
-              <label >General Service Charge (₹)</label>
+              <label>General Service Charge (₹)</label>
               <input type="number" value={serviceCharge} onChange={(e) => setServiceCharge(e.target.value)} placeholder="0.00" />
             </div>
           </div>
@@ -299,19 +301,19 @@ const BillingPage = () => {
         )}
 
         <div className='border-1 border-blue-500/20 bg-blue-500/5 p-3 rounded-md'>
-            <p className='text-xs '>Service / Onsite Repair/ Reassembly Labour Charges</p>
+            <p className='text-xs'>Service / Onsite Repair/ Reassembly Labour Charges</p>
           <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
             <div className="col-span-2">
-              <input type="text" placeholder="Description" value={customItemName} onChange={e => setCustomItemName(e.target.value)}  />
+              <input type="text" placeholder="Charge Description.." value={customItemName} onChange={e => setCustomItemName(e.target.value)} />
             </div>
             <div>
-              <input type="number" placeholder="Sell Price ₹" value={customItemPrice} onChange={e => setCustomItemPrice(e.target.value)}  />
+              <input type="number" placeholder="Sell Price ₹" value={customItemPrice} onChange={e => setCustomItemPrice(e.target.value)} />
             </div>
             <div>
-              <input type="number" placeholder="Base Rate ₹" value={customItemBaseRate} onChange={e => setCustomItemBaseRate(e.target.value)}  />
+              <input type="number" placeholder="Base Rate ₹" value={customItemBaseRate} onChange={e => setCustomItemBaseRate(e.target.value)} />
             </div>
             <div>
-              <input type="number" placeholder="Qty" min="1" value={customItemQuantity} onChange={e => setCustomItemQuantity(e.target.value)} />
+              <input type="number" placeholder="Quantity" min="1" value={customItemQuantity} onChange={e => setCustomItemQuantity(e.target.value)} />
             </div>
             <div>
               <Button type="primary" onClick={handleAddCustomCharge} className="py-2" label="Add"></Button>
@@ -325,7 +327,7 @@ const BillingPage = () => {
             <label>Inventory Catalog List</label>
             <input 
               type="text"
-              placeholder="🔍 Search catalog..."
+              placeholder="Search by Product Name"
               value={productSearchKeyword}
               onChange={(e) => setProductSearchKeyword(e.target.value)}
             />
@@ -333,87 +335,89 @@ const BillingPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-1 max-h-[350px] overflow-y-auto pr-1">
             <div className='d-flex w-full bg-vercel-balck border-1 border-zinc-800 text-xs p-2 rounded-t-md'>
-              <div className='w-3/5 '>Name</div>
+              <div className='w-3/5'>Name</div>
               <div className='w-1/5'>Brand</div>
               <div className='w-1/6'>Price</div>
               <div className='w-1/6'>Quantity</div>
             </div>
-            {filteredProductsList.map(p => (
-              <div onClick={() => handleAddItem(p._id)} disabled={p.quantity <= 0}  key={p._id} className="bg-vercel-surface p-2 text-xs text-vercel-secondary d-flex font-semibold rounded-md border-1 border-zinc-800 cursor-pointer hover:bg-white hover:text-vercel-black">
-                <div className='w-3/5 '>{p.name}</div>
-                <div className='w-1/5 '>{p.brand}</div>
-                <div className='w-1/6'>{p.price}</div>
-                <div className='w-1/6'>{p.quantity}</div>
-              </div>
-            ))}
+            {filteredProductsList.map((p) => {
+              const isSelected = cart.some(prod => prod.productId === p._id);
+              
+              return (
+                <div onClick={() => handleAddItem(p._id)} key={p._id} 
+                  className={`p-2 ${isSelected && "bg-white rounded-md text-black"} text-xs text-vercel-secondary d-flex font-semibold hover:rounded-md border-1 border-zinc-800 cursor-pointer hover:bg-white hover:text-vercel-black`}>
+                    <div className='w-3/5'>{p.name}</div>
+                    <div className='w-1/5'>{p.brand}</div>
+                    <div className='w-1/6'>{p.price}</div>
+                    <div className='w-1/6'>{p.quantity}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
     </div>
   );
+
+  const tableHeadData = ["Item Name", "Qty", "Discount", "Rate", "Total", ""];
 
   // Right Pane: Live Cart Manifest & Checkout Action
   const rightPaneContent = (
-    <div className="p-6 w-full h-full flex flex-col justify-between bg-vercel-black border-l border-zinc-800 overflow-y-auto custom-scrollbar">
-      <div>
-        <h2 className="text-base sm:text-lg font-bold text-zinc-200 tracking-tight border-b border-zinc-800 pb-3">Live Invoice Manifest</h2>
-        <div className="space-y-3 my-4">
-          {cart.length === 0 ? (
-            <div className="text-zinc-500 text-xs text-center py-16 italic">Cart manifest layout is empty</div>
-          ) : (
-            cart.map((item) => {
-              const uniqueKey = item.rowKey || item._id || item.productId;
-              return (
-                <div key={uniqueKey} className="flex flex-col gap-2 border-1p-3 rounded-md bg-zinc-950 border-zinc-800">
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs font-bold text-zinc-200">{item.name}</div>
-                      <div className="text-[11px] text-zinc-500">₹{item.price} × {item.orderedQuantity}</div>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xs font-black text-emerald-400">₹{(item.price - (item.discount || 0)) * item.orderedQuantity}</span>
-                      <button onClick={() => handleRemoveItem(uniqueKey)} className="text-[10px] text-red-500 hover:underline block mt-1">Remove</button>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 pt-2 border-t border-zinc-900">
-                    <span className="text-[10px] uppercase text-amber-500 font-bold">Discount:</span>
-                    <input 
-                      type="number"
-                      placeholder="₹0"
-                      value={item.discount === 0 ? '' : item.discount}
-                      onChange={(e) => handleItemDiscountAdjust(uniqueKey, e.target.value)}
-                    />
-                  </div>
-                </div>
-              );
-            })
-          )}
+    <div className="p-6 w-full h-full  overflow-hidden space-y-3">
+      <div className='overflow-hidden bg-vercel-black rounded-md h-[70%] min-h-[70%] max-h-[70%]'>
+        <div className='d-flex justify-between items-center'>
+        <h3 className="text-sm font-bold">Invoice Items</h3>
+        <Button 
+          onClick={handleSubmitBill} 
+          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-md text-xs uppercase tracking-wider transition-all"
+          label={editingBillId ? 'Update Invoice' : 'Create Invoice'}
+          />
+        </div>
+        <div className="overflow-y-scroll space-y-3 my-4 bg-vercel-card border-1 border-zinc-800 rounded-md h-full min-h-full max-h-full">
+          <MiniTable title={null} tableHeadData={tableHeadData} tableData={cart?.map((c) => {
+            const uniqueKey = c.rowKey || c._id || c.productId;
+            return [
+              { text: c.name, subtext: "", align: 'left' },
+              { text: c.price, align: 'left' },
+              { text: c.orderedQuantity, align: 'left' },
+              { 
+                text: <input 
+                        className='w-16'
+                        type="number"
+                        placeholder="₹0"
+                        value={c.discount === 0 ? '' : c.discount}
+                        onChange={(e) => handleItemDiscountAdjust(uniqueKey, e.target.value)}
+                      />, 
+                align: 'left', 
+                bold: true 
+              },
+              { text: `₹${(c.price - (c.discount || 0)) * c.orderedQuantity}`, align: 'left', bold: true },
+              { text: <Button classname='h-fit p-1.5' type='danger' onClick={() => handleRemoveItem(uniqueKey)} label={<Trash size={12}/>}/>, align: 'right', bold: true }
+            ];
+          })} />
         </div>
       </div>
 
-      <div className="border-t border-zinc-800 pt-4 mt-auto space-y-4">
-        <div className="flex items-center justify-between bg-zinc-950 p-3 rounded-md border-1 border-zinc-800">
-          <span className="text-xs font-bold text-zinc-300">Payment Status</span>
-          <div className="inline-flex p-0.5 bg-vercel-black rounded-md space-x-1">
-            <button type="button" onClick={() => setIsPaid(true)} className={`px-3 py-1.5 rounded-md font-bold text-xs uppercase ${isPaid ? 'bg-emerald-600 text-white' : 'text-zinc-500'}`}>Paid</button>
-            <button type="button" onClick={() => setIsPaid(false)} className={`px-3 py-1.5 rounded-md font-bold text-xs uppercase ${!isPaid ? 'bg-red-600 text-white' : 'text-zinc-500'}`}>Unpaid</button>
+      <div className="flex justify-between gap-3 items-center border-t border-zinc-800 pt-3">
+        
+        <div className="d-flex flex-col bg-red-800/50 px-2 py-2 rounded-md border-zinc-800 border-1">
+          <label>Payment Status</label>
+          <div className="inline-flex p-1 bg-vercel-black rounded-md space-x-1">
+            <button type="button" onClick={() => setIsPaid(true)} className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase ${isPaid ? 'bg-red-800 text-white' : 'text-zinc-500'}`}>Paid</button>
+            <button type="button" onClick={() => setIsPaid(false)} className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase ${!isPaid ? 'bg-green-800 text-white' : 'text-zinc-500'}`}>Unpaid</button>
           </div>
         </div>
-
-        <div className="flex justify-between items-center text-sm">
-          <span className="font-semibold text-zinc-400">Total Amount:</span>
-          <span className="text-xl font-black text-emerald-400 font-mono">₹{calculateTotal()}</span>
+        
+        <div className='text-sm border-1 border-zinc-800 rounded-md d-flex items-center justify-center p-2 gap-3 bg-vercel-card'>
+          <span className="font-semibold text-zinc-400">Grand Total:</span>
+          <span className="text-lg font-vercel-primary">₹{calculateTotal()}.00</span>
         </div>
-
-        <button onClick={handleSubmitBill} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-md text-xs uppercase tracking-wider transition-all">
-          {editingBillId ? 'Save & Append Changes' : 'Process Workflow Transaction'}
-        </button>
       </div>
-    </div>
+           </div>
   );
 
   return (
-    <div className='h-screen w-full bg-zinc-950'>
+    <div className='h-screen w-full bg-vercel-black'>
       {printTargetData ? (
         <div className="p-6 max-w-2xl mx-auto space-y-4">
           <div className="p-4 rounded-md flex justify-between items-center border-1 border-zinc-800">
@@ -427,7 +431,7 @@ const BillingPage = () => {
           animationKey={editingBillId || 'pos-checkout'}
           leftPane={leftPaneContent}
           rightPane={rightPaneContent}
-          defaultLeftWidth="62%"
+          defaultLeftWidth="45%"
         />
       )}
     </div>
