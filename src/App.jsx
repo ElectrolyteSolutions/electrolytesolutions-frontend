@@ -13,7 +13,7 @@ import logourl from './assets/icon.png';
 // Lazy loaded pages
 const AuthLandingPage = lazy(() => import('./auth/landing'));
 const DashboardPage = lazy(() => import("./pages/Dashboard"));
-const BillingPage = lazy(() => import('./pages/Billing'));
+const BillingPage = lazy(() => import('./pages/Bills'));
 const DevicesPage = lazy(() => import('./pages/Devices'));
 const CustomersPage = lazy(() => import('./pages/Customers'));
 const ProductsPage = lazy(() => import('./pages/Products'));
@@ -32,7 +32,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
     if (allowedRoles && !allowedRoles?.includes(role)) {
         if (role === 'admin') return <Navigate to="/dashboard" replace />;
-        if (role === 'store') return <Navigate to="/billing" replace />;
+        if (role === 'store') return <Navigate to="/bills" replace />;
         return <Navigate to="/products" replace />;
     }
     
@@ -98,7 +98,7 @@ function App() {
                             path="/" 
                             element={
                                 token ? (
-                                    <Navigate to={role === 'admin' ? '/dashboard' : role === 'store' ? '/billing' : '/products'} replace />
+                                    <Navigate to={role === 'admin' ? '/dashboard' : role === 'store' ? '/bills' : '/products'} replace />
                                 ) : (
                                     <AuthLandingPage />
                                 )
@@ -111,7 +111,7 @@ function App() {
 
                         {/* ADMIN & STORE Routes */}
                         <Route path="/devices" element={<ProtectedRoute allowedRoles={['admin', 'store']}><DevicesPage /></ProtectedRoute>} />
-                        <Route path="/billing" element={<ProtectedRoute allowedRoles={['admin', 'store']}><BillingPage /></ProtectedRoute>} />
+                        <Route path="/bills" element={<ProtectedRoute allowedRoles={['admin', 'store']}><BillingPage /></ProtectedRoute>} />
                         <Route path="/returns" element={<ProtectedRoute allowedRoles={['admin', 'store']}><ReturnsPage /></ProtectedRoute>} />
                         <Route path="/invoice" element={<ProtectedRoute allowedRoles={['admin', 'store']}><InvoiceTemplate /></ProtectedRoute>} />
 

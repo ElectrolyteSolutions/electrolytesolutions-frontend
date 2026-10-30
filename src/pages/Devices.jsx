@@ -103,7 +103,7 @@ const DevicesPage = () => {
       return;
     }
     
-    navigate('/billing', { 
+    navigate('/bills', { 
       state: { 
         autoCustomerId: device.owner._id,
         autoPurpose: 'repair',

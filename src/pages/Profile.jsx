@@ -133,11 +133,7 @@ const ProfilePage = () => {
     <div className="space-y-6 animate-in fade-in duration-500 w-full max-w-[1400px] mx-auto font-sans">
       
       {/* Header Section */}
-      <header className="flex items-center justify-between gap-4 pb-2 border-b border-zinc-800">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Account Settings & Profile</h1>
-        </div>
-      </header>
+      
 
       {isError && (
         <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-xs sm:text-sm">
