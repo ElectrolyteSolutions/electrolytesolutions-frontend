@@ -31,13 +31,13 @@ const getRouteIcon = (path) => {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
       );
-    case '/bills':
+    case '/invoices':
       return (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
         </svg>
       );
-    case '/bills':
+    case '/billing':
       return (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -94,8 +94,9 @@ const Navbar = ({isCollapsed,setIsCollapsed}) => {
           { name: 'Orders', path: '/orders' },
           { name: 'Products', path: '/products' },
           { name: 'Devices', path: '/devices' },
-          { name: 'Billing', path: '/bills' },
           { name: 'Customers', path: '/customers' },
+          { name: 'Invoices', path: '/invoices' },
+          { name: 'Billing', path: '/billing' },
           { name: 'Returns', path: '/returns' },
           { name: 'Profile', path: '/profile' }
         ];
@@ -103,7 +104,8 @@ const Navbar = ({isCollapsed,setIsCollapsed}) => {
         return [
           { name: 'Products', path: '/products' },
           { name: 'Devices', path: '/devices' },
-          { name: 'Billing', path: '/bills' },
+          { name: 'Billing', path: '/billing' },
+          { name: 'Invoices', path: '/invoices' },
           { name: 'Returns', path: '/returns' },
           { name: 'Stores / Customers', path: '/customers' },
           { name: 'Profile', path: '/profile' }

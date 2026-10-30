@@ -112,7 +112,7 @@ const DashboardPage = () => {
 
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto shrink-0">
           <button 
-            onClick={() => navigate('/bills')}
+            onClick={() => navigate('/invoices')}
             className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg transition-all shadow-lg shadow-emerald-600/10 cursor-pointer"
           >
             Open POS Console
@@ -257,7 +257,7 @@ const DashboardPage = () => {
       <div className="bg-vercel-secondary border border-zinc-800/60 rounded-xl shadow-xl overflow-hidden">
         <div className="px-4 sm:px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-vercel-card/20">
           <h3 className="text-sm font-bold text-zinc-200">Recent Invoice Actions</h3>
-          <button onClick={() => navigate('/bills')} className="text-xs text-blue-400 hover:underline cursor-pointer">View All Billing Logs</button>
+          <button onClick={() => navigate('/invoices')} className="text-xs text-blue-400 hover:underline cursor-pointer">View All Billing Logs</button>
         </div>
 
         <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-zinc-800">

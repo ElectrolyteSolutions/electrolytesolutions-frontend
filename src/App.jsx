@@ -3,17 +3,18 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-route
 import { useDispatch, useSelector } from 'react-redux';
 
 import Navbar from './components/navbar';
-import InvoiceTemplate from './components/InvoiceTemplate';
+import InvoiceTemplate from './components/InvoiceModal';
 import { getUserProfile, logout } from './features/authSlice';
 import PublicBillView from './pages/PublicBillView';
 import OrdersPage from './pages/Orders';
 import logourl from './assets/icon.png';
+import Invoices from './pages/Invoices';
 
 
 // Lazy loaded pages
 const AuthLandingPage = lazy(() => import('./auth/landing'));
 const DashboardPage = lazy(() => import("./pages/Dashboard"));
-const BillingPage = lazy(() => import('./pages/Bills'));
+const BillingPage = lazy(() => import('./pages/Billing'));
 const DevicesPage = lazy(() => import('./pages/Devices'));
 const CustomersPage = lazy(() => import('./pages/Customers'));
 const ProductsPage = lazy(() => import('./pages/Products'));
@@ -32,14 +33,15 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
     if (allowedRoles && !allowedRoles?.includes(role)) {
         if (role === 'admin') return <Navigate to="/dashboard" replace />;
-        if (role === 'store') return <Navigate to="/bills" replace />;
+        if (role === 'store') return <Navigate to="/invoices" replace />;
         return <Navigate to="/products" replace />;
     }
     
     return children;
 };
 
-// LAYOUT WRAPPER: Adjusts margins for sidebar vs auth screen
+
+
 const AppLayout = ({ children }) => {
     const location = useLocation();
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -47,23 +49,25 @@ const AppLayout = ({ children }) => {
     const isAuthPage = location.pathname === '/' || curLoc === 'bills';
 
     return (
-        <div className="flex min-h-screen bg-vercel-black text-white overflow-none">
+        <div className="flex h-screen w-screen bg-vercel-black text-white overflow-hidden">
             {/* Vercel-style Sidebar (Hidden on auth/public bill views) */}
             {!isAuthPage && <Navbar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />}
 
-            {/* Main Content Area: Automatically adjusts left padding based on whether the sidebar is collapsed or expanded */}
-            <div className={`flex flex-col flex-grow min-h-screen transition-all overflow-none duration-300 ${
+            {/* Main Content Area */}
+            <div className={`flex flex-col flex-grow h-screen transition-all duration-300 overflow-hidden ${
                 !isAuthPage 
                     ? (isCollapsed ? 'lg:pl-20 pt-16 lg:pt-0' : 'lg:pl-64 pt-16 lg:pt-0') 
                     : 'w-full'
             }`}>
-                <main className={`flex flex-col flex-grow h-screen overflow-hidden ${!isAuthPage ? 'w-full' : 'w-full'}`}>
-                    {!isAuthPage && <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full border-b border-zinc-800 px-6 py-4 overflow-hidden shrink-0 bg-vercel-black">
-                        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight capitalize">{curLoc}</h1>
-                    </header>}
+                <main className="flex flex-col flex-grow h-full w-full overflow-hidden">
+                    {!isAuthPage && (
+                        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full border-b border-zinc-800 px-6 py-4 overflow-hidden shrink-0 bg-vercel-black">
+                            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight capitalize">{curLoc}</h1>
+                        </header>
+                    )}
 
-                    {/* Only scrollable section */}
-                    <div className='flex-grow overflow-none h-[calc(100vh-120px)] custom-scrollbar bg-vercel-black '>
+                    {/* Strict bounded content viewport */}
+                    <div className='flex-grow h-full w-full overflow-hidden bg-vercel-black'>
                         {children}
                     </div>
                 </main>
@@ -71,6 +75,7 @@ const AppLayout = ({ children }) => {
         </div>
     );
 };
+
 
 function App() {
     const { token, role } = useSelector(state => state.auth);
@@ -98,7 +103,7 @@ function App() {
                             path="/" 
                             element={
                                 token ? (
-                                    <Navigate to={role === 'admin' ? '/dashboard' : role === 'store' ? '/bills' : '/products'} replace />
+                                    <Navigate to={role === 'admin' ? '/dashboard' : role === 'store' ? '/invoices' : '/products'} replace />
                                 ) : (
                                     <AuthLandingPage />
                                 )
@@ -111,9 +116,10 @@ function App() {
 
                         {/* ADMIN & STORE Routes */}
                         <Route path="/devices" element={<ProtectedRoute allowedRoles={['admin', 'store']}><DevicesPage /></ProtectedRoute>} />
-                        <Route path="/bills" element={<ProtectedRoute allowedRoles={['admin', 'store']}><BillingPage /></ProtectedRoute>} />
+                        <Route path="/invoices" element={<ProtectedRoute allowedRoles={['admin', 'store']}><Invoices /></ProtectedRoute>} />
                         <Route path="/returns" element={<ProtectedRoute allowedRoles={['admin', 'store']}><ReturnsPage /></ProtectedRoute>} />
                         <Route path="/invoice" element={<ProtectedRoute allowedRoles={['admin', 'store']}><InvoiceTemplate /></ProtectedRoute>} />
+                        <Route path="/billing" element={<ProtectedRoute allowedRoles={['admin', 'store']}><BillingPage /></ProtectedRoute>} />
 
                         {/* EVERYONE Routes */}
                         <Route path="/products" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><ProductsPage /></ProtectedRoute>} />

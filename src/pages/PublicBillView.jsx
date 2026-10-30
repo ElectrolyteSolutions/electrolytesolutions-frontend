@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import BillReceiptCore from '../components/BillReceiptCore';
+import BillReceiptCore from '../components/InvoiceTemplate';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
 

@@ -15,7 +15,11 @@ const GlobalTable = ({ title = "title", filteredList, status, selectedItem, setS
             <thead className="sticky top-0 z-10 bg-vercel-surface backdrop-blur-sm">
               <tr className="border-b border-zinc-800 text-sm font-semibold text-vercel-secondary text-left">
                 {tableHead.map((item, idx) => {
-                  return <th key={idx} onClick={item?.onClick} className={`truncate ${item.class}`}>{item.label}</th>;
+                  return <th key={idx} onClick={item?.onClick} style={{
+                    width:item?.width,
+                    maxWidth:item?.width,
+                    minWidth:item?.width,
+                  }} className={`truncate text-xs px-3 py-2 ${item.class}`}>{item.label}</th>;
                 })}
               </tr>
             </thead>
@@ -25,7 +29,11 @@ const GlobalTable = ({ title = "title", filteredList, status, selectedItem, setS
                   return (
                     <tr key={item} className="transition-all animate-pulse">
                       {tableData(tableHead)?.map((data, idx) => (
-                        <td key={idx} className={data.class}>
+                        <td key={idx} style={{
+                          width:tableHead[idx]?.width,
+                          maxWidth:tableHead[idx]?.width,
+                          minWidth:tableHead[idx]?.width
+                        }} className='text-xs px-3 py-2'>
                           <div className="h-4 bg-zinc-900 rounded w-full"></div>
                         </td>
                       ))}
@@ -52,7 +60,11 @@ const GlobalTable = ({ title = "title", filteredList, status, selectedItem, setS
                       }`}
                     >
                       {tableData(item)?.map((data, idx) => (
-                        <td key={idx} className={`truncate ${data?.class}`}>
+                        <td key={idx} style={{
+                          width:tableHead[idx]?.width,
+                          maxWidth:tableHead[idx]?.width,
+                          minWidth:tableHead[idx]?.width
+                        }} className={`truncate text-xs px-3 py-2 ${tableHead[idx]?.class}`}>
                           {data?.value}
                         </td>
                       ))}
