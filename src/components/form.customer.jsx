@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { checkEmailAvailability } from '../features/customerSlice';
 import { formatIsoDate } from '../functions/formatIsoDate';
-import CustomList from './CustomList';
+import CustomList from './list';
 
 const CustomerDetails = ({
   form,

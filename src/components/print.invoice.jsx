@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import InvoiceTemplate from './InvoiceTemplate';
+import InvoiceTemplate from './template.invoice';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
-import Button from './Button';
+import Button from './button';
 
 const InvoiceWrapper = ({ billData, onClose,promptDeleteBill }) => {
   const printRef = useRef();

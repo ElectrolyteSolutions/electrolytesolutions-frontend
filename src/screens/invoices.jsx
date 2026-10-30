@@ -1,14 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBills, deleteBill } from '../features/billingSlice';
-import ResizablePanes from '../components/TwoPaneLayout';
+import ResizablePanes from '../components/table.extralarge';
 import Header from '../components/SearchHeader';
-import GlobalTable from '../components/GlobalTable';
-import InvoiceTemplate from '../components/InvoiceModal';
+import GlobalTable from '../components/table.large';
 import { useToast } from '../context/ToastContext';
-import BillDetail from '../components/BillDetail';
-import Badge from '../components/Badge';
-import InvoiceWrapper from '../components/InvoiceViewer';
+import Badge from '../components/badge';
+import InvoiceWrapper from '../components/print.invoice';
 
 const statusOptions = [
   { label: 'All Invoices', value: 'all' },
@@ -101,7 +99,6 @@ function handleClose(){
       {value: `₹${bill?.profit}.00` }
     ];
   }
-  console.log(selectedBill)
 
   const leftPaneContent = (
     <div className="p-6 w-full h-full flex flex-col">

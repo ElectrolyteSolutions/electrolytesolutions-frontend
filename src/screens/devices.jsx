@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom'; 
 import { getDevices, addDevice, updateDevice, deleteDevice, getDeviceByType } from '../features/deviceSlice'; 
 import { getCustomers } from '../features/customerSlice';
-import ResizablePanes from '../components/TwoPaneLayout';
+import ResizablePanes from '../components/table.extralarge';
 import Header from '../components/SearchHeader';
-import Button from '../components/Button';
-import GlobalTable from '../components/GlobalTable';
-import Badge from '../components/Badge';
+import Button from '../components/button';
+import GlobalTable from '../components/table.large';
+import Badge from '../components/badge';
 import { useToast } from '../context/ToastContext'; // Imported Toast Context
-import DeviceDetails from '../components/DeviceDetails';
+import DeviceDetails from '../components/form.device';
 
 const statusOptions = [
   { value: "all", label: "All Statuses" },

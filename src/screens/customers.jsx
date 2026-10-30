@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCustomers, addCustomer, updateCustomer, deleteCustomer } from '../features/customerSlice';
-import ResizablePanes from '../components/TwoPaneLayout';
+import ResizablePanes from '../components/table.extralarge';
 import Header from '../components/SearchHeader';
-import Button from '../components/Button';
-import GlobalTable from '../components/GlobalTable';
-import ConfirmModal from '../components/ConfirmModal';
+import Button from '../components/button';
+import GlobalTable from '../components/table.large';
+import ConfirmModal from '../components/modal.prompt';
 import { useToast } from '../context/ToastContext';
-import CustomerDetails from '../components/CustomerDetails';
-import Badge from '../components/Badge';
+import CustomerDetails from '../components/form.customer';
+import Badge from '../components/badge';
 
 const statusOptions = [
   { value: "all", label: "All Customers" },

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import BillReceiptCore from './InvoiceTemplate';
+import BillReceiptCore from './template.invoice';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
 

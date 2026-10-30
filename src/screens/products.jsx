@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProducts, addProduct, updateProduct, deleteProduct } from '../features/productSlice';
-import ResizablePanes from '../components/TwoPaneLayout';
+import ResizablePanes from '../components/table.extralarge';
 import Header from '../components/SearchHeader';
-import Button from '../components/Button';
-import GlobalTable from '../components/GlobalTable';
-import ProductDetails from '../components/ProductDetails';
-import ConfirmModal from '../components/ConfirmModal';
+import Button from '../components/button';
+import GlobalTable from '../components/table.large';
+import ProductDetails from '../components/form.product';
+import ConfirmModal from '../components/modal.prompt';
 import { useToast } from '../context/ToastContext';
-import Badge from '../components/Badge';
+import Badge from '../components/badge';
 
 const statusOptions = [
   { value: "all", label: "All Products" },

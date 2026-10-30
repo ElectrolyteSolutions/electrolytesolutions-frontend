@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getOrders, updateOrderStatus } from '../features/orderSlice';
-import ResizablePanes from '../components/TwoPaneLayout';
+import ResizablePanes from '../components/table.extralarge';
 import Header from '../components/SearchHeader';
-import SkeletonLoader from '../components/SkeletonLoaderTable';
-import Badge from '../components/Badge';
-import GlobalTable from '../components/GlobalTable';
-import OrderDetails from '../components/OrderDetails';
+import Badge from '../components/badge';
+import GlobalTable from '../components/table.large';
+import OrderDetails from '../components/form.order';
 import { useToast } from '../context/ToastContext';
 
 const statusOptions = [

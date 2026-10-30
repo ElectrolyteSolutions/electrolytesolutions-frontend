@@ -1,7 +1,7 @@
 import React from 'react';
-import CustomList from './CustomList';
-import VercelDropdown from './DropdownBox';
-import MiniTable from './MiniTable';
+import CustomList from './list';
+import VercelDropdown from './dropdown';
+import MiniTable from './table.small';
 
 const OrderDetails = ({ selectedOrder, handleStatusChange }) => {
   if (!selectedOrder) return null;

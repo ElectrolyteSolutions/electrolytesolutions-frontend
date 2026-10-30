@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Button from './Button';
-import CustomList from './CustomList';
+import Button from './button';
+import CustomList from './list';
 import { formatIsoDate } from '../functions/formatIsoDate';
 
 const DeviceDetails = ({

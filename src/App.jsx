@@ -5,21 +5,21 @@ import { useDispatch, useSelector } from 'react-redux';
 import Navbar from './components/navbar';
 import InvoiceTemplate from './components/InvoiceModal';
 import { getUserProfile, logout } from './features/authSlice';
-import PublicBillView from './pages/PublicBillView';
-import OrdersPage from './pages/Orders';
+import PublicBillView from './screens/PublicBillView';
+import OrdersPage from './screens/orders';
 import logourl from './assets/icon.png';
-import Invoices from './pages/Invoices';
+import Invoices from './screens/invoices';
 
 
 // Lazy loaded pages
 const AuthLandingPage = lazy(() => import('./auth/landing'));
-const DashboardPage = lazy(() => import("./pages/Dashboard"));
-const BillingPage = lazy(() => import('./pages/Billing'));
-const DevicesPage = lazy(() => import('./pages/Devices'));
-const CustomersPage = lazy(() => import('./pages/Customers'));
-const ProductsPage = lazy(() => import('./pages/Products'));
-const ReturnsPage = lazy(() => import('./pages/Returns'));
-const ProfilePage = lazy(() => import('./pages/Profile'));
+const DashboardPage = lazy(() => import("./screens/dashboard"));
+const BillingPage = lazy(() => import('./screens/billing'));
+const DevicesPage = lazy(() => import('./screens/devices'));
+const CustomersPage = lazy(() => import('./screens/customers'));
+const ProductsPage = lazy(() => import('./screens/products'));
+const ReturnsPage = lazy(() => import('./screens/Returns'));
+const ProfilePage = lazy(() => import('./screens/profile'));
 
 // ⚡ SECURITY WRAPPER: Enforces login AND Role permissions
 const ProtectedRoute = ({ children, allowedRoles }) => {

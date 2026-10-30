@@ -5,10 +5,10 @@ import axios from 'axios';
 import { getCustomers } from '../features/customerSlice';
 import { getProducts } from '../features/productSlice';
 import { createInvoice, getBills } from '../features/billingSlice';
-import ResizablePanes from '../components/TwoPaneLayout';
+import ResizablePanes from '../components/table.extralarge';
 import InvoiceTemplate from '../components/InvoiceModal'; 
-import Button from '../components/Button';
-import MiniTable from '../components/MiniTable';
+import Button from '../components/button';
+import MiniTable from '../components/table.small';
 import { Trash } from 'lucide-react';
 
 const BillingPage = () => {
