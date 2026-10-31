@@ -90,15 +90,15 @@ const Navbar = ({isCollapsed,setIsCollapsed}) => {
     switch (role) {
       case 'admin':
         return [
-          { name: 'Dashboard', path: '/dashboard' },
-          { name: 'Orders', path: '/orders' },
-          { name: 'Products', path: '/products' },
-          { name: 'Devices', path: '/devices' },
-          { name: 'Customers', path: '/customers' },
-          { name: 'Invoices', path: '/invoices' },
-          { name: 'Billing', path: '/billing' },
-          { name: 'Returns', path: '/returns' },
-          { name: 'Profile', path: '/profile' }
+          { name: 'Dashboard (Beta)', path: '/dashboard' },
+          { name: 'Orders (Beta)', path: '/orders' },
+          { name: 'Products (Beta)', path: '/products' },
+          { name: 'Devices (Beta)', path: '/devices' },
+          { name: 'Customers (Beta)', path: '/customers' },
+          { name: 'Invoices (Beta)', path: '/invoices' },
+          { name: 'Billing (Beta)', path: '/billing' },
+          { name: 'Returns (Beta)', path: '/returns' },
+          { name: 'Profile (Beta)', path: '/profile' }
         ];
       case 'store':
         return [

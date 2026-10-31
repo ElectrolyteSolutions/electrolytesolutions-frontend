@@ -71,7 +71,7 @@ const DashboardPage = () => {
   const quoteCount = bills.filter(b => b.purpose === 'quotation').length;
 
   return (
-    <div className="max-w-[1600px] overflow-y-scroll mx-auto text-zinc-100 bg-zinc-950 min-h-screen space-y-6 animate-in fade-in duration-500 p-3 sm:p-6 w-full">
+    <div className="bg-vercel-black max-w-[1600px] overflow-y-scroll mx-auto text-zinc-100  min-h-screen space-y-6 animate-in fade-in duration-500 p-3 sm:p-6 w-full">
       
       {/* Dashboard Greetings & Profile Details Header */}
       <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-zinc-800 pb-6">
