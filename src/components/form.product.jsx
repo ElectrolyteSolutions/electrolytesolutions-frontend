@@ -80,7 +80,7 @@ const ProductDetails = ({
               value={form.name}
               onChange={e => setForm({ ...form, name: e.target.value })}
               required
-              className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+              
             />
           </div>
           <div>
@@ -91,7 +91,7 @@ const ProductDetails = ({
               value={form.brand}
               onChange={e => setForm({ ...form, brand: e.target.value })}
               required
-              className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+              
             />
           </div>
         </div>
@@ -105,7 +105,7 @@ const ProductDetails = ({
               placeholder="https://example.com/image.jpg"
               value={tempImageUrl}
               onChange={e => setTempImageUrl(e.target.value)}
-              className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+              
             />
             <Button
               type="button"
@@ -134,12 +134,12 @@ const ProductDetails = ({
               value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })}
               required
-              className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+              
             />
           </div>
 
           <div className="space-y-3 w-full">
-            <label className="text-[11px] block mb-1">Product Specification</label>
+            <label >Product Specification</label>
             {details.map((detail, index) => (
               <div key={index} className="flex flex-row gap-2 w-full items-center">
                 <input
@@ -148,7 +148,7 @@ const ProductDetails = ({
                   placeholder="Title"
                   value={detail.title}
                   onChange={(e) => handleInputChange(index, e)}
-                  className='w-48 bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white'
+                  className='w-2/5 '
                 />
                 <input
                   type="text"
@@ -157,7 +157,7 @@ const ProductDetails = ({
                   value={detail.content}
                   onChange={(e) => handleInputChange(index, e)}
                   required={detail?.title}
-                  className='w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white'
+                  className='w-full '
                 />
                 {details.length > 1 && (
                   <Button 
@@ -189,7 +189,7 @@ const ProductDetails = ({
                 value={form.collections[0] || ''}
                 onChange={e => setForm({ ...form, collections: [e.target.value] })}
                 required
-                className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+                
               >
                 <option value="">Select Category Collection</option>
                 {availableCollections.map(col => (
@@ -215,7 +215,7 @@ const ProductDetails = ({
                 placeholder="Collection Title"
                 value={newCollectionTitle}
                 onChange={e => setNewCollectionTitle(e.target.value)}
-                className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+                
               />
               <Button
                 type="button"
@@ -241,7 +241,7 @@ const ProductDetails = ({
                 <select 
                   value={form.type || ''}
                   onChange={e => setForm({ ...form, type: e.target.value })}
-                  className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+                  
                 >
                   <option value="">Select Product Type</option>
                   {availableTypes.map((t, index) => (
@@ -256,7 +256,7 @@ const ProductDetails = ({
                   value={form.type || ''}
                   onChange={e => setForm({ ...form, type: e.target.value })}
                   required
-                  className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+                  
                 />
               )}
             
@@ -290,7 +290,7 @@ const ProductDetails = ({
                 placeholder="e.g. 8517"
                 value={form.hsn}
                 onChange={e => setForm({ ...form, hsn: e.target.value })}
-                className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+                
               />
             </div>
             <div>
@@ -301,7 +301,7 @@ const ProductDetails = ({
                 value={form.quantity}
                 onChange={e => setForm({ ...form, quantity: e.target.value })}
                 required
-                className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+                
               />
             </div>
             <div>
@@ -310,7 +310,7 @@ const ProductDetails = ({
                 value={form.status}
                 onChange={e => setForm({ ...form, status: e.target.value })}
                 required
-                className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+                
               >
                 <option value="">Select status</option>
                 {[
@@ -339,7 +339,7 @@ const ProductDetails = ({
                 value={form.price}
                 onChange={e => setForm({ ...form, price: e.target.value })}
                 required
-                className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+                
               />
             </div>
             <div>
@@ -349,7 +349,7 @@ const ProductDetails = ({
                 type="number"
                 value={form.orignalPrice}
                 onChange={e => setForm({ ...form, orignalPrice: e.target.value })}
-                className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+                
               />
             </div>
             <div>
@@ -360,7 +360,7 @@ const ProductDetails = ({
                 value={form.baseRate}
                 onChange={e => setForm({ ...form, baseRate: e.target.value })}
                 required
-                className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+                
               />
             </div>
             <div>
@@ -383,7 +383,7 @@ const ProductDetails = ({
               placeholder="e.g. iphone-oled-panel"
               value={form.slug}
               onChange={e => setForm({ ...form, slug: e.target.value })}
-              className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+              
             />
           </div>  
           <div>
@@ -392,7 +392,7 @@ const ProductDetails = ({
               placeholder="e.g. Meta description summary"
               value={form.seoMetaDescription}
               onChange={e => setForm({ ...form, seoMetaDescription: e.target.value })}
-              className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+              
             />
           </div>  
           <div>
@@ -401,7 +401,7 @@ const ProductDetails = ({
               placeholder="e.g. iphone, oled, display"
               value={form.seoKeywords}
               onChange={e => setForm({ ...form, seoKeywords: e.target.value })}
-              className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-white"
+              
             />
           </div>  
         </div>
