@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const VercelDropdown = ({ value, onSelect ,rightOptions=[],type="light"}) => {
+const VercelDropdown = ({loading=false, value, onSelect ,rightOptions=[],type="light"}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -31,6 +31,7 @@ const VercelDropdown = ({ value, onSelect ,rightOptions=[],type="light"}) => {
         onClick={() => setIsOpen(!isOpen)}
         className="inline-flex items-center justify-between gap-3 bg-white text-black px-3 py-2 rounded-md text-sm font-semibold hover:opacity-80 transition-all cursor-pointer shadow-sm border-white border-1"
       >
+        {loading && <div className="loader"></div>}
         <span>{value.label || value}</span>
         <svg 
           className={`w-5 h-5 text-black transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
@@ -49,7 +50,7 @@ const VercelDropdown = ({ value, onSelect ,rightOptions=[],type="light"}) => {
           
         {/* Right Column */}
             {rightOptions.map((item) => {
-              const isActive = (value?.value) === item?.value ? true : false;
+              const isActive = (value?.value || value) === item?.value ? true : false;
               return <button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
@@ -59,6 +60,7 @@ const VercelDropdown = ({ value, onSelect ,rightOptions=[],type="light"}) => {
                     : 'text-vercel-secondary hover:text-vercel-primary hover:bg-vercel-hover'
                 }`}
               ><div>
+                
                 {item.icon && <span className="shrink-0">{item.icon}</span>}
                 <span className={`shrink-0 ${isActive ? 'text-vercel-primary' : 'text-vercel-secondary group-hover:text-vercel-primary'}`}>{item.label}</span>
                 </div>
