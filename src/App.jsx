@@ -9,7 +9,7 @@ import PublicBillView from './screens/PublicBillView';
 import OrdersPage from './screens/orders';
 import logourl from './assets/icon.png';
 import Invoices from './screens/invoices';
-
+import CardSuspense from './components/card.suspense';
 
 // Lazy loaded pages
 const AuthLandingPage = lazy(() => import('./auth/landing'));
@@ -39,8 +39,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     
     return children;
 };
-
-
 
 const AppLayout = ({ children }) => {
     const location = useLocation();
@@ -76,38 +74,40 @@ const AppLayout = ({ children }) => {
     );
 };
 
-
 function App() {
-    const { token, role } = useSelector(state => state.auth);
+    const { token, isLoading, role, profileData } = useSelector(state => state.auth);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(getUserProfile());
-    }, [dispatch]);
+        if (token) {
+            dispatch(getUserProfile());
+        }
+    }, [dispatch, token]);
+
+    // If user has a token but profile details haven't loaded yet, show suspense card
+    const location = useLocation ? window.location.pathname : '/';
+    const isPublicRoute = window.location.pathname === '/' || window.location.pathname.startsWith('/bills/');
+
+    if (token && !isPublicRoute && (isLoading || !profileData)) {
+        return (
+            <div className="h-screen w-screen bg-vercel-black flex items-center justify-center">
+                <CardSuspense />
+            </div>
+        );
+    }
 
     return (
         <BrowserRouter>
             <AppLayout>
-                <Suspense 
-                    fallback={
-                        <div className="flex items-center justify-center flex-col item-center h-full w-full animate-pulse text-zinc-400">
-                            <img src={logourl} className='h-12 w-12'></img>
-                            <div className="font-normal text-xs">Loading...</div>
-                        </div>
-                    }
-                >
+                <Suspense fallback={<CardSuspense />}>
                     <Routes>
                         <Route path="/bills/:token" element={<PublicBillView />} />
-
-                        <Route 
-                            path="/" 
-                            element={
-                                token ? (
-                                    <Navigate to={role === 'admin' ? '/dashboard' : role === 'store' ? '/invoices' : '/products'} replace />
-                                ) : (
-                                    <AuthLandingPage />
-                                )
-                            } 
+                        <Route path="/" element={token ? (
+                                <Navigate to={role === 'admin' ? '/dashboard' : role === 'store' ? '/invoices' : '/products'} replace />
+                            ) : (
+                                <AuthLandingPage />
+                            )
+                        } 
                         />
 
                         {/* ADMIN ONLY Routes */}
