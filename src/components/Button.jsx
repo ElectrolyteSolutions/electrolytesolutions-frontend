@@ -1,6 +1,7 @@
 import React from 'react';
 
 const Button = ({
+  buttontype="button",
   onClick = null,
   icon = null,
   label = null,
@@ -24,13 +25,12 @@ const Button = ({
   return (
     <button
       {...props}
-      type="button"
+      type={buttontype}
       onClick={onClick}
-      className={`inline-flex ${classname} items-center justify-between gap-3 px-2.5 rounded-md text-xs font-semibold transition-all cursor-pointer shadow-sm border-1 text-nowrap ${selectedTypeStyle}`}
+      className={`inline-flex ${classname} items-center justify-between gap-1 px-2.5 rounded-md text-xs font-semibold transition-all cursor-pointer shadow-sm border-1 text-nowrap ${selectedTypeStyle}`}
     >
     {loading ? <div className='loader'/>: icon}
       {label}
-      {icon}
     </button>
   );
 };

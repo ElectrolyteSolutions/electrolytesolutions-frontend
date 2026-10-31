@@ -17,8 +17,10 @@ const statusOptions = [
 
 const ProductsPage = () => {
   const dispatch = useDispatch();
-  const { items, status,error } = useSelector((state) => state.products);
+  const [loading,setLoading]=useState(false)
+  const { items, status, error } = useSelector((state) => state.products);
   const { addToast } = useToast();
+  const [details, setDetails] = useState([{ title: '', content: '' }]);
   
   const { user } = useSelector((state) => state.auth);
   const isCustomer = user?.role === 'customer';
@@ -34,6 +36,29 @@ const ProductsPage = () => {
   
   const [availableCollections, setAvailableCollections] = useState([]);
   const [availableTypes, setAvailableTypes] = useState([]);
+
+  const handleInputChange = (index, event) => {
+  const { name, value } = event.target;
+  setDetails(prevDetails => {
+    const updatedDetails = [...prevDetails];
+    updatedDetails[index] = {
+      ...updatedDetails[index],
+      [name]: value
+    };
+    return updatedDetails;
+  });
+};
+  
+  const addDetailRow = () => {
+    setDetails([...details, { title: '', content: '' }]);
+  };
+
+  const removeDetailRow = (index) => {
+    if (details.length > 1) {
+      const updatedDetails = details.filter((_, i) => i !== index);
+      setDetails(updatedDetails);
+    }
+  };
 
   const [form, setForm] = useState({ 
     erpProductId: '',
@@ -51,7 +76,7 @@ const ProductsPage = () => {
     seoKeywords: '',
     hsn: '',
     type: '',
-    status:"",
+    status: "",
     isCustomType: false
   });
 
@@ -95,25 +120,23 @@ const ProductsPage = () => {
         setIsCreatingCollection(false);
         addToast("Collection created successfully!", "success");
       } else {
-        addToast(res.error || res.data.error || 'Failed to create collection', "error");
+        addToast(data.error || 'Failed to create collection', "error");
       }
     } catch (err) {
       console.error("Error saving inline collection:", err);
-      addToast(err || 'Network error while creating collection.', "error");
+      addToast('Network error while creating collection.', "error");
     } finally {
       setCreatingCollectionLoading(false);
     }
   };
 
   useEffect(() => {
-    const payloadQueryOptions = {
+    dispatch(getProducts({
       search: searchTerm,
       sortBy: currentSortBy,
       sortOrder: currentSortOrder,
       ...(stockFilter.value === 'low-stock' && { alert: 'low-stock' })
-    };
-
-    dispatch(getProducts(payloadQueryOptions));
+    }));
     fetchLookups();
   }, [dispatch, searchTerm, stockFilter, currentSortBy, currentSortOrder]);
 
@@ -159,10 +182,15 @@ const ProductsPage = () => {
       seoKeywords: product.seo?.keywords ? product.seo.keywords.join(', ') : '',
       images: product?.images && product.images.length > 0 ? [...product.images] : [],
       hsn: product.hsn || '',
-      status: product.status,
+      status: product.status || 'active',
       type: product.type || '',
       isCustomType: false
     });
+    if (product.details && product.details.length > 0) {
+      setDetails(product.details);
+    } else {
+      setDetails([{ title: '', content: '' }]);
+    }
     setEditId(product._id);
   };
 
@@ -184,19 +212,22 @@ const ProductsPage = () => {
       seoMetaDescription: '', 
       seoKeywords: '',
       hsn: '',
-      status: 'Active',
+      status: 'active',
       type: '',
       isCustomType: false
     });
+    setDetails([{ title: '', content: '' }]);
     setEditId(null);
   };
 
   const handleSave = (e) => {
+    setLoading(true)
     e.preventDefault();
     const { isCustomType, ...cleanForm } = form;
     
     const payload = {
       ...cleanForm,
+      details,
       seo: {
         metaTitle: form.name,
         metaDescription: form.seoMetaDescription,
@@ -206,21 +237,23 @@ const ProductsPage = () => {
 
     if (editId) {
       dispatch(updateProduct({ id: editId, data: payload }))
-        .unwrap()
-        .then(() => {
-          addToast("Product updated successfully!", "success");
-          refreshDataLogs();
-        })
-        .catch((err) => addToast(error || "Failed to update product.", "error"));
-    } else {
-      dispatch(addProduct(payload))
+      .unwrap()
+      .then(() => {
+        addToast("Product updated successfully!", "success");
+        refreshDataLogs();
+        setLoading(false)
+      })
+        .catch((err) => addToast(err?.message || error || "Failed to update product.", "error"));
+      } else {
+        dispatch(addProduct(payload))
         .unwrap()
         .then(() => {
           addToast("Product created successfully!", "success");
           refreshDataLogs();
           setIsAddingNew(false);
+          setLoading(false)
         })
-        .catch((err) => addToast(error || "Failed to create product.", "error"));
+        .catch((err) => addToast(err?.message || error || "Failed to create product.", "error"));
     }
   };
 
@@ -288,13 +321,10 @@ const ProductsPage = () => {
         ), 
         class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4" 
       },    
-      { label: 'Status', value: <Badge title={p.status} 
-      type={p.status==="draft"?"dark":"light"}
-       ></Badge>, class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8" },
+      { label: 'Status', value: <Badge title={p.status} type={p.status==="draft"?"dark":"light"}></Badge>, class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8" },
       { label: 'Type', value: p.type, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
       { label: 'Category', value: p?.collections?.map((col) => col.title).join(","), class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
       { label: 'HSN', value: p.hsn, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
-      
     ];
   }
 
@@ -325,7 +355,7 @@ const ProductsPage = () => {
       <GlobalTable
         title="Products Inventory"
         tableHead={productsTableHead}
-        filteredList={items.map((p, idx) => ({ ...p, sno: idx + 1 }))}
+        filteredList={(items || []).map((p, idx) => ({ ...p, sno: idx + 1 }))}
         status={status}
         selectedItem={selectedProduct}
         setSelectedItem={handleSelectProduct}
@@ -342,7 +372,12 @@ const ProductsPage = () => {
         rightPane={
           (selectedProduct !== undefined || isAddingNew) ? (
             <ProductDetails
+              loading={loading}
+              addDetailRow={addDetailRow}
+              handleInputChange={handleInputChange}
+              removeDetailRow={removeDetailRow}
               form={form}
+              details={details}
               setForm={setForm}
               editId={editId}
               handleSave={handleSave}
@@ -354,7 +389,7 @@ const ProductsPage = () => {
               setNewCollectionTitle={setNewCollectionTitle}
               creatingCollectionLoading={creatingCollectionLoading}
               handleQuickCreateCollection={handleQuickCreateCollection}
-              promptDeleteProduct={()=>promptDeleteProduct(selectedProduct)}
+              promptDeleteProduct={() => promptDeleteProduct(selectedProduct)}
             />
           ) : null
         }
