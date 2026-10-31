@@ -75,7 +75,7 @@ const ProductDetails = ({
         <p className='text-xs'>Product Overview</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div>
-            <label className="text-[11px] block mb-1">Product Name</label>
+            <label >Product Name</label>
             <textarea maxLength={250} rows={1} placeholder="e.g. iPhone OLED Panel"
               value={form.name}
               onChange={e => setForm({ ...form, name: e.target.value })}
@@ -84,7 +84,7 @@ const ProductDetails = ({
             />
           </div>
           <div>
-            <label className="text-[11px] block mb-1">Brand</label>
+            <label >Brand</label>
             <input
               maxLength={50}
               placeholder="e.g. Apple"
@@ -99,7 +99,7 @@ const ProductDetails = ({
         {/* Product Description */}
         <p className='text-xs'>Product Description</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
-          <label className="text-[11px] block mb-1">Product Images (Add Image URLs)</label>
+          <label >Product Images (Add Image URLs)</label>
           <div className='flex flex-row justify-between gap-2'>
             <input
               placeholder="https://example.com/image.jpg"
@@ -127,7 +127,7 @@ const ProductDetails = ({
           </div>
       
           <div>
-            <label className="text-[11px] block mb-1">Full Description</label>
+            <label >Full Description</label>
             <textarea
               maxLength={2000}
               rows={8}
@@ -235,7 +235,7 @@ const ProductDetails = ({
           )}
 
           <div>
-            <label className="text-[11px] block mb-1">Product Type</label>
+            <label >Product Type</label>
             <div className='flex flex-row gap-2'>
               {!isAddingNewType ? (
                 <select 
@@ -284,7 +284,7 @@ const ProductDetails = ({
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div>
-              <label className="text-[11px] block mb-1">HSN Code</label>
+              <label >HSN Code</label>
               <input
                 maxLength={10}
                 placeholder="e.g. 8517"
@@ -294,7 +294,7 @@ const ProductDetails = ({
               />
             </div>
             <div>
-              <label className="text-[11px] block mb-1">Quantity</label>
+              <label >Quantity</label>
               <input
                 max={500}
                 type="number"
@@ -305,7 +305,7 @@ const ProductDetails = ({
               />
             </div>
             <div>
-              <label className="text-[11px] block mb-1">Status</label>
+              <label >Status</label>
               <select
                 value={form.status}
                 onChange={e => setForm({ ...form, status: e.target.value })}
@@ -332,7 +332,7 @@ const ProductDetails = ({
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md'>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div>
-              <label className="text-[11px] block mb-1">MRP (₹)</label>
+              <label >MRP (₹)</label>
               <input
                 maxLength={6}
                 type="number"
@@ -343,7 +343,7 @@ const ProductDetails = ({
               />
             </div>
             <div>
-              <label className="text-[11px] block mb-1">Original Price</label>
+              <label >Original Price</label>
               <input
                 maxLength={6}
                 type="number"
@@ -353,7 +353,7 @@ const ProductDetails = ({
               />
             </div>
             <div>
-              <label className="text-[11px] block mb-1">Base Rate</label>
+              <label >Base Rate</label>
               <input
                 maxLength={6}
                 type="number"
@@ -364,7 +364,7 @@ const ProductDetails = ({
               />
             </div>
             <div>
-              <label className="text-[11px] block mb-1">Profit</label>
+              <label >Profit</label>
               <input
                 value={calculateProfit()}
                 disabled
@@ -378,7 +378,7 @@ const ProductDetails = ({
         <p className='text-xs font-semibold text-zinc-300'>SEO Management</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div>
-            <label className="text-[11px] block mb-1">Slug URL Parameter</label>
+            <label >Slug URL Parameter</label>
             <input
               placeholder="e.g. iphone-oled-panel"
               value={form.slug}
@@ -387,7 +387,7 @@ const ProductDetails = ({
             />
           </div>  
           <div>
-            <label className="text-[11px] block mb-1">SEO Meta Description</label>
+            <label >SEO Meta Description</label>
             <input
               placeholder="e.g. Meta description summary"
               value={form.seoMetaDescription}
@@ -396,7 +396,7 @@ const ProductDetails = ({
             />
           </div>  
           <div>
-            <label className="text-[11px] block mb-1">SEO Keywords</label>
+            <label >SEO Keywords</label>
             <input
               placeholder="e.g. iphone, oled, display"
               value={form.seoKeywords}
