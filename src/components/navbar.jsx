@@ -97,7 +97,7 @@ const Navbar = ({isCollapsed,setIsCollapsed}) => {
       case 'admin':
         return [
           { name: 'Dashboard (Beta)', path: '/dashboard' },
-          { name: 'Orders (Beta)', path: '/orders' },
+          { name: 'Orders', path: '/orders' },
           { name: 'Products (Beta)', path: '/products' },
           { name: 'Collections (Beta)', path: '/collections' },
           { name: 'Devices (Beta)', path: '/devices' },

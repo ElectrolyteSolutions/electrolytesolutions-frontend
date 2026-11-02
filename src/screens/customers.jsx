@@ -19,7 +19,7 @@ const CustomersPage = () => {
   const dispatch = useDispatch();
   const { items, status, error } = useSelector((state) => state.customers);
   const { addToast } = useToast();
-
+  const [loading,setLoading]=useState(false)
   const [selectedCustomer, setSelectedCustomer] = useState(undefined);
   const [editId, setEditId] = useState(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -96,6 +96,9 @@ const CustomersPage = () => {
 
   const handleSave = (e) => {
     e.preventDefault();
+
+    try{
+    setLoading(true)
     const payload = {
       ...form,
       name: form.name.trim(),
@@ -131,6 +134,10 @@ const CustomersPage = () => {
         })
         .catch((err) => addToast(error || "Failed to register customer.", "error"));
     }
+  }
+  catch(err){
+    addToast(err.message || error || "Failed to Complete Operation")
+  }
   };
 
   const promptDeleteCustomer = (customer) => {
@@ -244,7 +251,8 @@ const CustomersPage = () => {
         />
         {!isAddingNew && (
           <Button 
-            onClick={handleAddNewClick} 
+            onClick={handleAddNewClick}
+            classname='py-2.5' 
             icon={
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -275,6 +283,7 @@ const CustomersPage = () => {
         rightPane={
           (selectedCustomer !== undefined || isAddingNew) ? (
             <CustomerDetails
+              loading={loading}
               customer={selectedCustomer}
               form={form}
               setForm={setForm}

@@ -7,6 +7,7 @@ import GlobalTable from '../components/table.large';
 import { useToast } from '../context/ToastContext';
 import Badge from '../components/badge';
 import InvoiceWrapper from '../components/print.invoice';
+import { useLocation } from 'react-router-dom';
 
 const statusOptions = [
   { label: 'All Invoices', value: 'all' },
@@ -22,6 +23,8 @@ const statusOptions2 = [
 
 const Invoices = () => {
   const dispatch = useDispatch();
+  const location=useLocation()
+  console.log(location.state)
   const { items: bills, status } = useSelector(state => state.billings);
   const { addToast } = useToast();
 
@@ -43,6 +46,9 @@ function handleClose(){
 
   useEffect(() => {
     dispatch(getBills());
+    if (location?.state){
+      setSelectedBill(bills?.find((bill)=> bill.billNumber === location?.state))
+    }
   }, [dispatch]);
 
   const filteredAndSortedBills = useMemo(() => {

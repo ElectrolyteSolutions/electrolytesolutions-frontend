@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom'; 
+import { useLocation, useNavigate } from 'react-router-dom'; 
 import axios from 'axios'; 
 import { getCustomers } from '../features/customerSlice';
 import { getProducts } from '../features/productSlice';
@@ -9,16 +9,19 @@ import ResizablePanes from '../components/table.extralarge';
 import InvoiceTemplate from '../components/InvoiceModal'; 
 import Button from '../components/button';
 import MiniTable from '../components/table.small';
+import ConfirmModal from '../components/modal.prompt'; // Ensure correct import path
 import { Trash } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 const BillingPage = () => {
   const dispatch = useDispatch();
   const location = useLocation(); 
-  
+  const navigate =useNavigate()
+  const {addToast}=useToast()
   const customers = useSelector(state => state.customers.items);
   const products = useSelector(state => state.products.items);
-  const { items: bills } = useSelector(state => state.billings);
   const { token } = useSelector(state => state.auth);
+
 
   const [printTargetData, setPrintTargetData] = useState(null);
 
@@ -41,10 +44,16 @@ const BillingPage = () => {
   const [customItemBaseRate, setCustomItemBaseRate] = useState('');
   const [customItemQuantity, setCustomItemQuantity] = useState(1);
 
-  // Tracking states
+  // Tracking & Modal States
   const [duplicateBillMatch, setDuplicateBillMatch] = useState(null);
   const [isInitialIncomingCheckDone, setIsInitialIncomingCheckDone] = useState(false);
   const [editingBillId, setEditingBillId] = useState(null);
+
+  // Loading States for Operations
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [targetItemToDelete, setTargetItemToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     dispatch(getCustomers());
@@ -52,29 +61,67 @@ const BillingPage = () => {
     dispatch(getBills());
   }, [dispatch]);
 
+  // Effect to load existing bill data into state when entering edit mode via location.state
   useEffect(() => {
-    if (location.state?.autoCustomerId && !isInitialIncomingCheckDone && bills.length > 0) {
-      const targetCustomerId = location.state.autoCustomerId;
-      const targetPurpose = location.state.autoPurpose || 'repair';
-      const targetDeviceId = location.state.autoDeviceId || '';
+    if (location.state && location.state._id && customers.length > 0) {
+      const bill = location.state;
 
-      setSelectedCustomerId(targetCustomerId.toString());
-      setPurpose(targetPurpose);
-      setSelectedDeviceId(targetDeviceId.toString());
+      setEditingBillId(bill._id);
+      setSelectedCustomerId(bill.customer?._id?.toString() || bill.customer?.toString() || '');
+      setPurpose(bill.purpose || 'purchase');
+      setSelectedDeviceId(bill.device?._id?.toString() || bill.device || '');
+      setServiceCharge(bill.serviceCharge || 0);
+      setIsPaid(bill.isPaid ?? true);
 
-      if (targetPurpose === 'repair' && targetDeviceId) {
-        const structuralMatch = bills.find(
-          (bill) => bill.purpose === 'repair' && bill.device?._id?.toString() === targetDeviceId.toString()
-        );
-
-        if (structuralMatch) {
-          setDuplicateBillMatch(structuralMatch);
-          alert(`⚠️ Alert: A Repair Invoice has already been logged inside the registry for this specific device asset.`);
-        }
+      if (bill.items && Array.isArray(bill.items)) {
+        const mappedCartItems = bill.items.map((item, index) => ({
+          productId: item.productId?.toString() || item._id,
+          rowKey: item._id || `existing-${index}-${Date.now()}`,
+          name: item.name,
+          price: item.price,
+          baseRate: item.baseRate || 0,
+          discount: item.discount || 0,
+          orderedQuantity: item.orderedQuantity || 1,
+          isCustomLineItem: item.isCustomLineItem || false,
+          isExistingLineItem: true,
+          _id: item._id
+        }));
+        setCart(mappedCartItems);
       }
-      setIsInitialIncomingCheckDone(true);
     }
-  }, [location.state, bills, isInitialIncomingCheckDone]);
+  }, [location.state, customers]);
+
+  // Effect to load existing bill data into state when entering edit mode via location.state
+  useEffect(() => {
+    if (location.state && location.state._id && customers.length > 0) {
+      const bill = location.state;
+
+      // 1. Set basic invoice metadata & IDs
+      setEditingBillId(bill._id);
+      setSelectedCustomerId(bill.customer?._id?.toString() || bill.customer?.toString() || '');
+      setPurpose(bill.purpose || 'purchase');
+      setSelectedDeviceId(bill.device?._id?.toString() || bill.device || '');
+      setServiceCharge(bill.serviceCharge || 0);
+      setIsPaid(bill.isPaid ?? true);
+
+      // 2. Map existing items into the cart structure with isExistingLineItem flag
+      if (bill.items && Array.isArray(bill.items)) {
+        const mappedCartItems = bill.items.map((item, index) => ({
+          productId: item.productId?.toString() || item._id,
+          rowKey: item._id || `existing-${index}-${Date.now()}`,
+          name: item.name,
+          price: item.price,
+          baseRate: item.baseRate || 0,
+          discount: item.discount || 0,
+          orderedQuantity: item.orderedQuantity || 1,
+          isCustomLineItem: item.isCustomLineItem || false,
+          isExistingLineItem: true, // Marker to distinguish existing DB items
+          _id: item._id
+        }));
+        setCart(mappedCartItems);
+      }
+    }
+  }, [location.state, customers]);
 
   const currentCustomer = customers.find(c => c._id?.toString() === selectedCustomerId?.toString());
 
@@ -124,7 +171,7 @@ const BillingPage = () => {
       const currentKey = item.rowKey || item._id || item.productId;
       if (currentKey === targetRowKey) {
         if (numericDiscount > item.price) {
-          alert("Discount cannot exceed original component rate value!");
+          addToast("Discount cannot exceed original component rate value!","error");
           return item;
         }
         return { ...item, discount: numericDiscount };
@@ -135,7 +182,7 @@ const BillingPage = () => {
 
   const handleAddCustomCharge = (e) => {
     e.preventDefault();
-    if (!customItemName.trim() || !customItemPrice) return alert("Enter charge description and selling price");
+    if (!customItemName.trim() || !customItemPrice) return addToast("Enter charge description and selling price","error");
 
     const customId = `CUSTOM-${Date.now()}`;
     const newCustomField = {
@@ -157,12 +204,28 @@ const BillingPage = () => {
     setCustomItemQuantity(1);
   };
 
-  const handleRemoveItem = (targetRowKey) => {
+  const handleRemoveItemPrompt = (targetRowKey) => {
     const targetedItem = cart.find(item => (item.rowKey || item._id || item.productId) === targetRowKey);
     if (editingBillId && targetedItem?.isExistingLineItem) {
-      if (!window.confirm("This item is already saved to the database. Are you sure you want to drop it from this bill?")) return;
+      setTargetItemToDelete(targetedItem);
+      setIsDeleteModalOpen(true);
+      return;
     }
     setCart(cart.filter(item => (item.rowKey || item._id || item.productId) !== targetRowKey));
+  };
+
+  const handleConfirmDelete = () => {
+    if (!targetItemToDelete) return;
+    setIsDeleting(true);
+    
+    // Simulate or perform deletion processing logic here
+    setTimeout(() => {
+      const targetKey = targetItemToDelete.rowKey || targetItemToDelete._id || targetItemToDelete.productId;
+      setCart(cart.filter(item => (item.rowKey || item._id || item.productId) !== targetKey));
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+      setTargetItemToDelete(null);
+    }, 400);
   };
 
   const calculateTotal = () => {
@@ -170,10 +233,10 @@ const BillingPage = () => {
     return purpose === 'repair' ? itemsTotal + Number(serviceCharge) : itemsTotal;
   };
 
-  const handleSubmitBill = (e) => {
+  const handleSubmitBill = async (e) => {
     e.preventDefault();
-    if (!selectedCustomerId || cart.length === 0) return alert("Please specify customer and add lines");
-    if (purpose === 'repair' && !selectedDeviceId) return alert("Please select a target hardware device");
+    if (!selectedCustomerId || cart.length === 0) return addToast("Please specify customer and add lines","error");
+    if (purpose === 'repair' && !selectedDeviceId) return addToast("Please select a target hardware device","error");
 
     const finalizedProcessedItems = cart.map(item => ({
       ...item,
@@ -189,25 +252,35 @@ const BillingPage = () => {
       isPaid: isPaid
     };
 
-    if (editingBillId) {
-      axios.put(
-        `${import.meta.env.VITE_API_URL}billings/${editingBillId}`,
-        completePayload,
-        { headers: { Authorization: `Bearer ${token}` } }
-      )
-      .then((res) => {
-        alert("Invoice updated successfully!");
+    setIsSubmitting(true);
+    var billID = null
+    try {
+      if (editingBillId) {
+        const res = await axios.put(
+          `${import.meta.env.VITE_API_URL}billings/${editingBillId}`,
+          completePayload,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        billID = await res?.data?.billNumber        
+        addToast("Invoice updated successfully! Navigating to Inovice Page","success");
         handlePostSubmitCleanup(res.data);
-      })
-      .catch(err => alert(`Failed to update bill record: ${err.response?.data?.message || err.message}`));
-    } else {
-      dispatch(createInvoice(completePayload)).then((res) => {
+      } else {
+        const res = await dispatch(createInvoice(completePayload));
+        billID = await res?.data?.billNumber        
+        addToast("Invoice Create successfully! Navigating to Inovice Page","success");
         if (!res.error) {
           handlePostSubmitCleanup(res.payload);
         } else {
-          alert(`Error executing workflow: ${res.payload.message}`);
+          addToast(`Error executing workflow: ${res.payload?.message || 'Failed'}`,"error");
         }
-      });
+      
+
+      }
+      await navigate("/invoices",{state:billID})
+    } catch (err) {
+      addToast(`Failed to save bill record: ${err.response?.data?.message || err.message}`,"error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -316,13 +389,13 @@ const BillingPage = () => {
               <input type="number" placeholder="Quantity" min="1" value={customItemQuantity} onChange={e => setCustomItemQuantity(e.target.value)} />
             </div>
             <div>
-              <Button type="primary" onClick={handleAddCustomCharge} className="py-2" label="Add"></Button>
+              <Button type="primary" onClick={handleAddCustomCharge} className="py-2" label="Add" />
             </div>
           </div>
         </div>
 
         {/* Inventory Catalog Matrix */}
-        <div className="space-y-4 bg-vercel-black rounded-md border-1 border-zinc-800 bg-vercel-black p-3">
+        <div className="space-y-4 bg-vercel-black rounded-md border-1 border-zinc-800 p-3">
           <div className="flex flex-col gap-2">
             <label>Inventory Catalog List</label>
             <input 
@@ -334,7 +407,7 @@ const BillingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-1 max-h-[350px] overflow-y-auto pr-1">
-            <div className='d-flex w-full bg-vercel-balck border-1 border-zinc-800 text-xs p-2 rounded-t-md'>
+            <div className='d-flex w-full bg-vercel-black border-1 border-zinc-800 text-xs p-2 rounded-t-md'>
               <div className='w-3/5'>Name</div>
               <div className='w-1/5'>Brand</div>
               <div className='w-1/6'>Price</div>
@@ -363,15 +436,16 @@ const BillingPage = () => {
 
   // Right Pane: Live Cart Manifest & Checkout Action
   const rightPaneContent = (
-    <div className="p-6 w-full h-full  overflow-hidden space-y-3">
+    <div className="p-6 w-full h-full overflow-hidden space-y-3">
       <div className='overflow-hidden bg-vercel-black rounded-md h-[70%] min-h-[70%] max-h-[70%]'>
         <div className='d-flex justify-between items-center'>
         <h3 className="text-sm font-bold">Invoice Items</h3>
         <Button 
           onClick={handleSubmitBill} 
-          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-md text-xs uppercase tracking-wider transition-all"
-          label={editingBillId ? 'Update Invoice' : 'Create Invoice'}
-          />
+          disabled={isSubmitting}
+          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-md text-xs uppercase tracking-wider transition-all disabled:opacity-50"
+          label={isSubmitting ? (editingBillId ? 'Updating...' : 'Creating...') : (editingBillId ? 'Update Invoice' : 'Create Invoice')}
+        />
         </div>
         <div className="overflow-y-scroll space-y-3 my-4 bg-vercel-card border-1 border-zinc-800 rounded-md h-full min-h-full max-h-full">
           <MiniTable title={null} tableHeadData={tableHeadData} tableData={cart?.map((c) => {
@@ -392,15 +466,14 @@ const BillingPage = () => {
                 bold: true 
               },
               { text: `₹${(c.price - (c.discount || 0)) * c.orderedQuantity}`, align: 'left', bold: true },
-              { text: <Button classname='h-fit p-1.5' type='danger' onClick={() => handleRemoveItem(uniqueKey)} label={<Trash size={12}/>}/>, align: 'right', bold: true }
+              { text: <Button classname='h-fit p-1.5' type='danger' onClick={() => handleRemoveItemPrompt(uniqueKey)} label={<Trash size={12}/>}/>, align: 'right', bold: true }
             ];
           })} />
         </div>
       </div>
 
       <div className="flex justify-between gap-3 items-center border-t border-zinc-800 pt-3">
-        
-        <div className="d-flex flex-col bg-red-800/50 px-2 py-2 rounded-md border-zinc-800 border-1">
+        <div className="d-flex flex-col bg-red-800/50 px-2 py-2 rounded-md border-zinc-800 border">
           <label>Payment Status</label>
           <div className="inline-flex p-1 bg-vercel-black rounded-md space-x-1">
             <button type="button" onClick={() => setIsPaid(true)} className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase ${isPaid ? 'bg-red-800 text-white' : 'text-zinc-500'}`}>Paid</button>
@@ -413,7 +486,7 @@ const BillingPage = () => {
           <span className="text-lg font-vercel-primary">₹{calculateTotal()}.00</span>
         </div>
       </div>
-           </div>
+    </div>
   );
 
   return (
@@ -434,6 +507,19 @@ const BillingPage = () => {
           defaultLeftWidth="45%"
         />
       )}
+
+      {/* Confirmation Modal integrated with drilled-down loading state */}
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title={`Delete "${targetItemToDelete?.name || 'Item'}"?`}
+        description="This action cannot be undone. This will permanently remove the item line record from your active ERP ledger database."
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        isDestructive={true}
+        loading={isDeleting}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };

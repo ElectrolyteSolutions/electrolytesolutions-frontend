@@ -20,7 +20,7 @@ const ProductsPage = () => {
   const [loading,setLoading]=useState(false)
   const { items, status, error } = useSelector((state) => state.products);
   const { addToast } = useToast();
-  const [details, setDetails] = useState([{ title: '', content: '' }]);
+  const [details, setDetails] = useState([]);
   
   const { user } = useSelector((state) => state.auth);
   const isCustomer = user?.role === 'customer';
@@ -49,16 +49,6 @@ const ProductsPage = () => {
   });
 };
   
-  const addDetailRow = () => {
-    setDetails([...details, { title: '', content: '' }]);
-  };
-
-  const removeDetailRow = (index) => {
-    if (details.length > 1) {
-      const updatedDetails = details.filter((_, i) => i !== index);
-      setDetails(updatedDetails);
-    }
-  };
 
   const [form, setForm] = useState({ 
     erpProductId: '',
@@ -138,7 +128,7 @@ const ProductsPage = () => {
       ...(stockFilter.value === 'low-stock' && { alert: 'low-stock' })
     }));
     fetchLookups();
-  }, [dispatch, searchTerm, stockFilter, currentSortBy, currentSortOrder]);
+  }, [searchTerm, stockFilter, currentSortBy, currentSortOrder]);
 
   const fetchLookups = async () => {
     try {
@@ -168,7 +158,7 @@ const ProductsPage = () => {
     setIsAddingNew(false);
     setSelectedProduct(product);
     setForm({
-      erpProductId: product.erpProductId || '',
+      erpProductId: product.erpProductId || `ERP${String(items?.length).padStart(4,'0')}`,
       slug: product.slug || '',
       name: product.name || '',
       description: product.description || '',
@@ -189,7 +179,7 @@ const ProductsPage = () => {
     if (product.details && product.details.length > 0) {
       setDetails(product.details);
     } else {
-      setDetails([{ title: '', content: '' }]);
+      setDetails([]);
     }
     setEditId(product._id);
   };
@@ -198,7 +188,7 @@ const ProductsPage = () => {
     setIsAddingNew(true);
     setSelectedProduct(null);
     setForm({ 
-      erpProductId: '', 
+      erpProductId: `ERP${String(items?.length)?.padStart(4,'0')}`, 
       images: [],
       collections: [],
       slug: '', 
@@ -208,28 +198,28 @@ const ProductsPage = () => {
       price: '', 
       orignalPrice: '', 
       baseRate: '', 
-      quantity: '', 
+      quantity: 1, 
       seoMetaDescription: '', 
       seoKeywords: '',
       hsn: '',
-      status: 'active',
+      status: 'draft',
       type: '',
       isCustomType: false
     });
-    // setDetails([{ title: '', content: '' }]);
+    setDetails([])
     setEditId(null);
   };
 
-  const handleSave = (e) => {
-    setLoading(true)
-    e.preventDefault();
-    const { isCustomType, ...cleanForm } = form;
-    // if(!(details[0]?.title && details[0].content)){ 
-    // setDetails(null)}
+  const handleSave = async (e) => {
+  e.preventDefault();
   
+  try {
+    setLoading(true);
+
+    const { isCustomType, ...cleanForm } = form;
     const payload = {
       ...cleanForm,
-      // details,
+      details,
       seo: {
         metaTitle: form.name,
         metaDescription: form.seoMetaDescription,
@@ -238,26 +228,21 @@ const ProductsPage = () => {
     };
 
     if (editId) {
-      dispatch(updateProduct({ id: editId, data: payload }))
-      .unwrap()
-      .then(() => {
-        addToast("Product updated successfully!", "success");
-        refreshDataLogs();
-        setLoading(false)
-      })
-        .catch((err) => addToast(err?.message || error || "Failed to update product.", "error"));
-      } else {
-        dispatch(addProduct(payload))
-        .unwrap()
-        .then(() => {
-          addToast("Product created successfully!", "success");
-          refreshDataLogs();
-          setIsAddingNew(false);
-          setLoading(false)
-        })
-        .catch((err) => addToast(err?.message || error || "Failed to create product.", "error"));
+      await dispatch(updateProduct({ id: editId, data: payload })).unwrap();
+      addToast("Product updated successfully!", "success");
+      refreshDataLogs();
+    } else {
+      await dispatch(addProduct(payload)).unwrap();
+      addToast("Product created successfully!", "success");
+      refreshDataLogs();
+      setIsAddingNew(false);
     }
-  };
+  } catch (err) {
+    addToast(err?.message || error || "Failed to save product.", "error");
+  } finally {
+    setLoading(false); // Ensures loading is always turned off, success or fail
+  }
+};
 
   const promptDeleteProduct = (product) => {
     setProductToDelete(product);
@@ -374,10 +359,9 @@ const ProductsPage = () => {
         rightPane={
           (selectedProduct !== undefined || isAddingNew) ? (
             <ProductDetails
+              setDetails={setDetails}
               loading={loading}
-              addDetailRow={addDetailRow}
               handleInputChange={handleInputChange}
-              removeDetailRow={removeDetailRow}
               form={form}
               details={details}
               setForm={setForm}

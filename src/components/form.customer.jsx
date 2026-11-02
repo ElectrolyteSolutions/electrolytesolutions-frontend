@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { checkEmailAvailability } from '../features/customerSlice';
 import { formatIsoDate } from '../functions/formatIsoDate';
 import CustomList from './list';
+import Button from './button';
 
 const CustomerDetails = ({
   form,
@@ -10,7 +11,8 @@ const CustomerDetails = ({
   editId,
   handleSave,
   promptDeleteCustomer,
-  customer
+  customer,
+  loading
 }) => {
   const dispatch = useDispatch();
   const [emailStatus, setEmailStatus] = useState(null); // 'checking' | 'available' | 'taken' | null
@@ -73,23 +75,22 @@ const CustomerDetails = ({
           )}
         </h3>
         <div className="flex gap-2">
-          <button
+          <Button
+            loading={loading}
+            buttontType="submit"
             disabled={isFormInvalid}
-            type="submit"
-            className={`w-fit px-3 py-2 rounded-md text-xs font-semibold transition-colors ${
+            type="button"
+            className={`transition-colors ${
               isFormInvalid ? 'bg-zinc-700 text-zinc-400 cursor-not-allowed opacity-50' : 'bg-white hover:opacity-80 text-black cursor-pointer'
             }`}
-          >
-            {editId ? 'Update Customer' : 'Add Customer'}
-          </button>
+            label={editId ? 'Update Customer' : 'Add Customer'}
+          />
           {editId && (
-            <button
-              type='button'
+            <Button
+              type='danger'
               onClick={() => promptDeleteCustomer()}
-              className="w-fit bg-red-500 hover:opacity-80 text-white px-3 py-2 rounded-md text-xs font-semibold transition-colors cursor-pointer"
-            >
-              Delete
-            </button>
+              label='Delete'
+            />
           )}
         </div>
       </div>

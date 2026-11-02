@@ -4,7 +4,7 @@ import Button from './button';
 const ProductDetails = ({
   form,
   details,
-  addDetailRow,
+  setDetails,
   handleInputChange,
   setForm,
   editId,
@@ -18,11 +18,22 @@ const ProductDetails = ({
   creatingCollectionLoading,
   handleQuickCreateCollection,
   promptDeleteProduct,
-  removeDetailRow,
   loading,
 }) => {
   const [tempImageUrl, setTempImageUrl] = useState('');
   const [isAddingNewType, setIsAddingNewType] = useState(false);
+
+  const addDetailRow = () => {
+    setDetails([...details, { title: '', content: '' }]);
+  };
+
+  const removeDetailRow = (index) => {
+    if (details.length > 1) {
+      const updatedDetails = details.filter((_, i) => i !== index);
+      setDetails(updatedDetails);
+    }
+  };
+
 
   const handleAddImage = () => {
     if (!tempImageUrl.trim()) return;
@@ -97,9 +108,8 @@ const ProductDetails = ({
            <div>
             <label >ERP ID</label>
             <input
-              type="number"
-              maxLength={10}
-              placeholder="ERP ID (must be unique)"
+              maxLength={8}
+              placeholder="ELECXXXX"
               value={form.erpProductId}
               onChange={e => setForm({ ...form, erpProductId: e.target.value })}
               required
@@ -116,7 +126,7 @@ const ProductDetails = ({
               placeholder="https://example.com/image.jpg"
               value={tempImageUrl}
               onChange={e => setTempImageUrl(e.target.value)}
-              
+
             />
             <Button
               type="button"
@@ -145,13 +155,13 @@ const ProductDetails = ({
               value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })}
               required
-              
+              placeholder='Write every details about the product or service'
             />
           </div>
 
           <div className="space-y-3 w-full">
-            <label >Product Specification</label>
-            {details.map((detail, index) => (
+            <label >Product Specification (Click to Add Details row)</label>
+            {details?.length > 0 && details?.map((detail, index) => (
               <div key={index} className="flex flex-row gap-2 w-full items-center">
                 <input
                   type="text"
@@ -160,6 +170,7 @@ const ProductDetails = ({
                   value={detail.title}
                   onChange={(e) => handleInputChange(index, e)}
                   className='w-2/5 '
+                  required
                 />
                 <input
                   type="text"
@@ -170,13 +181,13 @@ const ProductDetails = ({
                   required={detail?.title}
                   className='w-full '
                 />
-                {details.length > 1 && (
+                
                   <Button 
                     type="danger" 
                     onClick={() => removeDetailRow(index)}
                     label="Remove"
                   />
-                )}
+                
               </div>
             ))}
 
@@ -186,7 +197,7 @@ const ProductDetails = ({
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                 </svg>}
-              label="Add More"/>
+              label="Add Detail Row"/>
           </div>
         </div>
 
@@ -200,7 +211,7 @@ const ProductDetails = ({
                 value={form.collections[0] || ''}
                 onChange={e => setForm({ ...form, collections: [e.target.value] })}
                 required
-                
+
               >
                 <option value="">Select Category Collection</option>
                 {availableCollections.map(col => (
@@ -271,21 +282,19 @@ const ProductDetails = ({
                 />
               )}
             
-              <button 
+              <Button 
                 type="button"
-                className='bg-vercel-primary text-vercel-black rounded-md text-xs font-bold text-nowrap px-3 flex gap-1 items-center justify-center cursor-pointer' 
                 onClick={() => {
                   setIsAddingNewType(!isAddingNewType);
                   setForm({ ...form, type: '' });
-                }} 
-              >
-                {!isAddingNewType && (
+                }}
+                icon={!isAddingNewType && (
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                   </svg>
                 )}
-                {isAddingNewType ? 'Select from List' : 'New Type'}
-              </button>
+                label={isAddingNewType ? 'Select from List' : 'New Type'}
+              />
             </div>
           </div>
         </div>
@@ -307,6 +316,7 @@ const ProductDetails = ({
             <div>
               <label >Quantity</label>
               <input
+                placeholder='Stock Count'
                 max={500}
                 type="number"
                 value={form.quantity}
@@ -321,7 +331,6 @@ const ProductDetails = ({
                 value={form.status}
                 onChange={e => setForm({ ...form, status: e.target.value })}
                 required
-                
               >
                 <option value="">Select status</option>
                 {[
@@ -343,35 +352,36 @@ const ProductDetails = ({
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md'>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div>
-              <label >MRP (₹)</label>
+              <label >Store Price (₹)</label>
               <input
+                placeholder='Selling Price'
                 maxLength={6}
                 type="number"
                 value={form.price}
                 onChange={e => setForm({ ...form, price: e.target.value })}
                 required
-                
               />
             </div>
             <div>
-              <label >Original Price</label>
+              <label >M.R.P.(₹)</label>
               <input
+                placeholder='List Price'
                 maxLength={6}
                 type="number"
                 value={form.orignalPrice}
                 onChange={e => setForm({ ...form, orignalPrice: e.target.value })}
-                
+                required
               />
             </div>
             <div>
               <label >Base Rate</label>
               <input
+                placeholder='Cost Price'
                 maxLength={6}
                 type="number"
                 value={form.baseRate}
                 onChange={e => setForm({ ...form, baseRate: e.target.value })}
                 required
-                
               />
             </div>
             <div>
@@ -379,7 +389,6 @@ const ProductDetails = ({
               <input
                 value={calculateProfit()}
                 disabled
-                className="w-full bg-vercel-surface border-1 border-zinc-800 rounded p-1.5 text-xs text-zinc-400 cursor-not-allowed"
               />
             </div>
           </div>
@@ -412,7 +421,6 @@ const ProductDetails = ({
               placeholder="e.g. iphone, oled, display"
               value={form.seoKeywords}
               onChange={e => setForm({ ...form, seoKeywords: e.target.value })}
-              
             />
           </div>  
         </div>

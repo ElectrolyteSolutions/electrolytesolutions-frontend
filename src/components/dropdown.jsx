@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Button from './button';
 
 const VercelDropdown = ({loading=false, value, onSelect ,rightOptions=[],type="light"}) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,14 +27,14 @@ const VercelDropdown = ({loading=false, value, onSelect ,rightOptions=[],type="l
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
       {/* Trigger Button matching your screenshot */}
-      <button
+      <Button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center justify-between gap-3 bg-white text-black px-3 py-2 rounded-md text-sm font-semibold hover:opacity-80 transition-all cursor-pointer shadow-sm border-white border-1"
-      >
-        {loading && <div className="loader"></div>}
-        <span>{value.label || value}</span>
-        <svg 
+        onClick={()=> setIsOpen(!isOpen)}
+        loading={loading}
+        classname='py-2 font-bold px-3'
+        iconRight={true}
+        label={value.label || value}
+        icon={<svg 
           className={`w-5 h-5 text-black transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
           fill="none" 
           viewBox="0 0 24 24" 
@@ -41,8 +42,9 @@ const VercelDropdown = ({loading=false, value, onSelect ,rightOptions=[],type="l
           strokeWidth="2"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
+        </svg>}
+      ></Button>
+      
 
       {/* Two-Column Popover Panel */}
       {isOpen && (

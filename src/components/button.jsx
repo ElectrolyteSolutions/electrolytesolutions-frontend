@@ -8,6 +8,7 @@ const Button = ({
   type = "light",
   loading=false,
   classname="py-1.5",
+  iconRight=false,
   ...props
 }) => {
   // Map types to specfific Tailwind color classes
@@ -29,8 +30,9 @@ const Button = ({
       onClick={onClick}
       className={`inline-flex ${classname} items-center justify-between gap-1 px-2.5 rounded-md text-xs font-semibold transition-all cursor-pointer shadow-sm border-1 text-nowrap ${selectedTypeStyle}`}
     >
-    {loading ? <div className='loader'/>: icon}
+    {loading ? <div className='loader'/>: (!iconRight && icon)}
       {label}
+      {iconRight && icon}
     </button>
   );
 };

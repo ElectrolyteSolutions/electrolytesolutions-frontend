@@ -4,11 +4,14 @@ import InvoiceTemplate from './template.invoice';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
 import Button from './button';
+import { useNavigate } from 'react-router-dom';
 
 const InvoiceWrapper = ({ billData, onClose,promptDeleteBill }) => {
   const printRef = useRef();
   const [isGstinMasked, setIsGstinMasked] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(false);
+  const navigate = useNavigate();
+
 
   const storeCustomers = useSelector((state) => state.customers.items);
   const storeDevices = useSelector((state) => state.devices.items);
@@ -129,6 +132,9 @@ const InvoiceWrapper = ({ billData, onClose,promptDeleteBill }) => {
             <Button 
               type={isGstinMasked ? 'secondary' : 'Success'} onClick={()=>setIsGstinMasked(!isGstinMasked)} label={isGstinMasked ? 'Unmask GSTIN' : 'Mask GSTIN'}/>
             <Button type='' onClick={()=>handleShareLink()} label={copyFeedback ? 'Link Copied!' : 'Share'}/>
+            <Button type='danger' onClick={()=>{
+              navigate('/billing',{state:invoice})}}
+             label="Edit"/>
             <Button type="primary" onClick={()=>handleDownloadPdf()} label="Download"/>
             <Button type='secondary' onClick={()=>handlePrint()} label="Print"/>
           </div>
