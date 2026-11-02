@@ -224,7 +224,7 @@ const ProductsPage = () => {
     setLoading(true)
     e.preventDefault();
     const { isCustomType, ...cleanForm } = form;
-    if(!(details[0]?.title && details[0].content)){ }
+    if(!(details[0]?.title && details[0].content)){ 
     setDetails(null)}
   
     const payload = {
