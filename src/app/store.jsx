@@ -5,6 +5,7 @@ import deviceReducer from '../features/deviceSlice';
 import billingReducer from '../features/billingSlice';
 import authReducer from '../features/authSlice';
 import orderReducer from '../features/orderSlice';
+import collectionReducer from '../features/collectionSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     billings: billingReducer,
     auth: authReducer,
     order: orderReducer,
+    collections: collectionReducer,
     // profile: profileReducer,
     // Add other features here as you scale
   },
