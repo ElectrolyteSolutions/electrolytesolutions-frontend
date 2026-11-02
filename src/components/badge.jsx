@@ -6,3 +6,4 @@ const Badge = ({type="dark",title="title here"}) => {
             </span>
 }
 export default Badge
+// bjbca

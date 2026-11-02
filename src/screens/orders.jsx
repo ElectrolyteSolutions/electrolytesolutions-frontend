@@ -38,6 +38,7 @@ function ordersTableData (order) {
  
 const OrdersPage = () => {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const { items: orders, status } = useSelector((state) => state.order);
   const { addToast } = useToast()
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -68,16 +69,20 @@ const OrdersPage = () => {
 
 
   const handleStatusChange = async (orderId, newStatus) => {
+    setLoading(true);
     try {
       // .unwrap() lets you catch fulfilled or rejected states directly in the component
       await dispatch(updateOrderStatus({ id: orderId, data: { fulfillmentStatus: newStatus } })).unwrap();
-      
+      setSelectedOrder((prevOrder) => prevOrder && prevOrder._id === orderId ? { ...prevOrder, fulfillmentStatus: newStatus } : prevOrder);
       // Success toast
       addToast("Order status updated successfully!", "success");
     } catch (error) {
       // Error toast - cleanly extracting the error message if provided by your API/thunk
       const errorMessage = error?.message || error || "Failed to update order status.";
       addToast(errorMessage, "error");
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -106,6 +111,7 @@ const OrdersPage = () => {
       } 
       rightPane={selectedOrder && 
         <OrderDetails
+          loading={loading}
           selectedOrder={selectedOrder} 
           handleStatusChange={handleStatusChange} 
         />

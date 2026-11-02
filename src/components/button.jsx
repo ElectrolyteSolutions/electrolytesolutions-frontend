@@ -10,7 +10,7 @@ const Button = ({
   classname="py-1.5",
   ...props
 }) => {
-  // Map types to specific Tailwind color classes
+  // Map types to specfific Tailwind color classes
   const typeStyles = {
     danger: "bg-red-600 text-white hover:bg-red-700 border-red-600",
     success: "bg-green-600 text-white hover:bg-green-700 border-green-600",

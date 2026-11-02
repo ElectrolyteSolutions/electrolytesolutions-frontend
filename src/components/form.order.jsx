@@ -3,7 +3,7 @@ import CustomList from './list';
 import VercelDropdown from './dropdown';
 import MiniTable from './table.small';
 
-const OrderDetails = ({ selectedOrder, handleStatusChange }) => {
+const OrderDetails = ({ loading, selectedOrder, handleStatusChange }) => {
   if (!selectedOrder) return null;
 
   const customerName = selectedOrder.customer?.firstName && selectedOrder.customer?.lastName 
@@ -45,6 +45,7 @@ const tableHeadData = ["Item Name", "Qty", "Rate", "Total"];
           </p>
         </div>
         <VercelDropdown 
+          loading={loading}
           value={selectedOrder?.fulfillmentStatus || 'Unfulfilled'} 
           onSelect={(newValue) => handleStatusChange(selectedOrder._id,newValue.label)} 
           rightOptions={[
