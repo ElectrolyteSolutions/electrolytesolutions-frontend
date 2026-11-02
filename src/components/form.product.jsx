@@ -94,6 +94,17 @@ const ProductDetails = ({
               
             />
           </div>
+           <div>
+            <label >ERP ID</label>
+            <input
+              type="number"
+              maxLength={10}
+              placeholder="ERP ID (must be unique)"
+              value={form.erpProductId}
+              onChange={e => setForm({ ...form, erpProductId: e.target.value })}
+              required
+            />
+          </div>
         </div>
 
         {/* Product Description */}
