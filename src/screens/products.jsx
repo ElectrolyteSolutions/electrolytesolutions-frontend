@@ -216,14 +216,14 @@ const ProductsPage = () => {
       type: '',
       isCustomType: false
     });
-    setDetails([{ title: '', content: '' }]);
+    // setDetails([{ title: '', content: '' }]);
     setEditId(null);
   };
 
   const handleSave = (e) => {
     setLoading(true)
     e.preventDefault();
-    // const { isCustomType, ...cleanForm } = form;
+    const { isCustomType, ...cleanForm } = form;
     // if(!(details[0]?.title && details[0].content)){ 
     // setDetails(null)}
   
