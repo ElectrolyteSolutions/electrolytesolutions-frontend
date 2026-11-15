@@ -210,6 +210,8 @@ const ProductsPage = () => {
     setEditId(null);
   };
 
+  
+
   const handleSave = async (e) => {
   e.preventDefault();
   
@@ -283,8 +285,8 @@ const ProductsPage = () => {
     { label: 'Product Name', value: 'name', class: "text-xs px-3 py-2 w-28 min-w-28 max-w-28 cursor-pointer", onClick: () => handleSortToggle('name') },
     { label: 'MRP', value: 'price', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12 cursor-pointer", onClick: () => handleSortToggle('price') },
     { label: 'Stock', value: 'quantity', class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4 cursor-pointer", onClick: () => handleSortToggle('quantity') },
-    { label: 'Status', value: 'status', class: "text-xs px-3 py-2 w-9 max-w-9 min-w-9", onClick: () => {} },
-    { label: 'Product Type', value: 'type', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12", onClick: () => {} },
+    { label: 'Status', value: 'status', class: "text-xs px-3 py-2 w-9 max-w-9 min-w-9 cursor-pointer", onClick: () => handleSortToggle('status') },
+    { label: 'Product Type', value: 'type', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12 cursor-pointer", onClick: () => handleSortToggle('type')  },
     { label: 'Category', value: 'collection', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12", onClick: () => {} },
     { label: 'HSN', value: 'hsn', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12", onClick: () => {} },
   ];
@@ -308,7 +310,7 @@ const ProductsPage = () => {
         ), 
         class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4" 
       },    
-      { label: 'Status', value: <Badge title={p.status} type={p.status==="draft"?"dark":"light"}></Badge>, class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8" },
+      { label: 'Status', value: <Badge title={p.status} type={p.status==="active"?"dark":"light"}></Badge>, class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8" },
       { label: 'Type', value: p.type, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
       { label: 'Category', value: p?.collections?.map((col) => col.title).join(","), class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
       { label: 'HSN', value: p.hsn, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
@@ -319,6 +321,7 @@ const ProductsPage = () => {
     <div className="p-6 w-full h-full flex flex-col pr-1">
       <div className='flex flex-row gap-3 h-fit'>
         <Header 
+          loading={searchTerm && status === "loading"}
           placeholder="Search Product by Name, SKU, ID, Description..."
           searchTerm={searchTerm} 
           setSearchTerm={setSearchTerm}
@@ -343,7 +346,7 @@ const ProductsPage = () => {
         title="Products Inventory"
         tableHead={productsTableHead}
         filteredList={(items || []).map((p, idx) => ({ ...p, sno: idx + 1 }))}
-        status={status}
+        status={(status === "loading" && items.length === 0) && "loading"}
         selectedItem={selectedProduct}
         setSelectedItem={handleSelectProduct}
         tableData={productsTableData}
