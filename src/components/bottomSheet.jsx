@@ -71,7 +71,7 @@ export function BottomSheet({ isOpen, onClose, title, children }) {
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className="cursor-grab d-flex select-none px-4 pt-3 pb-2 active:cursor-grabbing"
+          className="cursor-grab d-flex select-none px-4 py-1 active:cursor-grabbing items-center"
         >
           {/* Pill Handle */}
           

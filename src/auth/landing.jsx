@@ -124,7 +124,7 @@ const AuthLandingPage = () => {
 
   return (
     <div className="h-screen w-screen bg-vercel-black d-flex items-center justify-center">
-          <form onSubmit={handleAuthSubmit} className="rounded-md bg-vercel-card p-3 space-y-2 border-1 border-zinc-800 items-center w-full sm:w-fit h-full sm:h-fit justify-center ">
+          <form onSubmit={handleAuthSubmit} className="rounded-md bg-vercel-card sm:px-3 py-3 px-10 space-y-2 border-1 border-zinc-800 items-center w-full sm:w-fit h-full sm:h-fit justify-center ">
             <div className="d-sm-none h-[20vh]">
 
             </div>
