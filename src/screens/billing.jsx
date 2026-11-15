@@ -313,7 +313,7 @@ const BillingPage = () => {
 
   // Left Pane: POS Configuration & Product Matrix
   const leftPaneContent = (
-    <div className="bg-vercel-black p-6 w-full h-full flex flex-col space-y-2">
+    <div className="bg-vercel-black p-6 w-full h-full flex flex-col space-y-2 overflow-y-scroll sm:h-full h-[70vh]">
         <h3 className="text-sm text-white font-semibold pb-3">Point of Sale Console</h3>
 
       {duplicateBillMatch && !editingBillId && (

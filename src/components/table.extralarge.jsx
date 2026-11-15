@@ -105,7 +105,6 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
     );
   }
 
-  console.log(hasRight)
 
   // Case 3: Both Panes exist (Resizable Split Layout)
   return (
