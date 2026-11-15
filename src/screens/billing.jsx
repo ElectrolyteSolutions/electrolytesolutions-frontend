@@ -21,6 +21,7 @@ const BillingPage = () => {
   const customers = useSelector(state => state.customers.items);
   const products = useSelector(state => state.products.items);
   const { token } = useSelector(state => state.auth);
+  const [showBill,setShowBill]=useState(false)
 
 
   const [printTargetData, setPrintTargetData] = useState(null);
@@ -313,7 +314,8 @@ const BillingPage = () => {
 
   // Left Pane: POS Configuration & Product Matrix
   const leftPaneContent = (
-    <div className="bg-vercel-black p-6 w-full h-full flex flex-col space-y-2 overflow-y-scroll sm:h-full h-[70vh]">
+    <div className="bg-vercel-black p-6 w-full flex flex-col space-y-2 overflow-y-scroll sm:h-full h-[80vh]">
+
         <h3 className="text-sm text-white font-semibold pb-3">Point of Sale Console</h3>
 
       {duplicateBillMatch && !editingBillId && (
@@ -501,10 +503,10 @@ const BillingPage = () => {
         </div>
       ) : (
         <ResizablePanes 
-          animationKey={editingBillId || 'pos-checkout'}
           leftPane={leftPaneContent}
           rightPane={rightPaneContent}
           defaultLeftWidth="45%"
+          animationKey={showBill}
         />
       )}
 

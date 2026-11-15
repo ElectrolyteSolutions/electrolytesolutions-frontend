@@ -13,13 +13,12 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
   const hasRight = Boolean(rightPane) && !isRightCollapsed;
 
 
-
   // Whenever a new item is clicked/selected (changing the animationKey or rightPane), automatically un-collapse!
   useEffect(() => {
     if (rightPane) {
       setIsRightCollapsed(false);
     }
-  }, [animationKey, rightPane]);
+  }, [animationKey]);
 
   const startResizing = useCallback((e) => {
     e.preventDefault();
@@ -83,7 +82,7 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
           isMobile?<button
                 type="button"
                 onClick={() => setIsRightCollapsed(false)}
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white p-2 rounded-t-md border-1 border-zinc-700 shadow-lg transition-all cursor-pointer"
+                className="absolute top-5/6 left-1/2 -translate-x-1/2 z-30 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white p-2 rounded-md border-1 border-zinc-700 shadow-lg transition-all cursor-pointer"
                 title="Expand panel"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
