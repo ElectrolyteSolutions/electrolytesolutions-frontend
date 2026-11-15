@@ -7,6 +7,7 @@ import Badge from '../components/badge';
 import GlobalTable from '../components/table.large';
 import OrderDetails from '../components/form.order';
 import { useToast } from '../context/ToastContext';
+import { BottomSheet } from '../components/bottomSheet';
 
 const statusOptions = [
   { label: 'All Orders', value: 'all' },
@@ -44,6 +45,8 @@ const OrdersPage = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState(statusOptions[0]);
+
+     
 
   useEffect(() => {
     dispatch(getOrders());
@@ -117,6 +120,8 @@ const OrdersPage = () => {
         />
       } 
     />
+
+     
     </div>
   );
 };

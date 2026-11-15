@@ -1,13 +1,18 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { BottomSheet } from './bottomSheet';
+import { useMobile } from '../context/useMobile';
 
 const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animationKey }) => {
   const [leftWidth, setLeftWidth] = useState(defaultLeftWidth);
   const [isResizing, setIsResizing] = useState(false);
   const [isRightCollapsed, setIsRightCollapsed] = useState(false);
   const containerRef = useRef(null);
+  const isMobile =useMobile()
 
   const hasLeft = Boolean(leftPane);
   const hasRight = Boolean(rightPane) && !isRightCollapsed;
+
+
 
   // Whenever a new item is clicked/selected (changing the animationKey or rightPane), automatically un-collapse!
   useEffect(() => {
@@ -75,10 +80,20 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
       <div ref={containerRef} className="flex flex-col w-full h-full overflow-hidden relative">
         <div className="w-full h-full custom-scrollbar">{leftPane}</div>
         {Boolean(rightPane) && (
-          <button
+          isMobile?<button
+                type="button"
+                onClick={() => setIsRightCollapsed(false)}
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white p-2 rounded-t-md border-1 border-zinc-700 shadow-lg transition-all cursor-pointer"
+                title="Expand panel"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
+              :<button
             type="button"
             onClick={() => setIsRightCollapsed(false)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white p-2 rounded-l-md border border-zinc-700 shadow-lg transition-all cursor-pointer"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white p-2 rounded-l-md border-1 border-zinc-700 shadow-lg transition-all cursor-pointer"
             title="Expand panel"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -89,6 +104,8 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
       </div>
     );
   }
+
+  console.log(hasRight)
 
   // Case 3: Both Panes exist (Resizable Split Layout)
   return (
@@ -131,14 +148,25 @@ const ResizablePanes = ({ leftPane, rightPane, defaultLeftWidth = '58%', animati
       </div>
 
       {/* Right Pane */}
-      <div 
+      {!isMobile?<div 
         style={{ width: window.innerWidth >= 1024 ? `calc(100% - ${leftWidth} - 8px)` : '100%' }}
         className="flex flex-col h-full overflow-none custom-scrollbar pl-0 lg:pl-3 lg:mt-0 transition-none"
       >
         <div key={animationKey} className="h-full flex flex-col animate-in slide-in-from-right-4 duration-300 overflow-none">
           {rightPane}
         </div>
-      </div>
+      </div>:
+
+
+
+
+      
+        <BottomSheet
+          isOpen={hasRight}
+          onClose={() => {setIsRightCollapsed(true);}}
+        >
+          {rightPane}
+        </BottomSheet>}
     </div>
   );
 };

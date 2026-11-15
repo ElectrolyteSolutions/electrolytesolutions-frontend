@@ -60,7 +60,7 @@ const AppLayout = ({ children }) => {
             }`}>
                 <main className="flex flex-col flex-grow h-full w-full overflow-hidden">
                     {!isAuthPage && (
-                        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full border-b border-zinc-800 px-6 py-4 overflow-hidden shrink-0 bg-vercel-black">
+                        <header className="d-none d-sm-flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full border-b border-zinc-800 px-6 py-4 overflow-hidden shrink-0 bg-vercel-black">
                             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight capitalize">{curLoc}</h1>
                         </header>
                     )}

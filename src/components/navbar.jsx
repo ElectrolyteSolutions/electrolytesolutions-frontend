@@ -75,6 +75,10 @@ const Navbar = ({isCollapsed,setIsCollapsed}) => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const rawRoute = location.pathname.replace('/', ''); // "dashboard" (or "" for "/")
+  const currentRoute = rawRoute
+    ? rawRoute.charAt(0).toUpperCase() + rawRoute.slice(1)
+    : 'Home';
   
   const { profileData, role } = useSelector(state => state.auth);
   
@@ -134,7 +138,7 @@ const Navbar = ({isCollapsed,setIsCollapsed}) => {
       <div className="lg:hidden flex items-center justify-between bg-vercel-black border-b border-zinc-800 px-4 py-3 fixed top-0 left-0 right-0 z-50">
         <Link to="/" className="flex items-center gap-2">
           <img src={iconUrl} alt="Logo" className="h-7 w-7 rounded-md" />
-          <span className="text-vercel-primary font-bold text-sm tracking-tight">Electrolyte ERP</span>
+          <span className="text-vercel-primary font-bold text-sm tracking-tight">{currentRoute}</span>
         </Link>
         <button
           onClick={() => setIsOpen(!isOpen)}

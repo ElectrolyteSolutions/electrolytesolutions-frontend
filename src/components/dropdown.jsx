@@ -55,7 +55,9 @@ const VercelDropdown = ({loading=false, value, onSelect ,rightOptions=[],type="l
               const isActive = (value?.value || value) === item?.value ? true : false;
               return <button
                 key={item.id}
-                onClick={() => handleItemClick(item)}
+                onClick={(e) => {
+                  e.stopPropagation
+                  handleItemClick(item)}}
                 className={`flex w-full justify-between items-center gap-2 px-2 py-2 rounded-md text-xs font-medium transition-all group relative ${
                   isActive
                     ? 'bg-vercel-selected text-vercel-primary font-bold shadow-sm'
