@@ -7,6 +7,7 @@ import authReducer from '../features/authSlice';
 import orderReducer from '../features/orderSlice';
 import collectionReducer from '../features/collectionSlice';
 import storeReducer from '../features/storeSlice'
+import androidReducer from '../features/androidSlice'
 
 export const store = configureStore({
   reducer: {
@@ -17,7 +18,8 @@ export const store = configureStore({
     auth: authReducer,
     order: orderReducer,
     collections: collectionReducer,
-    store:storeReducer
+    store:storeReducer,
+    android:androidReducer
     // profile: profileReducer,
     // Add other features here as you scale
   },

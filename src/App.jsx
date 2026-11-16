@@ -12,6 +12,7 @@ import Invoices from './screens/invoices';
 import CardSuspense from './components/card.suspense';
 import CollectionsPage from './screens/collections';
 import StoreSettingsPage from './screens/store';
+import AndroidManagementPage from './screens/notifier';
 
 // Lazy loaded pages
 const AuthLandingPage = lazy(() => import('./auth/landing'));
@@ -129,6 +130,7 @@ function App() {
                         <Route path="/profile" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><ProfilePage /></ProtectedRoute>} />
                         <Route path="/orders" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><OrdersPage /></ProtectedRoute>} />
                         <Route path="/store" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><StoreSettingsPage /></ProtectedRoute>} />
+                        <Route path="/notify" element={<ProtectedRoute allowedRoles={['admin', 'store', 'customer']}><AndroidManagementPage /></ProtectedRoute>} />
 
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
