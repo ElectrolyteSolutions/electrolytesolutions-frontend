@@ -114,7 +114,9 @@ const AndroidManagementPage = () => {
   const deviceTableHead = [
     { label: '#', value: 'sno', width: 12 * 4, class: 'rounded-l-md', onClick: () => {} },
     { label: 'Role / User', value: 'user', width: 35 * 4, onClick: () => {} },
+    { label: 'User Id', value: 'id', width: 50 * 4, onClick: () => {} },
     { label: 'Device Model', value: 'model', width: 50 * 4, onClick: () => {} },
+    { label: 'FCM Token', value: 'fcm', width: 50 * 4, onClick: () => {} },
     { label: 'Android OS', value: 'os', width: 30 * 4, onClick: () => {} },
     { label: 'Push Token Status', value: 'token', width: 4 * 25, onClick: () => {} },
     { label: 'Last Active', value: 'updatedAt', width: 4 * 28, class: 'rounded-r-md', onClick: () => {} }
