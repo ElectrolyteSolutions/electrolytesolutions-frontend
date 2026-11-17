@@ -234,31 +234,31 @@ const DevicesPage = () => {
   }, [items, searchTerm, statusFilter, selectedDeviceTypeTab, sortBy]);
 
   const deviceTableHead = [
-    { label: '#', value: 'sno', class: "text-xs px-3 py-2 w-2 max-w-2 min-w-2" },
-    { label: 'Device Name', value: 'name', class: "text-xs px-3 py-2 w-24 max-w-24 min-w-24" },
-    { label: 'Hardware ID', value: 'name', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
-    { label: 'Device Type', value: 'type', class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8" },
-    { label: 'Customer Name', value: 'customer', class: "text-xs px-3 py-2 w-20 max-w-20 min-w-20" },
-    { label: 'Faults /Issues', value: 'issues', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
-    { label: 'Status', value: 'status', class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4" },
+    { label: '#', value: 'sno', class: "txt-xs px-3 py-2 w-2 max-w-2 min-w-2" },
+    { label: 'Device Name', value: 'name', class: "txt-xs px-3 py-2 w-24 max-w-24 min-w-24" },
+    { label: 'Hardware ID', value: 'name', class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12" },
+    { label: 'Device Type', value: 'type', class: "txt-xs px-3 py-2 w-8 max-w-8 min-w-8" },
+    { label: 'Customer Name', value: 'customer', class: "txt-xs px-3 py-2 w-20 max-w-20 min-w-20" },
+    { label: 'Faults /Issues', value: 'issues', class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12" },
+    { label: 'Status', value: 'status', class: "txt-xs px-3 py-2 w-4 max-w-4 min-w-4" },
   ];
 
   function deviceTableData(d) {
     return [
-      { label: '#', value: d.sno || '', class: "text-xs px-3 py-2 w-2 max-w-2 min-w-2 rounded-l-md" },
-      { label: 'DeviceHWID', value: d.deviceName, class: "text-xs px-3 py-2 w-24 max-w-24 min-w-24" },
-      { label: 'HWID', value: d.deviceHardwareId, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
-      { label: 'Type', value: d?.deviceType || "-", class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8 capitalize"},
-      { label: 'Customer', value: d.owner?.name || "-", class: "text-xs px-3 py-2 w-20 max-w-20 min-w-20" },
+      { label: '#', value: d.sno || '', class: "txt-xs px-3 py-2 w-2 max-w-2 min-w-2 rounded-l-md" },
+      { label: 'DeviceHWID', value: d.deviceName, class: "txt-xs px-3 py-2 w-24 max-w-24 min-w-24" },
+      { label: 'HWID', value: d.deviceHardwareId, class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12" },
+      { label: 'Type', value: d?.deviceType || "-", class: "txt-xs px-3 py-2 w-8 max-w-8 min-w-8 capitalize"},
+      { label: 'Customer', value: d.owner?.name || "-", class: "txt-xs px-3 py-2 w-20 max-w-20 min-w-20" },
       { 
         label: 'Faults /Issues', 
         value: d.issues && d.issues.length > 0 ? d.issues.slice(0, 2).join(", ") + (d.issues.length > 2 ? "..." : "") : <span>No faults</span>, 
-        class: "text-[10px] px-3 py-2 w-12 max-w-12 min-w-12" 
+        class: "txt-ten px-3 py-2 w-12 max-w-12 min-w-12" 
       },
       { 
         label: 'Status', 
         value: <Badge title={d?.deviceRepairingStatus} type={d?.deviceRepairingStatus === ("resolved") ? "dark" : "light"}></Badge>,
-        class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4" 
+        class: "txt-xs px-3 py-2 w-4 max-w-4 min-w-4" 
       }
     ];
   }

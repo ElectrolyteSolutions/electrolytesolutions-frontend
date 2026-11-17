@@ -89,7 +89,7 @@ export function BottomSheet({ isOpen, onClose, title, children }) {
 
 
         {/* Scrollable Content */}
-        <div className=" h-[80vh] pb-6">{children}</div>
+        <div className=" h-[80vh] pb-6 px-3">{children}</div>
       </div>
     </>
   );

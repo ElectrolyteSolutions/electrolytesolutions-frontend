@@ -56,9 +56,9 @@ const ProductDetails = ({
   };
 
   return (
-    <form onSubmit={handleSave} className="flex flex-col h-full w-full overflow-x-hidden px-3 py-6">
+    <form onSubmit={handleSave} className="flex flex-col h-full w-full overflow-x-hidden py-6">
       <div className='flex flex-row justify-between items-center border-b border-zinc-800 pb-3'>
-        <h3 className="text-sm font-medium text-vercel-primary line-clamp-2 w-2/4">
+        <h3 className="txt-sm font-medium text-vercel-primary line-clamp-2 w-2/4">
           {editId ? (
             <>Edit Mode: <span className='text-vercel-secondary'>{form.name || 'Product'}</span></>
           ) : (
@@ -83,7 +83,7 @@ const ProductDetails = ({
 
       <div className="mt-3 h-screen bg-vercel-surface rounded-md border-1 border-zinc-800 px-2 py-2 overflow-y-auto space-y-2 custom-scrollbar max-h-[calc(100vh-20%)]">
         {/* Product Overview */}
-        <p className='text-xs'>Product Overview</p>
+        <p className='txt-xs'>Product Overview</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div>
             <label >Product Name</label>
@@ -118,7 +118,7 @@ const ProductDetails = ({
         </div>
 
         {/* Product Description */}
-        <p className='text-xs'>Product Description</p>
+        <p className='txt-xs'>Product Description</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <label >Product Images (Add Image URLs)</label>
           <div className='flex flex-row justify-between gap-2'>
@@ -141,7 +141,7 @@ const ProductDetails = ({
           <div className="flex flex-wrap gap-2 pt-2">
             {form.images.map((url, index) => (
               <div key={index} className="border-1 border-zinc-800 rounded-md relative p-2">
-                <button type="button" onClick={() => handleRemoveImage(index)} className="text-zinc-400 text-lg font-bold absolute top-0 right-2 m-0 p-0 cursor-pointer">&times;</button>
+                <button type="button" onClick={() => handleRemoveImage(index)} className="text-zinc-400 txt-lg font-bold absolute top-0 right-2 m-0 p-0 cursor-pointer">&times;</button>
                 <img src={url} alt={`Preview ${index}`} className="w-24 h-24 object-cover rounded-md bg-zinc-950" />
               </div>
             ))}
@@ -202,9 +202,9 @@ const ProductDetails = ({
         </div>
 
         {/* Product Type and Category */}
-        <p className='text-xs font-semibold text-zinc-300'>Product Type and Category</p>
+        <p className='txt-xs font-semibold text-zinc-300'>Product Type and Category</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
-          <label className="text-[11px] mb-0 pb-0 block">Product Category</label>
+          <label className="txt-eleven mb-0 pb-0 block">Product Category</label>
           {!isCreatingCollection ? (
             <div className='flex gap-3'>
               <select
@@ -300,7 +300,7 @@ const ProductDetails = ({
         </div>
 
         {/* Taxes and Inventory Management */}
-        <p className='text-xs font-semibold text-zinc-300'>Taxes and Inventory Management</p>
+        <p className='txt-xs font-semibold text-zinc-300'>Taxes and Inventory Management</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div>
@@ -348,7 +348,7 @@ const ProductDetails = ({
         </div>
 
         {/* Price, Discounts and Rates */}
-        <p className='text-xs font-semibold text-zinc-300'>Price, Discounts and Rates</p>
+        <p className='txt-xs font-semibold text-zinc-300'>Price, Discounts and Rates</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md'>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div>
@@ -395,7 +395,7 @@ const ProductDetails = ({
         </div>
 
         {/* SEO Management */}
-        <p className='text-xs font-semibold text-zinc-300'>SEO Management</p>
+        <p className='txt-xs font-semibold text-zinc-300'>SEO Management</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div>
             <label >Slug URL Parameter</label>

@@ -18,22 +18,22 @@ const statusOptions = [
 ];
 
 const ordersTableHead = [
-  { label: '#Orders', value: 'orders',class:" text-xs px-3 py-2 w-20 max-w-20 min-w-20" },
-  { label: 'Customer', value: 'Paid',class:" text-xs px-3 py-2 w-32 max-w-32 min-w-32" },
-  { label: 'Date', value: 'date',class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18" },
-  { label: 'Financial', value: 'financial',class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18" },
-  { label: 'Fulfillment', value: 'fulfillment',class:" text-xs px-3 py-2 w-20 max-w-20 min-w-20" },
-  { label: 'Amount', value: 'amount',class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18" }
+  { label: '#Orders', value: 'orders',class:" txt-xs px-3 py-2 w-20 max-w-20 min-w-20" },
+  { label: 'Customer', value: 'Paid',class:" txt-xs px-3 py-2 w-32 max-w-32 min-w-32" },
+  { label: 'Date', value: 'date',class:" txt-xs px-3 py-2 w-18 max-w-18 min-w-18" },
+  { label: 'Financial', value: 'financial',class:" txt-xs px-3 py-2 w-18 max-w-18 min-w-18" },
+  { label: 'Fulfillment', value: 'fulfillment',class:" txt-xs px-3 py-2 w-20 max-w-20 min-w-20" },
+  { label: 'Amount', value: 'amount',class:" txt-xs px-3 py-2 w-18 max-w-18 min-w-18" }
 ];
 
 function ordersTableData (order) {
   return [
-    { label: '#Orders', value: `#${String(order.orderNumber || order._id)?.slice(-8)}` ,class:" text-xs px-3 py-2 rounded-l-md font-medium w-20 max-w-20 min-w-20" },
-    { label: 'Customer', value: order.customer?.name || `${order.customer?.firstName || ''} ${order.customer?.lastName || ''}`.trim() || 'Guest Customer',class: "text-xs px-3 py-2 w-32 max-w-32 min-w-32 font-medium max-w-[180px]" },
-    { label: 'Date', value: new Date(order.createdAt || Date.now()).toLocaleDateString() ,class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18" },
-    { label: 'Financial', value: <Badge type={order?.financialStatus?.toLowerCase() === "paid" ? "dark":"light"} title={order?.financialStatus || 'Paid'}/> ,class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18"},
-    { label: 'Fulfillment', value: order?.fulfillmentStatus || 'Unfulfilled',class:"px-3 py-2 w-20 max-w-20 min-w-20 text-[10px] uppercase font-bold text-zinc-400" },
-    { label: 'Amount', value: `Rs ${order?.totalAmount || order?.totalPrice || 0}` ,class:" text-xs px-3 py-2 w-18 max-w-18 min-w-18 font-medium text-white rounded-r-md" },
+    { label: '#Orders', value: `#${String(order.orderNumber || order._id)?.slice(-8)}` ,class:" txt-xs px-3 py-2 rounded-l-md font-medium w-20 max-w-20 min-w-20" },
+    { label: 'Customer', value: order.customer?.name || `${order.customer?.firstName || ''} ${order.customer?.lastName || ''}`.trim() || 'Guest Customer',class: "txt-xs px-3 py-2 w-32 max-w-32 min-w-32 font-medium max-w-[180px]" },
+    { label: 'Date', value: new Date(order.createdAt || Date.now()).toLocaleDateString() ,class:" txt-xs px-3 py-2 w-18 max-w-18 min-w-18" },
+    { label: 'Financial', value: <Badge type={order?.financialStatus?.toLowerCase() === "paid" ? "dark":"light"} title={order?.financialStatus || 'Paid'}/> ,class:" txt-xs px-3 py-2 w-18 max-w-18 min-w-18"},
+    { label: 'Fulfillment', value: order?.fulfillmentStatus || 'Unfulfilled',class:"px-3 py-2 w-20 max-w-20 min-w-20 txt-ten uppercase font-bold text-zinc-400" },
+    { label: 'Amount', value: `Rs ${order?.totalAmount || order?.totalPrice || 0}` ,class:" txt-xs px-3 py-2 w-18 max-w-18 min-w-18 font-medium text-white rounded-r-md" },
   ];
 }
  

@@ -2,7 +2,7 @@ const GlobalTable = ({ title = "title", filteredList, status, selectedItem, setS
   return (
     <div className="w-full flex flex-col h-full min-h-0 overflow-hidden">
       {/* Header */}
-      <div className="py-3 text-sm font-semibold text-vercel-primary flex justify-between items-center shrink-0">
+      <div className="py-3 txt-sm font-semibold text-vercel-primary flex justify-between items-center shrink-0">
         <span>{title} List</span>
       </div>
 
@@ -13,13 +13,13 @@ const GlobalTable = ({ title = "title", filteredList, status, selectedItem, setS
         <div className=" overflow-x-auto w-full max-h-full custom-scrollbar">
           <table className="w-full text-left border-collapse min-w-[700px]">
             <thead className="sticky top-0 z-10 bg-vercel-surface backdrop-blur-sm">
-              <tr className="border-b border-zinc-800 text-sm font-semibold text-vercel-secondary text-left">
+              <tr className="border-b border-zinc-800 txt-sm font-semibold text-vercel-secondary text-left">
                 {tableHead.map((item, idx) => {
                   return <th key={idx} onClick={item?.onClick} style={{
                     width:item?.width,
                     maxWidth:item?.width,
                     minWidth:item?.width,
-                  }} className={`truncate text-xs px-3 py-2 ${item.class}`}>{item.label}</th>;
+                  }} className={`truncate txt-xs px-3 py-2 ${item.class}`}>{item.label}</th>;
                 })}
               </tr>
             </thead>
@@ -33,7 +33,7 @@ const GlobalTable = ({ title = "title", filteredList, status, selectedItem, setS
                           width:tableHead[idx]?.width,
                           maxWidth:tableHead[idx]?.width,
                           minWidth:tableHead[idx]?.width
-                        }} className='text-xs px-3 py-2'>
+                        }} className='txt-xs px-3 py-2'>
                           <div className="h-4 bg-zinc-900 rounded w-full"></div>
                         </td>
                       ))}
@@ -42,7 +42,7 @@ const GlobalTable = ({ title = "title", filteredList, status, selectedItem, setS
                 })
               ) : filteredList.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-zinc-500 text-sm italic">
+                  <td colSpan="6" className="px-6 py-12 text-center text-zinc-500 txt-sm italic">
                     No records found matching your criteria.
                   </td>
                 </tr>
@@ -64,7 +64,7 @@ const GlobalTable = ({ title = "title", filteredList, status, selectedItem, setS
                           width:tableHead[idx]?.width,
                           maxWidth:tableHead[idx]?.width,
                           minWidth:tableHead[idx]?.width
-                        }} className={`truncate text-xs px-3 py-2 ${tableHead[idx]?.class}`}>
+                        }} className={`truncate txt-xs px-3 py-2 ${tableHead[idx]?.class}`}>
                           {data?.value}
                         </td>
                       ))}

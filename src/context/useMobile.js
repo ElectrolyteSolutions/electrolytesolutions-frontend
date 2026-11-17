@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const SM_BREAKPOINT = 640; // Standard 'sm' breakpoint in pixels
+const SM_BREAKPOINT = 1024; // Standard 'sm' breakpoint in pixels
 
 export function useMobile(breakpoint = SM_BREAKPOINT) {
   const [isMobile, setIsMobile] = useState(false);

@@ -216,10 +216,10 @@ const AndroidManagementPage = () => {
     <div className="p-6 h-full flex flex-col bg-vercel-black text-vercel-primary overflow-y-auto border-l border-zinc-800">
       <div className="flex justify-between items-center pb-4 border-b border-zinc-800 mb-6">
         <div>
-          <h2 className="text-sm font-medium text-vercel-primary">
+          <h2 className="txt-sm font-medium text-vercel-primary">
             {selectedDevice ? 'Device Inspector' : 'Create Broadcast'}
           </h2>
-          <p className="text-xs text-zinc-400">
+          <p className="txt-xs text-zinc-400">
             {selectedDevice ? `ID: ${selectedDevice._id}` : 'Target specific user groups or broadcast globally'}
           </p>
         </div>
@@ -240,17 +240,17 @@ const AndroidManagementPage = () => {
       </div>
 
       {selectedDevice && (
-        <div className="space-y-2 mb-6 text-sm bg-vercel-surface p-3 rounded-md border-1 border-zinc-800">
+        <div className="space-y-2 mb-6 txt-sm bg-vercel-surface p-3 rounded-md border-1 border-zinc-800">
           <div><strong className="text-zinc-400">User / Role:</strong> <span className="text-vercel-primary">{selectedDevice.user || selectedDevice.userId || 'Unassigned'}</span></div>
           <div><strong className="text-zinc-400">Device Model:</strong> <span className="text-vercel-primary">{selectedDevice.deviceData?.deviceModel || selectedDevice.userData?.deviceModel || 'Unknown'}</span></div>
           <div><strong className="text-zinc-400">Android Version:</strong> <span className="text-vercel-primary">{selectedDevice.deviceData?.androidVersion || selectedDevice.userData?.androidVersion || 'N/A'}</span></div>
-          <div><strong className="text-zinc-400">FCM Token:</strong> <code className="bg-zinc-900 border-1 border-zinc-800 px-1 py-0.5 rounded text-xs text-zinc-300 break-all">{selectedDevice.token}</code></div>
+          <div><strong className="text-zinc-400">FCM Token:</strong> <code className="bg-zinc-900 border-1 border-zinc-800 px-1 py-0.5 rounded txt-xs text-zinc-300 break-all">{selectedDevice.token}</code></div>
         </div>
       )}
 
       {/* Broadcast Creation Form or Targeted Notification Form */}
       <div className={selectedDevice ? "mt-0" : ""}>
-        <h3 className="text-xs font-semibold text-zinc-300 mb-3">
+        <h3 className="txt-xs font-semibold text-zinc-300 mb-3">
           {selectedDevice ? 'Send Targeted Push Notification' : 'Broadcast Configuration'}
         </h3>
         

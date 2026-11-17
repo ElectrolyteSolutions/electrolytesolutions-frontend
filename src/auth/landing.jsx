@@ -17,7 +17,7 @@ const PasswordField = ({ isLoginView, password, setPassword }) => {
         {isLoginView && (
           <button 
             type="button" 
-            className="text-[10px] font-medium text-vercel-blue hover:text-indigo-400 transition-colors"
+            className="txt-ten font-medium text-vercel-blue hover:text-indigo-400 transition-colors"
           >
             Forgot Password?
           </button>
@@ -128,7 +128,7 @@ const AuthLandingPage = () => {
             <div className="d-sm-none h-[20vh]">
 
             </div>
-            <p className='text-center font-semibold text-sm'>Welcome to Electrolyte Solutions</p>
+            <p className='text-center font-semibold txt-sm'>Welcome to Electrolyte Solutions</p>
             {/* Registration Only Fields */}
             {!isLoginView && (
               <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
@@ -144,7 +144,7 @@ const AuthLandingPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5 ml-0.5">Account Role</label>
+                  <label className="block txt-ten font-bold text-zinc-400 uppercase tracking-widest mb-1.5 ml-0.5">Account Role</label>
                   <select 
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
@@ -172,13 +172,13 @@ const AuthLandingPage = () => {
             
             <PasswordField isLoginView={isLoginView} password={password} setPassword={setPassword} />
             <div className="text-center pt-2">
-              <p className="text-zinc-500 text-[10px] font-medium">
+              <p className="text-zinc-500 txt-ten font-medium">
                 {isLoginView ? "Don't have system access? " : "Already have an assigned role? "}
                 <button 
                   type="button" 
                   // onClick={toggleView}
                   onClick={()=>{alert('Come Back Later')}}
-                  className="font-medium text-[10px] text-vercel-blue hover:text-indigo-300 hover:underline transition-all"
+                  className="font-medium txt-ten text-vercel-blue hover:text-indigo-300 hover:underline transition-all"
                 >
                   {isLoginView ? 'Request Account' : 'Login Here'}
                 </button>
@@ -189,7 +189,7 @@ const AuthLandingPage = () => {
             <button 
               type="submit" 
               disabled={isLoading}
-              className="w-full bg-vercel-primary hover:opacity-50 disabled:text-zinc-500 text-vercel-black font-bold py-2 rounded-md text-xs transition-all shadow-lg shadow-indigo-900/20 mt-6 flex justify-center items-center gap-2 cursor-pointer"
+              className="w-full bg-vercel-primary hover:opacity-50 disabled:text-zinc-500 text-vercel-black font-bold py-2 rounded-md txt-xs transition-all shadow-lg shadow-indigo-900/20 mt-6 flex justify-center items-center gap-2 cursor-pointer"
             >
               {isLoading ? (
                 <span className="animate-pulse">Loading...</span>

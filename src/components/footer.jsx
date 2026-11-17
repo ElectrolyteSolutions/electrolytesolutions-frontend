@@ -47,9 +47,9 @@ const Footer = () => {
           <div className="space-y-6">
             <Link to="/" className="flex items-center gap-2">
               <img src={iconUrl} alt="Logo" className="h-8 w-8 grayscale brightness-200" />
-              <span className="text-white font-bold text-xl">Electrolyte Solutions</span>
+              <span className="text-white font-bold txt-xl">Electrolyte Solutions</span>
             </Link>
-            <p className="text-sm leading-6 max-w-xs">
+            <p className="txt-sm leading-6 max-w-xs">
               At Electrolyte Solutions, we provide fast, reliable, and professional IT and electronics services — right to your doorstep. Whether you need repairs, setup, or support, we’re here to power your tech life.
             </p>
             <div className="flex space-x-5">
@@ -64,13 +64,13 @@ const Footer = () => {
           <div className="mt-12 grid grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
+                <h3 className="txt-sm font-semibold text-white tracking-wider uppercase">
                   {footerSections[0].title}
                 </h3>
                 <ul className="mt-4 space-y-3">
                   {footerSections[0].links.map((link) => (
                     <li key={link.name}>
-                      <Link to={link.path} className="text-sm hover:text-white transition-colors">
+                      <Link to={link.path} className="txt-sm hover:text-white transition-colors">
                         {link.name}
                       </Link>
                     </li>
@@ -78,13 +78,13 @@ const Footer = () => {
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
+                <h3 className="txt-sm font-semibold text-white tracking-wider uppercase">
                   {footerSections[1].title}
                 </h3>
                 <ul className="mt-4 space-y-3">
                   {footerSections[1].links.map((link) => (
                     <li key={link.name}>
-                      <Link to={link.path} className="text-sm hover:text-white transition-colors">
+                      <Link to={link.path} className="txt-sm hover:text-white transition-colors">
                         {link.name}
                       </Link>
                     </li>
@@ -94,13 +94,13 @@ const Footer = () => {
             </div>
             <div className="md:grid md:grid-cols-1">
               <div>
-                <h3 className="text-sm font-semibold text-white tracking-wider uppercase">
+                <h3 className="txt-sm font-semibold text-white tracking-wider uppercase">
                   {footerSections[2].title}
                 </h3>
                 <ul className="mt-4 space-y-3">
                   {footerSections[2].links.map((link) => (
                     <li key={link.name}>
-                      <Link to={link.path} className="text-sm hover:text-white transition-colors">
+                      <Link to={link.path} className="txt-sm hover:text-white transition-colors">
                         {link.name}
                       </Link>
                     </li>
@@ -113,10 +113,10 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="mt-12 border-t border-zinc-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs">
+          <p className="txt-xs">
             &copy; {currentYear} ElectrolyteSolutions Inc. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 text-xs">
+          <div className="flex items-center gap-6 txt-xs">
             <span className="flex items-center gap-2">
               <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
               V 1.0

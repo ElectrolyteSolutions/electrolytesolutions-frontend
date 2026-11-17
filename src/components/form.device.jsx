@@ -35,7 +35,7 @@ const DeviceDetails = ({
   return (
     <form onSubmit={handleSave} className="flex flex-col h-full w-full overflow-x-none">
       <div className='flex flex-row justify-between items-center border-b border-zinc-800 pb-3'>
-        <h3 className="text-sm font-medium text-vercel-primary line-clamp-2 w-2/4">
+        <h3 className="txt-sm font-medium text-vercel-primary line-clamp-2 w-2/4">
           {editId ? (
             <>Edit Mode: <span className='text-vercel-secondary'>{form.deviceName || 'Device'}</span></>
           ) : (
@@ -46,7 +46,7 @@ const DeviceDetails = ({
         <div className="flex gap-2">
           <button
             type="submit"
-            className="w-fit bg-white hover:opacity-50 text-black px-3 py-2 rounded-md text-xs font-semibold transition-colors cursor-pointer"
+            className="w-fit bg-white hover:opacity-50 text-black px-3 py-2 rounded-md txt-xs font-semibold transition-colors cursor-pointer"
           >
             {editId ? 'Save Changes' : 'Register Repair Record'}
           </button>
@@ -54,7 +54,7 @@ const DeviceDetails = ({
             <button
               type='button'
               onClick={(e) => handleDeleteRecord(editId, e)}
-              className="w-fit bg-red-500 hover:opacity-50 text-white px-3 py-2 rounded-md text-xs font-semibold transition-colors cursor-pointer"
+              className="w-fit bg-red-500 hover:opacity-50 text-white px-3 py-2 rounded-md txt-xs font-semibold transition-colors cursor-pointer"
             >
               Delete Device
             </button>
@@ -64,7 +64,7 @@ const DeviceDetails = ({
 
       {/* Form Body */}
       <div className="mt-3 h-screen bg-vercel-surface rounded-md border-1 border-zinc-800 px-2 py-2 overflow-y-auto space-y-2 custom-scrollbar max-h-[calc(100vh-20%)]">
-        <p className='text-xs'>Device Overview</p>
+        <p className='txt-xs'>Device Overview</p>
 
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div>
@@ -120,7 +120,7 @@ const DeviceDetails = ({
           )}
         </div>
 
-        <p className='text-xs'>Customer Details</p>
+        <p className='txt-xs'>Customer Details</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md'>
           <label >Assigned Customer</label>
           <select 
@@ -134,7 +134,7 @@ const DeviceDetails = ({
           </select>
         </div>
 
-        <p className='text-xs'>Service Details</p>
+        <p className='txt-xs'>Service Details</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div className="flex flex-col gap-2">
             <div className="flex flex-row gap-3 w-full">
@@ -162,7 +162,7 @@ const DeviceDetails = ({
                   <button
                     type="button"
                     onClick={handleAddIssue}
-                    className="bg-white w-fit flex items-center justify-center text-black hover:bg-zinc-200 px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer"
+                    className="bg-white w-fit flex items-center justify-center text-black hover:bg-zinc-200 px-3 py-1 rounded-md txt-xs font-semibold transition-colors cursor-pointer"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -179,13 +179,13 @@ const DeviceDetails = ({
                   <div className="flex flex-wrap gap-1.5 pt-2">
                     {form.issues.map((issue, idx) => (
                       <div key={idx} className="flex items-center justify-center gap-2 bg-red-950 pl-2.5 pr-1.5 py-1 rounded-md">
-                        <span className="text-[11px] font-normal text-vercel-primary">{issue}</span>
-                        <button type="button" onClick={() => handleRemoveIssue(idx)} className="text-sm px-1 cursor-pointer">&times;</button>
+                        <span className="txt-eleven font-normal text-vercel-primary">{issue}</span>
+                        <button type="button" onClick={() => handleRemoveIssue(idx)} className="txt-sm px-1 cursor-pointer">&times;</button>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[11px] text-zinc-500 italic">No faults reported yet.</p>
+                  <p className="txt-eleven text-zinc-500 italic">No faults reported yet.</p>
                 )}
               </div>
             </div>

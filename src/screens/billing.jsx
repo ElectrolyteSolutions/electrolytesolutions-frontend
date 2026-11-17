@@ -316,24 +316,24 @@ const BillingPage = () => {
   const leftPaneContent = (
     <div className="bg-vercel-black p-6 w-full flex flex-col space-y-2 overflow-y-scroll sm:h-full h-[80vh]">
 
-        <h3 className="text-sm text-white font-semibold pb-3">Point of Sale Console</h3>
+        <h3 className="txt-sm text-white font-semibold pb-3">Point of Sale Console</h3>
 
       {duplicateBillMatch && !editingBillId && (
         <div className="border-1 border-amber-500/30 p-4 rounded-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h4 className="text-sm font-bold text-amber-400">⚠️ Existing Repair Bill Detected</h4>
-            <p className="text-zinc-400 text-xs">An invoice was already generated for this hardware configuration.</p>
+            <h4 className="txt-sm font-bold text-amber-400">⚠️ Existing Repair Bill Detected</h4>
+            <p className="text-zinc-400 txt-xs">An invoice was already generated for this hardware configuration.</p>
           </div>
-          <button onClick={() => setDuplicateBillMatch(null)} className="bg-vercel-black hover:bg-vercel-card text-zinc-300 text-xs px-3 py-2 rounded-md transition-colors">Ignore & New</button>
+          <button onClick={() => setDuplicateBillMatch(null)} className="bg-vercel-black hover:bg-vercel-card text-zinc-300 txt-xs px-3 py-2 rounded-md transition-colors">Ignore & New</button>
         </div>
       )}
 
       {editingBillId && (
         <div className="bg-blue-600/10 border-1 border-blue-500/30 p-4 rounded-md flex items-center justify-between gap-3">
-          <div className="text-xs text-blue-400">
+          <div className="txt-xs text-blue-400">
             <span className="font-bold uppercase bg-blue-500/20 px-2 py-0.5 rounded mr-2">Edit Mode Active</span>
           </div>
-          <button onClick={handleCancelEditMode} className="text-xs font-bold text-zinc-400 hover:text-red-400 underline">Cancel</button>
+          <button onClick={handleCancelEditMode} className="txt-xs font-bold text-zinc-400 hover:text-red-400 underline">Cancel</button>
         </div>
       )}
 
@@ -358,7 +358,7 @@ const BillingPage = () => {
 
         {purpose === 'repair' && selectedCustomerId && (
           <div className='border-1 border-amber-500/20 bg-amber-500/5 p-3 rounded-md'>
-            <p className='text-xs m-0'>Service / Onsite Repair/ Reassembly Labour Charges</p>
+            <p className='txt-xs m-0'>Service / Onsite Repair/ Reassembly Labour Charges</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div>
               <label>Linked Hardware Target</label>
@@ -376,7 +376,7 @@ const BillingPage = () => {
         )}
 
         <div className='border-1 border-blue-500/20 bg-blue-500/5 p-3 rounded-md'>
-            <p className='text-xs'>Service / Onsite Repair/ Reassembly Labour Charges</p>
+            <p className='txt-xs'>Service / Onsite Repair/ Reassembly Labour Charges</p>
           <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
             <div className="col-span-2">
               <input type="text" placeholder="Charge Description.." value={customItemName} onChange={e => setCustomItemName(e.target.value)} />
@@ -409,7 +409,7 @@ const BillingPage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-1 max-h-[350px] overflow-y-auto pr-1">
-            <div className='d-flex w-full bg-vercel-black border-1 border-zinc-800 text-xs p-2 rounded-t-md'>
+            <div className='d-flex w-full bg-vercel-black border-1 border-zinc-800 txt-xs p-2 rounded-t-md'>
               <div className='w-3/5'>Name</div>
               <div className='w-1/5'>Brand</div>
               <div className='w-1/6'>Price</div>
@@ -420,7 +420,7 @@ const BillingPage = () => {
               
               return (
                 <div onClick={() => handleAddItem(p._id)} key={p._id} 
-                  className={`p-2 ${isSelected && "bg-white rounded-md text-black"} text-xs text-vercel-secondary d-flex font-semibold hover:rounded-md border-1 border-zinc-800 cursor-pointer hover:bg-white hover:text-vercel-black`}>
+                  className={`p-2 ${isSelected && "bg-white rounded-md text-black"} txt-xs text-vercel-secondary d-flex font-semibold hover:rounded-md border-1 border-zinc-800 cursor-pointer hover:bg-white hover:text-vercel-black`}>
                     <div className='w-3/5'>{p.name}</div>
                     <div className='w-1/5'>{p.brand}</div>
                     <div className='w-1/6'>{p.price}</div>
@@ -441,11 +441,11 @@ const BillingPage = () => {
     <div className="p-6 w-full h-full overflow-hidden space-y-3">
       <div className='overflow-hidden bg-vercel-black rounded-md h-[70%] min-h-[70%] max-h-[70%]'>
         <div className='d-flex justify-between items-center'>
-        <h3 className="text-sm font-bold">Invoice Items</h3>
+        <h3 className="txt-sm font-bold">Invoice Items</h3>
         <Button 
           onClick={handleSubmitBill} 
           disabled={isSubmitting}
-          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-md text-xs uppercase tracking-wider transition-all disabled:opacity-50"
+          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-md txt-xs uppercase tracking-wider transition-all disabled:opacity-50"
           label={isSubmitting ? (editingBillId ? 'Updating...' : 'Creating...') : (editingBillId ? 'Update Invoice' : 'Create Invoice')}
         />
         </div>
@@ -478,14 +478,14 @@ const BillingPage = () => {
         <div className="d-flex flex-col bg-red-800/50 px-2 py-2 rounded-md border-zinc-800 border">
           <label>Payment Status</label>
           <div className="inline-flex p-1 bg-vercel-black rounded-md space-x-1">
-            <button type="button" onClick={() => setIsPaid(true)} className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase ${isPaid ? 'bg-red-800 text-white' : 'text-zinc-500'}`}>Paid</button>
-            <button type="button" onClick={() => setIsPaid(false)} className={`px-3 py-1.5 rounded-md font-bold text-[10px] uppercase ${!isPaid ? 'bg-green-800 text-white' : 'text-zinc-500'}`}>Unpaid</button>
+            <button type="button" onClick={() => setIsPaid(true)} className={`px-3 py-1.5 rounded-md font-bold txt-ten uppercase ${isPaid ? 'bg-red-800 text-white' : 'text-zinc-500'}`}>Paid</button>
+            <button type="button" onClick={() => setIsPaid(false)} className={`px-3 py-1.5 rounded-md font-bold txt-ten uppercase ${!isPaid ? 'bg-green-800 text-white' : 'text-zinc-500'}`}>Unpaid</button>
           </div>
         </div>
         
-        <div className='text-sm border-1 border-zinc-800 rounded-md d-flex items-center justify-center p-2 gap-3 bg-vercel-card'>
+        <div className='txt-sm border-1 border-zinc-800 rounded-md d-flex items-center justify-center p-2 gap-3 bg-vercel-card'>
           <span className="font-semibold text-zinc-400">Grand Total:</span>
-          <span className="text-lg font-vercel-primary">₹{calculateTotal()}.00</span>
+          <span className="txt-lg font-vercel-primary">₹{calculateTotal()}.00</span>
         </div>
       </div>
     </div>
@@ -496,8 +496,8 @@ const BillingPage = () => {
       {printTargetData ? (
         <div className="p-6 max-w-2xl mx-auto space-y-4">
           <div className="p-4 rounded-md flex justify-between items-center border-1 border-zinc-800">
-            <span className="text-xs font-semibold text-emerald-400">🎉 Transaction Processed Successfully!</span>
-            <button onClick={() => setPrintTargetData(null)} className="bg-vercel-card text-white text-xs px-4 py-2 rounded-md font-bold">← New Transaction</button>
+            <span className="txt-xs font-semibold text-emerald-400">🎉 Transaction Processed Successfully!</span>
+            <button onClick={() => setPrintTargetData(null)} className="bg-vercel-card text-white txt-xs px-4 py-2 rounded-md font-bold">← New Transaction</button>
           </div>
           <InvoiceTemplate billData={printTargetData} onClose={() => setPrintTargetData(null)} />
         </div>

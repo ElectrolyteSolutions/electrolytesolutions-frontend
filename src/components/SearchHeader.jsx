@@ -22,7 +22,7 @@ const Header = ({placeholder, searchTerm, setSearchTerm, statusFilter, setStatus
           placeholder={placeholder}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-vercel-card text-zinc-100 placeholder-zinc-500 pl-10 pr-4 py-2 rounded-md border-1 border-zinc-800 focus:outline-none focus:border-white text-sm transition-all hover:border-white"
+          className="w-full bg-vercel-card text-zinc-100 placeholder-zinc-500 pl-10 pr-4 py-2 rounded-md border-1 border-zinc-800 focus:outline-none focus:border-white txt-sm transition-all hover:border-white"
         />
         <div className="d-flex gap-2 absolute end-3 top-3">
         {loading && <div className="loader"></div>}

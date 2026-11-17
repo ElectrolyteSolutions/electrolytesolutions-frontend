@@ -167,27 +167,27 @@ const CollectionsPage = () => {
   };
 
   const collectionsTableHead = [
-    { label: '#', value: 'sno', class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4", onClick: ()=>{} },
-    { label: 'ERP ID', value: 'erpCollectionId', class: "text-xs px-3 py-2 w-24 min-w-24 max-w-24", onClick: ()=>{} },
-    { label: 'Collection Title', value: 'title', class: "text-xs px-3 py-2 w-36 min-w-36 max-w-36 cursor-pointer", onClick: () => handleSortToggle('title') },
-    { label: 'Slug URL', value: 'slug', class: "text-xs px-3 py-2 w-32 min-w-32 max-w-32", onClick: ()=>{} },
-    { label: 'SEO Meta Title', value: 'metaTitle', class: "text-xs px-3 py-2 w-40 min-w-40 max-w-40", onClick: ()=>{} },
+    { label: '#', value: 'sno', class: "txt-xs px-3 py-2 w-4 max-w-4 min-w-4", onClick: ()=>{} },
+    { label: 'ERP ID', value: 'erpCollectionId', class: "txt-xs px-3 py-2 w-24 min-w-24 max-w-24", onClick: ()=>{} },
+    { label: 'Collection Title', value: 'title', class: "txt-xs px-3 py-2 w-36 min-w-36 max-w-36 cursor-pointer", onClick: () => handleSortToggle('title') },
+    { label: 'Slug URL', value: 'slug', class: "txt-xs px-3 py-2 w-32 min-w-32 max-w-32", onClick: ()=>{} },
+    { label: 'SEO Meta Title', value: 'metaTitle', class: "txt-xs px-3 py-2 w-40 min-w-40 max-w-40", onClick: ()=>{} },
   ];
 
   function collectionsTableData(c) {
     return [
-      { label: '#', value: c.sno || '', class: "text-xs pl-3 pr-0 py-2 rounded-l-md w-4 max-w-4 min-w-4" },
-      { label: 'ERP ID', value: <span className="font-mono text-[11px] text-zinc-400">{c.erpCollectionId}</span>, class: "text-xs px-3 py-2 w-24 min-w-24 max-w-24" },
+      { label: '#', value: c.sno || '', class: "txt-xs pl-3 pr-0 py-2 rounded-l-md w-4 max-w-4 min-w-4" },
+      { label: 'ERP ID', value: <span className="font-mono txt-eleven text-zinc-400">{c.erpCollectionId}</span>, class: "txt-xs px-3 py-2 w-24 min-w-24 max-w-24" },
       { label: 'Collection Title', value: (
           <div className="flex items-center gap-2">
             {c.image && <img src={c.image} alt="" className="w-6 h-6 object-cover rounded bg-zinc-900" />}
             <div className="font-medium truncate">{c.title}</div>
           </div>
         ), 
-        class: "text-xs px-3 py-2 w-36 min-w-36 max-w-36" 
+        class: "txt-xs px-3 py-2 w-36 min-w-36 max-w-36" 
       },
-      { label: 'Slug URL', value: <span className="font-mono text-[11px] text-zinc-400 truncate">/{c.slug}</span>, class: "text-xs px-3 py-2 w-32 min-w-32 max-w-32" },
-      { label: 'SEO Meta Title', value: <span className="truncate text-zinc-300">{c.seo?.metaTitle || '-'}</span>, class: "text-xs px-3 py-2 w-40 min-w-40 max-w-40" },
+      { label: 'Slug URL', value: <span className="font-mono txt-eleven text-zinc-400 truncate">/{c.slug}</span>, class: "txt-xs px-3 py-2 w-32 min-w-32 max-w-32" },
+      { label: 'SEO Meta Title', value: <span className="truncate text-zinc-300">{c.seo?.metaTitle || '-'}</span>, class: "txt-xs px-3 py-2 w-40 min-w-40 max-w-40" },
     ];
   }
 

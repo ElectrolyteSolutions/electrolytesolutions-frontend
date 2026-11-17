@@ -121,7 +121,7 @@ const InvoiceWrapper = ({ billData, onClose,promptDeleteBill }) => {
   return (
     <div className="flex flex-col h-full w-full overflow-x-none px-3 py-6">
       <div className='d-flex flex-row justify-between align-items-center border-b-1 border-zinc-800 pb-3'>
-      <h3 className="text-sm font-medium text-vercel-primary line-clamp-2 ">
+      <h3 className="txt-sm font-medium text-vercel-primary line-clamp-2 ">
         {billData?.billNumber}
       </h3>
       <div className="flex flex-wrap items-center gap-2 ml-auto">

@@ -205,16 +205,16 @@ const CustomersPage = () => {
   }, [items, searchTerm, customerFilter, currentSortBy, currentSortOrder]);
 
   const customerTableHead = [
-    { label: '#', value: 'sno', class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4", onClick: () => {} },
-    { label: 'Customer Name', value: 'name', class: "text-xs px-3 py-2 w-38 min-w-38 max-w-38 cursor-pointer", onClick: () => handleSortToggle('name') },
-    { label: 'Phone', value: 'phone', class: "text-xs px-3 py-2 w-26 min-w-26 max-w-26", onClick: () => {} },
-    { label: 'Email', value: 'phone', class: "text-xs px-3 py-2 w-32 min-w-32 max-w-32", onClick: () => {} },
-    { label: 'Type', value: 'type', class: "text-xs px-3 py-2 w-22 min-w-22 max-w-22", onClick: () => {handleSortToggle('type')} },
-    { label: 'Address', value: 'devices', class: "text-xs px-3 py-2 w-42 min-w-42 max-w-42", onClick: () => {} },
-    { label: 'Devices ', value: 'devices', class: "text-xs px-3 py-2 w-16 min-w-16 max-w-16", onClick: () => {} },
-    { label: 'Orders ', value: 'devices', class: "text-xs px-3 py-2 w-16 min-w-16 max-w-16", onClick: () => {} },
-    { label: 'GST', value: 'gst', class: "text-xs px-3 py-2 w-16 min-w-16 max-w-16 cursor-pointer", onClick: () => {} },
-    { label: 'PAN', value: 'pan', class: "text-xs px-3 py-2 w-28 min-w-28 max-w-28", onClick: () => {} },
+    { label: '#', value: 'sno', class: "txt-xs px-3 py-2 w-4 max-w-4 min-w-4", onClick: () => {} },
+    { label: 'Customer Name', value: 'name', class: "txt-xs px-3 py-2 w-38 min-w-38 max-w-38 cursor-pointer", onClick: () => handleSortToggle('name') },
+    { label: 'Phone', value: 'phone', class: "txt-xs px-3 py-2 w-26 min-w-26 max-w-26", onClick: () => {} },
+    { label: 'Email', value: 'phone', class: "txt-xs px-3 py-2 w-32 min-w-32 max-w-32", onClick: () => {} },
+    { label: 'Type', value: 'type', class: "txt-xs px-3 py-2 w-22 min-w-22 max-w-22", onClick: () => {handleSortToggle('type')} },
+    { label: 'Address', value: 'devices', class: "txt-xs px-3 py-2 w-42 min-w-42 max-w-42", onClick: () => {} },
+    { label: 'Devices ', value: 'devices', class: "txt-xs px-3 py-2 w-16 min-w-16 max-w-16", onClick: () => {} },
+    { label: 'Orders ', value: 'devices', class: "txt-xs px-3 py-2 w-16 min-w-16 max-w-16", onClick: () => {} },
+    { label: 'GST', value: 'gst', class: "txt-xs px-3 py-2 w-16 min-w-16 max-w-16 cursor-pointer", onClick: () => {} },
+    { label: 'PAN', value: 'pan', class: "txt-xs px-3 py-2 w-28 min-w-28 max-w-28", onClick: () => {} },
   ];
 
   function customerTableData(c) {
@@ -222,19 +222,19 @@ const CustomersPage = () => {
     const displayAddress = c.address || (c.addresses?.[0] ? `${c.addresses[0].address1}, ${c.addresses[0].city}` : 'No address');
 
     return [
-      { label: '#', value: c.sno || '', class: "text-xs pl-3 pr-0 py-2 rounded-l-md w-4 max-w-4 min-w-4" },
-      { label: 'Customer Name', value: displayName, class: "text-xs px-3 py-2 w-38 min-w-38 max-w-38"
+      { label: '#', value: c.sno || '', class: "txt-xs pl-3 pr-0 py-2 rounded-l-md w-4 max-w-4 min-w-4" },
+      { label: 'Customer Name', value: displayName, class: "txt-xs px-3 py-2 w-38 min-w-38 max-w-38"
       },
-      { label: 'Phone', value: c.phone || "-", class: "text-xs px-3 py-2 w-26 min-w-26 max-w-26" },
-      { label: 'Email', value: c.email || "-", class: "text-xs px-3 py-2 w-32 min-w-32 max-w-32" },
+      { label: 'Phone', value: c.phone || "-", class: "txt-xs px-3 py-2 w-26 min-w-26 max-w-26" },
+      { label: 'Email', value: c.email || "-", class: "txt-xs px-3 py-2 w-32 min-w-32 max-w-32" },
       { label: 'Type', value: <Badge type={c?.customerType === 'Corporate' ? 'light' : 'dark'} title={c?.customerType || 'Individual'}></Badge>,
-        class: "text-xs px-3 py-2 w-22 min-w-22 max-w-22"
+        class: "txt-xs px-3 py-2 w-22 min-w-22 max-w-22"
       },
-      { label: 'Address', value: displayAddress ,class: "text-xs px-3 py-2 w-42 min-w-42 max-w-42" },
-      { label: 'Devices', value: c.devices?.length || 0 ,class: "text-xs px-3 py-2 w-16 min-w-16 max-w-16" },
-      { label: 'Orders', value: c.orders?.length || 0 ,class: "text-xs px-3 py-2 w-16 min-w-16 max-w-16" },
-      { label: 'GST', value: c.gst || "-" ,class: "text-xs px-3 py-2 w-28 min-w-28 max-w-28" },
-      { label: 'PAN', value: c?.pan || "-" ,class: "text-xs px-3 py-2 w-20 min-w-20 max-w-20" }
+      { label: 'Address', value: displayAddress ,class: "txt-xs px-3 py-2 w-42 min-w-42 max-w-42" },
+      { label: 'Devices', value: c.devices?.length || 0 ,class: "txt-xs px-3 py-2 w-16 min-w-16 max-w-16" },
+      { label: 'Orders', value: c.orders?.length || 0 ,class: "txt-xs px-3 py-2 w-16 min-w-16 max-w-16" },
+      { label: 'GST', value: c.gst || "-" ,class: "txt-xs px-3 py-2 w-28 min-w-28 max-w-28" },
+      { label: 'PAN', value: c?.pan || "-" ,class: "txt-xs px-3 py-2 w-20 min-w-20 max-w-20" }
     ];
   }
 

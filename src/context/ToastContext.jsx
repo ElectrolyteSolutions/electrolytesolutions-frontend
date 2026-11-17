@@ -46,7 +46,7 @@ export const ToastProvider = ({ children }) => {
               toast.type
             )} shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200`}
           >
-            <div className="flex items-center gap-2.5 text-xs font-medium">
+            <div className="flex items-center gap-2.5 txt-xs font-medium">
               {toast.type === 'success' && (
                 <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
               )}
@@ -60,7 +60,7 @@ export const ToastProvider = ({ children }) => {
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-zinc-500 hover:text-white transition-colors text-xs font-bold cursor-pointer p-1"
+              className="text-zinc-500 hover:text-white transition-colors txt-xs font-bold cursor-pointer p-1"
             >
               ✕
             </button>

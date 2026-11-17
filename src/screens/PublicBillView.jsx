@@ -83,7 +83,7 @@ const PublicBillView = () => {
       <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center p-4">
         <div className="text-center space-y-2">
           <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-xs font-mono text-zinc-400">Loading your secure bill...</p>
+          <p className="txt-xs font-mono text-zinc-400">Loading your secure bill...</p>
         </div>
       </div>
     );
@@ -93,9 +93,9 @@ const PublicBillView = () => {
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center p-4">
         <div className="bg-vercel-secondary border border-zinc-800 p-6 rounded-lg max-w-md w-full text-center space-y-3">
-          <div className="text-2xl">⚠️</div>
-          <h2 className="text-sm font-bold uppercase tracking-wider text-red-400">Access Error</h2>
-          <p className="text-xs text-zinc-400">{error || 'Bill not found or link has expired.'}</p>
+          <div className="txt-2xl">⚠️</div>
+          <h2 className="txt-sm font-bold uppercase tracking-wider text-red-400">Access Error</h2>
+          <p className="txt-xs text-zinc-400">{error || 'Bill not found or link has expired.'}</p>
         </div>
       </div>
     );
@@ -149,14 +149,14 @@ const PublicBillView = () => {
       {/* Public Action Controls Toolbar */}
       <div className="w-full max-w-[800px] flex flex-wrap justify-between items-center gap-3 bg-vercel-secondary border border-zinc-800 px-4 py-3 rounded-xl no-print shadow-lg">
         <div>
-          <h1 className="text-sm font-bold text-white">Public Secure Bill View</h1>
-          <p className="text-[10px] text-zinc-400 font-mono">Invoice ID: {bill?.billNumber || bill?._id}</p>
+          <h1 className="txt-sm font-bold text-white">Public Secure Bill View</h1>
+          <p className="txt-ten text-zinc-400 font-mono">Invoice ID: {bill?.billNumber || bill?._id}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 ml-auto">
           {/* <button 
             onClick={() => setIsGstinMasked(!isGstinMasked)}
-            className="bg-vercel-card hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700 cursor-pointer"
+            className="bg-vercel-card hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium txt-xs transition-all shadow border border-zinc-700 cursor-pointer"
             title="Toggle GSTIN Masking"
           >
             {isGstinMasked ? '👁️ Unmask GSTIN' : '🔒 Mask GSTIN'}
@@ -164,14 +164,14 @@ const PublicBillView = () => {
 
           <button 
             onClick={handleDownloadPdf}
-            className="bg-vercel-card hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow border border-zinc-700 cursor-pointer"
+            className="bg-vercel-card hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold txt-xs transition-all shadow border border-zinc-700 cursor-pointer"
           >
             📥 Download PDF
           </button>
 
           <button 
             onClick={handlePrint}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md font-semibold text-xs transition-all shadow cursor-pointer"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md font-semibold txt-xs transition-all shadow cursor-pointer"
           >
             🖨️ Print
           </button>

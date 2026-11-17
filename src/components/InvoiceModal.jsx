@@ -175,14 +175,14 @@ const InvoiceWrapperModal = ({ billData, onClose }) => {
         {/* Modal Header Bar with Controls */}
         <div className="px-4 sm:px-6 py-3 border-b border-zinc-800 flex flex-wrap justify-between items-center gap-3 bg-vercel-secondary shrink-0">
           <div className="min-w-0 pr-2">
-            <h3 className="text-base sm:text-lg font-bold text-white truncate">Invoice & Billing Statement</h3>
-            <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase mt-0.5 truncate">Invoice ID: {billData?.billNumber || billData?._id}</p>
+            <h3 className="txt-base sm:txt-lg font-bold text-white truncate">Invoice & Billing Statement</h3>
+            <p className="txt-ten sm:txt-xs text-zinc-500 font-mono uppercase mt-0.5 truncate">Invoice ID: {billData?.billNumber || billData?._id}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 ml-auto">
             <button 
               onClick={() => setIsGstinMasked(!isGstinMasked)}
-              className="bg-vercel-card hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium text-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
+              className="bg-vercel-card hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md font-medium txt-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
               title="Toggle GSTIN Masking"
             >
               {isGstinMasked ? '👁️ Unmask GSTIN' : '🔒 Mask GSTIN'}
@@ -190,26 +190,26 @@ const InvoiceWrapperModal = ({ billData, onClose }) => {
 
             <button 
               onClick={handleShareLink}
-              className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow cursor-pointer no-print"
+              className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-md font-semibold txt-xs transition-all shadow cursor-pointer no-print"
             >
               {copyFeedback ? '✓ Link Copied!' : '🔗 Share Public Link'}
             </button>
 
             <button 
               onClick={handleDownloadPdf}
-              className="bg-vercel-card hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
+              className="bg-vercel-card hover:bg-zinc-700 text-zinc-200 px-3 py-1.5 rounded-md font-semibold txt-xs transition-all shadow border border-zinc-700 cursor-pointer no-print"
             >
               📥 Download PDF
             </button>
 
             <button 
               onClick={handlePrint}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md font-semibold text-xs transition-all shadow cursor-pointer no-print"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-1.5 rounded-md font-semibold txt-xs transition-all shadow cursor-pointer no-print"
             >
               🖨️ Print
             </button>
 
-            <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors text-2xl shrink-0 leading-none cursor-pointer ml-2 no-print">&times;</button>
+            <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors txt-2xl shrink-0 leading-none cursor-pointer ml-2 no-print">&times;</button>
           </div>
         </div>
 

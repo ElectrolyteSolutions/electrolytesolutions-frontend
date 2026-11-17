@@ -153,7 +153,7 @@ const ProfilePage = () => {
         value: (
           <div>
             <div className="font-semibold text-zinc-200">{session.device}</div>
-            <div className="text-[11px] text-zinc-400 font-mono">IP: {session.ipAddress}</div>
+            <div className="txt-eleven text-zinc-400 font-mono">IP: {session.ipAddress}</div>
           </div>
         ), 
       },
@@ -178,7 +178,7 @@ const ProfilePage = () => {
               type="danger"
               onClick={() => handleTerminateSession(session)}
               label="Log out"
-              className="text-xs py-1"
+              className="txt-xs py-1"
             />
           </div>
         ), 
@@ -190,7 +190,7 @@ const ProfilePage = () => {
   const leftPaneContent = (
     <div className="p-6 w-full h-full flex flex-col overflow-y-auto custom-scrollbar bg-vercel-black">
       <div className="text-vercel-suraface p-4 sm:p-6 rounded-xl shadow-xl border-1 border-zinc-800/60">
-        <h3 className="text-sm font-bold text-vercel-primary mb-4">Edit Profile & Business Details</h3>
+        <h3 className="txt-sm font-bold text-vercel-primary mb-4">Edit Profile & Business Details</h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -358,7 +358,7 @@ const ProfilePage = () => {
     <div className="p-6 w-full h-full flex flex-col justify-between text-vercel-suraface border-l border-zinc-800 overflow-y-auto custom-scrollbar">
       <div>
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-vercel-primary">Active Login Sessions</h3>
+          <h3 className="txt-sm font-bold text-vercel-primary">Active Login Sessions</h3>
           {sessions && sessions.length > 0 && (
             <Button
               type="danger"
@@ -367,10 +367,10 @@ const ProfilePage = () => {
             />
           )}
         </div>
-        <p className="text-zinc-500 text-xs mb-4">Here is where and when your account is currently logged in.</p>
+        <p className="text-zinc-500 txt-xs mb-4">Here is where and when your account is currently logged in.</p>
 
         {sessions && sessions.length === 0 ? (
-          <p className="text-zinc-500 text-xs italic py-8 text-center">No active sessions found.</p>
+          <p className="text-zinc-500 txt-xs italic py-8 text-center">No active sessions found.</p>
         ) : (
           <div className="max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
             <GlobalTable

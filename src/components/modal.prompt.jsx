@@ -19,10 +19,10 @@ const ConfirmModal = ({
         
         {/* Header / Content */}
         <div className="p-6 space-y-2">
-          <h3 className="text-base font-semibold text-white tracking-tight">
+          <h3 className="txt-base font-semibold text-white tracking-tight">
             {title}
           </h3>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+          <p className="txt-xs text-zinc-400 leading-relaxed">
             {description}
           </p>
         </div>
@@ -33,7 +33,7 @@ const ConfirmModal = ({
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="bg-transparent hover:bg-zinc-800 text-zinc-300 px-4 py-2 rounded-md text-xs font-semibold transition-colors border-1 border-zinc-800 cursor-pointer"
+            className="bg-transparent hover:bg-zinc-800 text-zinc-300 px-4 py-2 rounded-md txt-xs font-semibold transition-colors border-1 border-zinc-800 cursor-pointer"
           >
             {cancelText}
           </button>
@@ -42,7 +42,7 @@ const ConfirmModal = ({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className={`px-4 py-2 rounded-md text-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-md txt-xs font-semibold transition-all cursor-pointer flex items-center gap-2 ${
               isDestructive 
                 ? 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-500/20' 
                 : 'bg-white hover:bg-zinc-200 text-black shadow-lg shadow-white/10'

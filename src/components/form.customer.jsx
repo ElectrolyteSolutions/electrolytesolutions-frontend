@@ -67,7 +67,7 @@ const CustomerDetails = ({
   return (
     <form onSubmit={handleSave} className="flex flex-col h-full w-full overflow-x-none px-3 py-6">
       <div className='flex flex-row justify-between items-center border-b border-zinc-800 pb-3'>
-        <h3 className="text-sm font-bold text-vercel-primary line-clamp-2 w-2/4">
+        <h3 className="txt-sm font-bold text-vercel-primary line-clamp-2 w-2/4">
           {editId ? (
             <>Edit Mode: <span className='text-vercel-secondary'>{form.name || `${form.firstName || ''} ${form.lastName || ''}`.trim() || 'Customer'}</span></>
           ) : (
@@ -97,10 +97,10 @@ const CustomerDetails = ({
 
       <div className="mt-3 h-screen bg-vercel-surface rounded-md border-1 border-zinc-800 p-2 overflow-y-auto space-y-2 custom-scrollbar max-h-[calc(100vh-20%)]">
         {/* Customer Category & Info */}
-        <p className='text-xs font-medium'>Customer Profile & Classification</p>
+        <p className='txt-xs font-medium'>Customer Profile & Classification</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div>
-            <label className="text-[11px] text-zinc-400 block mb-1">Customer Category</label>
+            <label className="txt-eleven text-zinc-400 block mb-1">Customer Category</label>
             <select
               value={form.customerType}
               onChange={e => setForm({ ...form, customerType: e.target.value })}
@@ -112,7 +112,7 @@ const CustomerDetails = ({
           </div>
 
           <div>
-            <label className="text-[11px] text-zinc-400 block mb-1">
+            <label className="txt-eleven text-zinc-400 block mb-1">
               {form.customerType === "Corporate" ? "Corporate Name" : "Full Name"}
             </label>
 
@@ -128,7 +128,7 @@ const CustomerDetails = ({
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[11px] text-zinc-400 block mb-1">Company GST</label>
+                    <label className="txt-eleven text-zinc-400 block mb-1">Company GST</label>
                     <input
                       type="text"
                       maxLength={20}
@@ -138,7 +138,7 @@ const CustomerDetails = ({
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-zinc-400 block mb-1">PAN</label>
+                    <label className="txt-eleven text-zinc-400 block mb-1">PAN</label>
                     <input
                       type="text"
                       maxLength={15}
@@ -173,7 +173,7 @@ const CustomerDetails = ({
         </div>
 
         {/* Contact & Address */}
-        <p className='text-xs font-medium'>Contact & Location Details</p>
+        <p className='txt-xs font-medium'>Contact & Location Details</p>
         <div className='bg-vercel-black px-2 py-2 border-1 border-zinc-800 rounded-md space-y-3'>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
@@ -216,14 +216,14 @@ const CustomerDetails = ({
                 />
               </div>
               <div className="flex justify-between items-center pt-1">
-                {emailStatus === 'checking' && <span className="text-[10px] text-amber-400 animate-pulse">Checking for availability...</span>}
-                {emailStatus === 'taken' && <span className="text-[10px] text-red-400">{emailMsg}</span>}
+                {emailStatus === 'checking' && <span className="txt-ten text-amber-400 animate-pulse">Checking for availability...</span>}
+                {emailStatus === 'taken' && <span className="txt-ten text-red-400">{emailMsg}</span>}
               </div>
             </div>
           </div>
 
           <div>
-            <label className="text-[11px] text-zinc-400 block mb-1">Full Address</label>
+            <label className="txt-eleven text-zinc-400 block mb-1">Full Address</label>
             <textarea
               maxLength={300}
               rows={3}
@@ -235,7 +235,7 @@ const CustomerDetails = ({
           </div>
         </div>
         {editId && <>
-        {customer?.addresses?.length>0 && <><p className='text-sm font-medium'>Address and Location</p>
+        {customer?.addresses?.length>0 && <><p className='txt-sm font-medium'>Address and Location</p>
         {customer?.addresses?.map((add,index)=>{
             return  <CustomList 
                         title={`Addresses ${index + 1}`}        

@@ -93,16 +93,16 @@ export default function StoreSettingsPage() {
 
         <div className="flex justify-between items-center mb-6 border-b-1 pb-4">
             <div>
-            <h1 className="text-2xl font-bold text-vercel-white">Store Settings & Policies</h1>
-            <p className="text-sm text-gray-500">Manage legal policies and business contact details.</p>
+            <h1 className="txt-2xl font-bold text-vercel-white">Store Settings & Policies</h1>
+            <p className="txt-sm text-gray-500">Manage legal policies and business contact details.</p>
             </div>
             {isSuccess && (
-            <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full">
+            <span className="bg-green-100 text-green-700 txt-xs font-semibold px-3 py-1.5 rounded-full">
                 {message}
             </span>
             )}
             {isError && (
-            <span className="bg-red-100 text-red-700 text-xs font-semibold px-3 py-1.5 rounded-full">
+            <span className="bg-red-100 text-red-700 txt-xs font-semibold px-3 py-1.5 rounded-full">
                 {message}
             </span>
             )}
@@ -112,7 +112,7 @@ export default function StoreSettingsPage() {
             
             {/* Contact Information Section */}
             <div className="bg-gray-50 p-5 rounded-xl border-1 border-gray-800 bg-vercel-black">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">Business & Contact Info</h2>
+            <h2 className="txt-lg font-semibold text-gray-700 mb-4">Business & Contact Info</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                 <label >GST Number</label>
@@ -190,7 +190,7 @@ export default function StoreSettingsPage() {
 
             {/* Policies Section */}
             <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-700">Store Policies (HTML / Plain Text)</h2>
+            <h2 className="txt-lg font-semibold text-gray-700">Store Policies (HTML / Plain Text)</h2>
             
             <div>
                 <label >Terms of Service</label>

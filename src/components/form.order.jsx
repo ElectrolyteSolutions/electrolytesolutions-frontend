@@ -37,10 +37,10 @@ const tableHeadData = ["Item Name", "Qty", "Rate", "Total"];
       {/* Header */}
       <div className="pb-3 border-b border-zinc-800 flex justify-between items-center">
         <div>
-          <h3 className="text-base text-sm font-bold text-vercel-primary">
+          <h3 className="txt-base txt-sm font-bold text-vercel-primary">
             Order #{selectedOrder.orderNumber || selectedOrder._id?.slice(-8)}
           </h3>
-          <p className="text-[11px] text-zinc-400">
+          <p className="txt-eleven text-zinc-400">
             Placed on {new Date(selectedOrder.createdAt || Date.now()).toLocaleString()}
           </p>
         </div>

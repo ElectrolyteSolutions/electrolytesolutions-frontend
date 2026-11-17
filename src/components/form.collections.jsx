@@ -24,7 +24,7 @@ const CollectionDetails = ({
   return (
     <form onSubmit={handleSave} className="flex flex-col h-full w-full overflow-x-hidden px-3 py-6">
       <div className='flex flex-row justify-between items-center border-b border-zinc-800 pb-3'>
-        <h3 className="text-sm font-medium text-vercel-primary line-clamp-2 w-2/4">
+        <h3 className="txt-sm font-medium text-vercel-primary line-clamp-2 w-2/4">
           {editId ? (
             <>Edit Mode: <span className='text-vercel-secondary'>{form.title || 'Collection'}</span></>
           ) : (
@@ -51,7 +51,7 @@ const CollectionDetails = ({
       <div className="mt-3 h-screen bg-vercel-surface rounded-md border-1 border-zinc-800 px-2 py-2 overflow-y-auto space-y-2 custom-scrollbar max-h-[calc(100vh-20%)]">
         
         {/* Collection Overview */}
-        <p className='text-xs font-semibold text-zinc-300'>Collection Overview</p>
+        <p className='txt-xs font-semibold text-zinc-300'>Collection Overview</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div>
             <label >ERP Collection ID</label>
@@ -87,7 +87,7 @@ const CollectionDetails = ({
         </div>
 
         {/* Collection Image */}
-        <p className='text-xs font-semibold text-zinc-300'>Collection Banner Image</p>
+        <p className='txt-xs font-semibold text-zinc-300'>Collection Banner Image</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <label >Image URL</label>
           <div className='flex flex-row justify-between gap-2'>
@@ -114,7 +114,7 @@ const CollectionDetails = ({
               <button 
                 type="button" 
                 onClick={handleRemoveImage} 
-                className="text-zinc-400 text-lg font-bold absolute top-0 right-2 m-0 p-0 cursor-pointer"
+                className="text-zinc-400 txt-lg font-bold absolute top-0 right-2 m-0 p-0 cursor-pointer"
               >
                 &times;
               </button>
@@ -124,7 +124,7 @@ const CollectionDetails = ({
         </div>
 
         {/* SEO Management */}
-        <p className='text-xs font-semibold text-zinc-300'>SEO Management</p>
+        <p className='txt-xs font-semibold text-zinc-300'>SEO Management</p>
         <div className='bg-vercel-black p-2 border-1 border-zinc-800 rounded-md space-y-2'>
           <div>
             <label >Slug URL Parameter</label>

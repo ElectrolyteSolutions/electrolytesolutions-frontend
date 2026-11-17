@@ -25,17 +25,17 @@ const RefundVoucherTemplate = ({ refundData }) => {
       
       {/* Action Header bar */}
       <div className="flex justify-between items-center mb-3 border-b border-zinc-800 pb-2 px-2">
-        <span className="text-xs text-red-400 font-bold tracking-wider uppercase font-mono">⚠️ Reverse POS Voucher Engine</span>
+        <span className="txt-xs text-red-400 font-bold tracking-wider uppercase font-mono">⚠️ Reverse POS Voucher Engine</span>
         <button 
           onClick={handlePrint} 
-          className="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-md font-semibold text-xs transition-all shadow-md"
+          className="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-md font-semibold txt-xs transition-all shadow-md"
         >
           🖨️ Print Refund Voucher
         </button>
       </div>
 
       {/* --- PRINT CONTAINER START --- */}
-      <div ref={printRef} className="bg-white text-vercel-secondary p-5 rounded-md font-sans tracking-tight text-[11px]">
+      <div ref={printRef} className="bg-white text-vercel-secondary p-5 rounded-md font-sans tracking-tight txt-eleven">
         <style dangerouslySetInnerHTML={{__html: `
           @media print { 
             @page { size: A4 portrait; margin: 8mm; } 
@@ -49,53 +49,53 @@ const RefundVoucherTemplate = ({ refundData }) => {
           <div className="flex items-center gap-3">
             <img src={logourl} alt="Logo" className="w-10 h-10 object-contain mix-blend-multiply" />
             <div>
-              <h1 className="text-sm font-black text-zinc-950 tracking-tighter leading-none">ELECTROLYTE SOLUTIONS</h1>
-              <p className="text-[9px] text-zinc-500 mt-1 leading-tight">
+              <h1 className="txt-sm font-black text-zinc-950 tracking-tighter leading-none">ELECTROLYTE SOLUTIONS</h1>
+              <p className="txt-nine text-zinc-500 mt-1 leading-tight">
                 Nahar Bala Ganj, Balrampur, UP, 271201<br />
-                <span className="font-semibold font-mono text-zinc-700 text-[8px]">Contact No.: 9648146167, 8081111867</span>
+                <span className="font-semibold font-mono text-zinc-700 txt-eight">Contact No.: 9648146167, 8081111867</span>
                 {(refundData.gstNo || true) && (
                   <>
                     <br />
-                    <span className="font-bold font-mono text-red-700 text-[8px] uppercase">GSTIN: {refundData.gstNo || '09EYOPR0179F1ZV'}</span>
+                    <span className="font-bold font-mono text-red-700 txt-eight uppercase">GSTIN: {refundData.gstNo || '09EYOPR0179F1ZV'}</span>
                   </>
                 )}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <h2 className="text-[10px] font-black text-white bg-red-600 px-2 py-0.5 rounded inline-block uppercase tracking-wider">Return Receipt</h2>
-            <div className="text-[9px] text-zinc-600 font-mono mt-1.5">Processed: {new Date(refundData.createdAt || Date.now()).toLocaleDateString()}</div>
+            <h2 className="txt-ten font-black text-white bg-red-600 px-2 py-0.5 rounded inline-block uppercase tracking-wider">Return Receipt</h2>
+            <div className="txt-nine text-zinc-600 font-mono mt-1.5">Processed: {new Date(refundData.createdAt || Date.now()).toLocaleDateString()}</div>
           </div>
         </div>
 
         {/* Complete un-truncated Full Token Reference IDs for auditing trail tracking accuracy */}
-        <div className="bg-red-50/50 border-b border-red-100 px-2 py-1 space-y-0.5 text-[9px] font-mono text-zinc-800">
+        <div className="bg-red-50/50 border-b border-red-100 px-2 py-1 space-y-0.5 txt-nine font-mono text-zinc-800">
           <div className="flex justify-between">
-            <span className="text-zinc-400 font-sans font-bold uppercase text-[8px]">Return Bill Reference ID:</span>
+            <span className="text-zinc-400 font-sans font-bold uppercase txt-eight">Return Bill Reference ID:</span>
             <span className="font-bold text-zinc-950 select-all">{refundData._id}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-zinc-400 font-sans font-bold uppercase text-[8px]">Original Invoice Linked ID:</span>
+            <span className="text-zinc-400 font-sans font-bold uppercase txt-eight">Original Invoice Linked ID:</span>
             <span className="font-bold text-zinc-700 select-all">{refundData.originalInvoiceId}</span>
           </div>
         </div>
 
         {/* Customer Profile Manifest block card metadata row */}
-        <div className="my-2.5 p-2 bg-red-50/20 border border-red-100/40 rounded text-[10px] flex justify-between items-center">
+        <div className="my-2.5 p-2 bg-red-50/20 border border-red-100/40 rounded txt-ten flex justify-between items-center">
           <div>
-            <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Refund Target Customer:</span>
-            <div className="font-bold text-vercel-secondary text-xs">{refundData.customer?.name || 'Walk-in Client'}</div>
-            <div className="text-zinc-600 font-mono text-[9px] mt-0.5">Ph: {refundData.customer?.phone || 'N/A'}</div>
+            <span className="txt-eight font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Refund Target Customer:</span>
+            <div className="font-bold text-vercel-secondary txt-xs">{refundData.customer?.name || 'Walk-in Client'}</div>
+            <div className="text-zinc-600 font-mono txt-nine mt-0.5">Ph: {refundData.customer?.phone || 'N/A'}</div>
           </div>
           <div className="text-right">
-            <span className="text-[9px] text-red-700 bg-red-50 font-bold px-2 py-0.5 rounded uppercase border border-red-100 tracking-wide font-sans">
+            <span className="txt-nine text-red-700 bg-red-50 font-bold px-2 py-0.5 rounded uppercase border border-red-100 tracking-wide font-sans">
               Purpose: return
             </span>
           </div>
         </div>
 
         {/* Returned Items Matrix Table row display lists layout block */}
-        <table className="w-full text-left border-collapse my-3 text-[10px]">
+        <table className="w-full text-left border-collapse my-3 txt-ten">
           <thead>
             <tr className="bg-red-50 text-red-800 font-bold border-b border-red-200 print:bg-red-50">
               <th className="px-2 py-1.5 w-6">#</th>
@@ -123,17 +123,17 @@ const RefundVoucherTemplate = ({ refundData }) => {
 
         {/* Totals Calculation Summary & Signoff Area */}
         <div className="flex justify-between items-end mt-4 pt-2.5 border-t border-zinc-200">
-          <div className="w-1/2 text-[8px] text-zinc-400 italic leading-tight">
+          <div className="w-1/2 txt-eight text-zinc-400 italic leading-tight">
             * This document verifies an absolute reverse return entry flow. Listed items have been successfully checked back into stock databases. Cash value has been distributed to customer profile.
           </div>
           <div className="w-1/2 space-y-1 text-zinc-600 text-right">
-            <div className="flex justify-between pl-12 text-[10px]">
+            <div className="flex justify-between pl-12 txt-ten">
               <span>Taxable Refund Base:</span>
               <span className="text-vercel-secondary font-mono">₹{absoluteGrandRefund.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between items-center bg-red-600 text-white px-3 py-1.5 rounded text-[11px] font-bold mt-1.5 shadow-sm">
+            <div className="flex justify-between items-center bg-red-600 text-white px-3 py-1.5 rounded txt-eleven font-bold mt-1.5 shadow-sm">
               <span>Total Cash Refunded:</span>
-              <span className="font-black font-mono text-xs">₹{absoluteGrandRefund.toFixed(2)}</span>
+              <span className="font-black font-mono txt-xs">₹{absoluteGrandRefund.toFixed(2)}</span>
             </div>
 
             {/* Signature Block space boundary layout line components */}
@@ -145,7 +145,7 @@ const RefundVoucherTemplate = ({ refundData }) => {
                 className="h-12 w-28 object-contain mix-blend-multiply mb-1 mr-2" 
               />
               <div className="w-36 h-0.5 bg-zinc-300 mb-0.5"></div>
-              <div className="text-[8px] uppercase font-bold text-zinc-400 tracking-wider">Authorized Signature</div>
+              <div className="txt-eight uppercase font-bold text-zinc-400 tracking-wider">Authorized Signature</div>
             </div>
           </div>
         </div>

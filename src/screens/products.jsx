@@ -281,39 +281,39 @@ const ProductsPage = () => {
   };
 
   const productsTableHead = [
-    { label: '#', value: 'sno', class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4", onClick: ()=>{} },
-    { label: 'Product Name', value: 'name', class: "text-xs px-3 py-2 w-28 min-w-28 max-w-28 cursor-pointer", onClick: () => handleSortToggle('name') },
-    { label: 'MRP', value: 'price', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12 cursor-pointer", onClick: () => handleSortToggle('price') },
-    { label: 'Stock', value: 'quantity', class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4 cursor-pointer", onClick: () => handleSortToggle('quantity') },
-    { label: 'Status', value: 'status', class: "text-xs px-3 py-2 w-9 max-w-9 min-w-9 cursor-pointer", onClick: () => handleSortToggle('status') },
-    { label: 'Product Type', value: 'type', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12 cursor-pointer", onClick: () => handleSortToggle('type')  },
-    { label: 'Category', value: 'collection', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12", onClick: () => {} },
-    { label: 'HSN', value: 'hsn', class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12", onClick: () => {} },
+    { label: '#', value: 'sno', class: "txt-xs px-3 py-2 w-4 max-w-4 min-w-4", onClick: ()=>{} },
+    { label: 'Product Name', value: 'name', class: "txt-xs px-3 py-2 w-28 min-w-28 max-w-28 cursor-pointer", onClick: () => handleSortToggle('name') },
+    { label: 'MRP', value: 'price', class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12 cursor-pointer", onClick: () => handleSortToggle('price') },
+    { label: 'Stock', value: 'quantity', class: "txt-xs px-3 py-2 w-4 max-w-4 min-w-4 cursor-pointer", onClick: () => handleSortToggle('quantity') },
+    { label: 'Status', value: 'status', class: "txt-xs px-3 py-2 w-9 max-w-9 min-w-9 cursor-pointer", onClick: () => handleSortToggle('status') },
+    { label: 'Product Type', value: 'type', class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12 cursor-pointer", onClick: () => handleSortToggle('type')  },
+    { label: 'Category', value: 'collection', class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12", onClick: () => {} },
+    { label: 'HSN', value: 'hsn', class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12", onClick: () => {} },
   ];
 
   function productsTableData(p) {
     return [
-      { label: '#', value: p.sno || '', class: "text-xs pl-3 pr-0 py-2 rounded-l-md w-4 max-w-4 min-w-4" },
+      { label: '#', value: p.sno || '', class: "txt-xs pl-3 pr-0 py-2 rounded-l-md w-4 max-w-4 min-w-4" },
       { label: 'Product Name', value: (
           <div>
             <div className="font-medium">{p.name}</div>
-            {p.sku && <div className="text-[10px] text-zinc-500">SKU: {p.sku}</div>}
+            {p.sku && <div className="txt-ten text-zinc-500">SKU: {p.sku}</div>}
           </div>
         ), 
-        class: "text-xs px-3 py-2 w-28 min-w-28 max-w-28" 
+        class: "txt-xs px-3 py-2 w-28 min-w-28 max-w-28" 
       },
-      { label: 'MRP', value: `${Number(p.price || 0).toFixed(2)}`, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
+      { label: 'MRP', value: `${Number(p.price || 0).toFixed(2)}`, class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12" },
       { label: 'Stock', value: (
           <span className={`font-bold font-mono ${p.quantity <= 0 ? 'text-red-400' : p.quantity < 10 ? 'text-amber-400' : 'text-emerald-400'}`}>
             {p.quantity}
           </span>
         ), 
-        class: "text-xs px-3 py-2 w-4 max-w-4 min-w-4" 
+        class: "txt-xs px-3 py-2 w-4 max-w-4 min-w-4" 
       },    
-      { label: 'Status', value: <Badge title={p.status} type={p.status==="active"?"dark":"light"}></Badge>, class: "text-xs px-3 py-2 w-8 max-w-8 min-w-8" },
-      { label: 'Type', value: p.type, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
-      { label: 'Category', value: p?.collections?.map((col) => col.title).join(","), class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
-      { label: 'HSN', value: p.hsn, class: "text-xs px-3 py-2 w-12 max-w-12 min-w-12" },
+      { label: 'Status', value: <Badge title={p.status} type={p.status==="active"?"dark":"light"}></Badge>, class: "txt-xs px-3 py-2 w-8 max-w-8 min-w-8" },
+      { label: 'Type', value: p.type, class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12" },
+      { label: 'Category', value: p?.collections?.map((col) => col.title).join(","), class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12" },
+      { label: 'HSN', value: p.hsn, class: "txt-xs px-3 py-2 w-12 max-w-12 min-w-12" },
     ];
   }
 

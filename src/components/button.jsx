@@ -28,7 +28,7 @@ const Button = ({
       {...props}
       type={buttontype}
       onClick={onClick}
-      className={`inline-flex ${classname} items-center justify-between gap-1 px-2.5 rounded-md text-xs font-semibold transition-all cursor-pointer shadow-sm border-1 text-nowrap ${selectedTypeStyle}`}
+      className={`inline-flex ${classname} items-center justify-between gap-1 px-2.5 rounded-md txt-xs font-semibold transition-all cursor-pointer shadow-sm border-1 text-nowrap ${selectedTypeStyle}`}
     >
     {loading ? <div className='loader'/>: (!iconRight && icon)}
       {label}
