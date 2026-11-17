@@ -40,11 +40,21 @@ const ProductDetails = ({
     setForm({ ...form, images: [...form.images, tempImageUrl.trim()] });
     setTempImageUrl('');
   };
+  const handlePosterImage = (url) => {
+    setForm({ ...form, poster: url });
+    setTempImageUrl('');
+  };
 
   const handleRemoveImage = (indexToRemove) => {
     setForm({
       ...form,
       images: form.images.filter((_, index) => index !== indexToRemove)
+    });
+  };
+  const handleRemovePoster = () => {
+    setForm({
+      ...form,
+      poster: null
     });
   };
 
@@ -140,12 +150,19 @@ const ProductDetails = ({
 
           <div className="flex flex-wrap gap-2 pt-2">
             {form.images.map((url, index) => (
-              <div key={index} className="border-1 border-zinc-800 rounded-md relative p-2">
-                <button type="button" onClick={() => handleRemoveImage(index)} className="text-zinc-400 txt-lg font-bold absolute top-0 right-2 m-0 p-0 cursor-pointer">&times;</button>
+
+              <div key={index} onClick={()=>{handlePosterImage(url)}} className={`border-1 border-zinc-800 rounded-md relative p-2 ${form.poster === url && 'border-white'}`}>
+                <button type="button" onClick={(e) => {
+                    e.stopPropagation()
+                    handleRemoveImage(index)
+                    }} 
+                    className="text-zinc-400 txt-lg font-bold absolute top-0 right-2 m-0 p-0 cursor-pointer">&times;</button>
                 <img src={url} alt={`Preview ${index}`} className="w-24 h-24 object-cover rounded-md bg-zinc-950" />
               </div>
             ))}
           </div>
+
+          
       
           <div>
             <label >Full Description</label>

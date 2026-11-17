@@ -67,7 +67,8 @@ const ProductsPage = () => {
     hsn: '',
     type: '',
     status: "",
-    isCustomType: false
+    isCustomType: false,
+    poster:""
   });
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -132,6 +133,7 @@ const ProductsPage = () => {
 
   const fetchLookups = async () => {
     try {
+      
       const colRes = await fetch(`${import.meta.env.VITE_API_URL}products/collections`);
       const colData = await colRes.json();
       setAvailableCollections(colData);
@@ -174,7 +176,8 @@ const ProductsPage = () => {
       hsn: product.hsn || '',
       status: product.status || 'active',
       type: product.type || '',
-      isCustomType: false
+      isCustomType: false,
+      poster:product?.poster || product?.images?.[0] || null
     });
     if (product.details && product.details.length > 0) {
       setDetails(product.details);
@@ -204,7 +207,8 @@ const ProductsPage = () => {
       hsn: '',
       status: 'draft',
       type: '',
-      isCustomType: false
+      isCustomType: false,
+      poster:''
     });
     setDetails([])
     setEditId(null);
