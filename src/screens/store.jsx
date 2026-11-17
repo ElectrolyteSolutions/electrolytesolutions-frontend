@@ -89,7 +89,7 @@ export default function StoreSettingsPage() {
   };
 
   const rightPaneContent = (
-        <div className="p-6 w-full h-full flex flex-col overflow-y-auto custom-scrollbar bg-vercel-black">
+        <div className="p-6 w-full flex flex-col overflow-y-auto custom-scrollbar bg-vercel-black h-[90vh]">
 
         <div className="flex justify-between items-center mb-6 border-b-1 pb-4">
             <div>
@@ -254,10 +254,6 @@ export default function StoreSettingsPage() {
   const leftPaneContent = (<div>Hello</div>)
 
   return <div className="h-screen w-full bg-vercel-black">
-      <ResizablePanes 
-        animationKey="profile-sessions"
-        leftPane={rightPaneContent}
-        defaultLeftWidth="45%"
-      />
+    {rightPaneContent}
     </div>
 }

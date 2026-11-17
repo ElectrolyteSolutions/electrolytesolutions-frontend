@@ -332,8 +332,7 @@ const ProductsPage = () => {
           statusFilter={[stockFilter.label]}
           setStatusFilter={[setStockFilter]}
           statusOptions={[statusOptions]}
-        />
-        {!isCustomer && !isAddingNew && (
+          extra={!isAddingNew && (
           <Button 
             onClick={handleAddNewClick} 
             icon={
@@ -344,6 +343,8 @@ const ProductsPage = () => {
             label="Add New" 
           />
         )}
+        />
+        
       </div>
 
       <GlobalTable

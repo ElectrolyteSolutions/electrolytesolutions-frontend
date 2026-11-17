@@ -84,7 +84,7 @@ div {
 }
 
 .txt-xs {
-  @apply text-sm sm:text-xs  
+  @apply text-base sm:text-xs  
 }
 .txt-sm {
   @apply text-base sm:text-sm  
@@ -142,7 +142,7 @@ div {
 
   /* Vercel-Style Select Box */
   select {
-    @apply appearance-none bg-vercel-card px-2 py-2 pr-9 rounded-md text-xs font-normal border-1 border-zinc-800 transition-all cursor-pointer hover:opacity-80 w-full;
+    @apply appearance-none bg-vercel-card px-2 py-2 pr-9 rounded-md sm:text-xs text-sm font-normal border-1 border-zinc-800 transition-all cursor-pointer hover:opacity-80 w-full;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23afffff' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.45rem center;
@@ -167,7 +167,7 @@ div {
 
   /* Vercel-Style Dropdown Options */
   select option {
-    @apply bg-vercel-card text-xs font-medium text-vercel-secondary py-1.5 rounded-md px-2;
+    @apply bg-vercel-card sm:text-xs text-sm font-medium text-vercel-secondary py-1.5 rounded-md px-2;
   }
   
   select option:hover {
@@ -198,7 +198,7 @@ div {
     @apply outline-none border-white bg-vercel-hover ring-1 ring-white;
   }
   textarea{
-    @apply w-full bg-zinc-950 rounded-md p-2 text-xs text-zinc-100 border border-zinc-800 focus:outline-none focus:border-white
+    @apply w-full bg-zinc-950 rounded-md p-2 sm:text-xs text-sm text-zinc-100 border border-zinc-800 focus:outline-none focus:border-white
   }
   textarea:hover {
     @apply outline-none border-white bg-vercel-hover ring-1 ring-white;
@@ -223,36 +223,4 @@ div {
   --color-vercel-muted: #666666;
   --color-vercel-blue: #0070F3;
 }
-
-/* Custom button styles can be written as standard CSS classes */
-.btn-vercel-white {
-  background-color: #ffffff;
-  color: #000000;
-  font-weight: 600;
-  font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background-color 0.15s ease;
-}
-.btn-vercel-white:hover {
-  background-color: #eaeaea;
-}
-
-.btn-vercel-dark {
-  background-color: #111111;
-  color: #ffffff;
-  border: 1px solid #333333;
-  font-weight: 500;
-  font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: all 0.15s ease;
-}
-.btn-vercel-dark:hover {
-  background-color: #222222;
-  border-color: #666666;
-}
-
-
-
 

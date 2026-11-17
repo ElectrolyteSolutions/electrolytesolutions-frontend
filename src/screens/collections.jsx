@@ -201,18 +201,18 @@ const CollectionsPage = () => {
           statusFilter={[statusFilter.label]}
           setStatusFilter={[setStatusFilter]}
           statusOptions={[statusOptions]}
-        />
-        {!isCustomer && !isAddingNew && (
-          <Button 
-            onClick={handleAddNewClick} 
-            icon={
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-            } 
-            label="Add New" 
-          />
-        )}
+          extra=
+          {!isCustomer && !isAddingNew && (
+            <Button 
+              onClick={handleAddNewClick} 
+              icon={
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+              } 
+              label="Add New" 
+            />
+          )}/>
       </div>
 
       <GlobalTable

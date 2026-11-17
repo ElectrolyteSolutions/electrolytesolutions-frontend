@@ -171,7 +171,6 @@ const AndroidManagementPage = () => {
   const leftPaneContent = (
     <div className="p-6 w-full h-full flex flex-col bg-vercel-black text-vercel-primary">
       <div className="flex flex-row justify-between items-center mb-4">
-        <div className="w-full">
           <Header
             placeholder="Search devices by model, user ID, or token..."
             searchTerm={searchTerm}
@@ -179,10 +178,7 @@ const AndroidManagementPage = () => {
             statusFilter={[statusFilter.label, sortBy.label]}
             setStatusFilter={[setStatusFilter, setSortBy]}
             statusOptions={[filterOptions, sortOptions]}
-          />
-        </div>
-        <div className="ml-3">
-          {!isCreatingBroadcast && (
+            extra= {!isCreatingBroadcast && (
             <Button 
               onClick={handleCreateBroadcastClick} 
               icon={
@@ -192,8 +188,7 @@ const AndroidManagementPage = () => {
               } 
               label="Create Broadcast" 
             />
-          )}
-        </div>
+          )}/>
       </div>
 
       <GlobalTable

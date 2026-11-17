@@ -31,7 +31,7 @@ const VercelDropdown = ({loading=false, value, onSelect ,rightOptions=[],type="l
         type="button"
         onClick={()=> setIsOpen(!isOpen)}
         loading={loading}
-        classname='py-2 font-bold px-3'
+        classname='h-full font-bold px-3'
         iconRight={true}
         label={value.label || value}
         icon={<svg 

@@ -248,7 +248,7 @@ const CustomersPage = () => {
           statusFilter={[customerFilter.label]}
           setStatusFilter={[setCustomerFilter]}
           statusOptions={[statusOptions]}
-        />
+        extra=
         {!isAddingNew && (
           <Button 
             onClick={handleAddNewClick}
@@ -260,7 +260,7 @@ const CustomersPage = () => {
             } 
             label="Register Customer" 
           />
-        )}
+        )}/>
       </div>
 
       <GlobalTable

@@ -273,8 +273,7 @@ const DevicesPage = () => {
           statusFilter={[statusFilter.label, selectedDeviceTypeTab?.label]} 
           setStatusFilter={[setStatusFilter, setSelectedDeviceTypeTab]}
           statusOptions={[statusOptions, deviceTypeTabs]}
-        />
-        {!isAddingNew && (
+          extra={!isAddingNew && (
           <Button 
             onClick={handleAddNewClick}
             icon={
@@ -284,7 +283,7 @@ const DevicesPage = () => {
             }
             label="Add Device" 
           />
-        )}
+        )}/>
       </div>
 
       <GlobalTable

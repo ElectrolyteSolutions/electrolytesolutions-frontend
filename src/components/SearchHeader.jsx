@@ -1,8 +1,8 @@
 import { Cross, X } from "lucide-react";
 import VercelDropdown from "./dropdown";
-const Header = ({placeholder, searchTerm, setSearchTerm, statusFilter, setStatusFilter,statusOptions,loading }) => {
+const Header = ({placeholder, searchTerm, setSearchTerm, statusFilter, setStatusFilter,statusOptions,loading,extra }) => {
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 w-full">
+    <div className="flex flex-wrap flex-row items-stretch items-center justify-start gap-2 w-full">
       <div className="flex-1 relative">
         <svg 
           className="w-4 h-4 text-zinc-400 absolute top-3 left-3"
@@ -22,13 +22,14 @@ const Header = ({placeholder, searchTerm, setSearchTerm, statusFilter, setStatus
           placeholder={placeholder}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full bg-vercel-card text-zinc-100 placeholder-zinc-500 pl-10 pr-4 py-2 rounded-md border-1 border-zinc-800 focus:outline-none focus:border-white txt-sm transition-all hover:border-white"
+          className="w-full bg-vercel-card min-w-48 text-zinc-100 placeholder-zinc-500 pl-10 pr-4 py-2 rounded-md border-1 border-zinc-800 focus:outline-none focus:border-white txt-sm transition-all hover:border-white"
         />
         <div className="d-flex gap-2 absolute end-3 top-3">
         {loading && <div className="loader"></div>}
         {searchTerm && <X onClick={()=>{setSearchTerm("")}} size={20} color="white"></X>}
         </div>
       </div>
+
       {statusFilter.map((val,index)=>{
 
         return <VercelDropdown 
@@ -38,6 +39,7 @@ const Header = ({placeholder, searchTerm, setSearchTerm, statusFilter, setStatus
           placeholder="Filter Status"
         />
       })}
+      {extra}
         
     </div>
   );
