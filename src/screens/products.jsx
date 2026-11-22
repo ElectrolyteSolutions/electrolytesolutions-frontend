@@ -340,6 +340,7 @@ const ProductsPage = () => {
 
   const productsTableHead = [
     { label: '#', value: 'sno', class: 'txt-xs px-3 py-2 w-4 max-w-4 min-w-4', onClick: () => {} },
+    { label: 'Image', value: 'sno', class: 'txt-xs px-3 py-2 w-4 max-w-4 min-w-4', onClick: () => {} },
     {
       label: 'Product Name',
       value: 'name',
@@ -377,6 +378,7 @@ const ProductsPage = () => {
   function productsTableData(p) {
     return [
       { label: '#', value: p.sno || '', class: 'txt-xs pl-3 pr-0 py-2 rounded-l-md w-4 max-w-4 min-w-4' },
+      { label: '#', value: <img className='rounded-md h-4 w-4' src={p.poster || p.images?.[0]}></img>, class: 'txt-xs px-0 py-2 rounded-l-md w-2 max-w-2 min-w-2' },
       {
         label: 'Product Name',
         value: (
