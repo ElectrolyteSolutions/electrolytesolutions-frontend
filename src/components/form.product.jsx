@@ -19,6 +19,8 @@ const ProductDetails = ({
   handleQuickCreateCollection,
   promptDeleteProduct,
   loading,
+  isAddingNew,
+  onReset
 }) => {
   const [tempImageUrl, setTempImageUrl] = useState('');
   const [isAddingNewType, setIsAddingNewType] = useState(false);
@@ -88,6 +90,12 @@ const ProductDetails = ({
               onClick={() => promptDeleteProduct()}
               label="Delete"/>
           )}
+          {isAddingNew && <Button
+                            type="button"
+                            onClick={onReset}
+                            label={'Reset'}
+                          />
+                      }
         </div>
       </div>
 

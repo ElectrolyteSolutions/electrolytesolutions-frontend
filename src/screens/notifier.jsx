@@ -113,15 +113,14 @@ const AndroidManagementPage = () => {
 
   const deviceTableHead = [
     { label: '#', value: 'sno', width: 12 * 4, class: 'rounded-l-md', onClick: () => {} },
-    { label: 'Role / User', value: 'user', width: 35 * 4, onClick: () => {} },
-    { label: 'User Id', value: 'id', width: 50 * 4, onClick: () => {} },
     { label: 'Device Model', value: 'model', width: 50 * 4, onClick: () => {} },
-    { label: 'FCM Token', value: 'fcm', width: 50 * 4, onClick: () => {} },
+    { label: 'User Name', value: 'id', width: 50 * 4, onClick: () => {} },
+    { label: 'User Role', value: 'user', width: 35 * 4, onClick: () => {} },
+    { label: 'Location', value: 'fcm', width: 50 * 4, onClick: () => {} },
     { label: 'Android OS', value: 'os', width: 30 * 4, onClick: () => {} },
     { label: 'Push Token Status', value: 'token', width: 4 * 25, onClick: () => {} },
     { label: 'Last Active', value: 'updatedAt', width: 4 * 28, class: 'rounded-r-md', onClick: () => {} }
   ];
-
   function deviceTableData(dev) {
     const modelName = dev.deviceData?.deviceModel || dev.userData?.deviceModel || 'Unknown Device';
     const osVersion = dev.deviceData?.androidVersion || dev.userData?.androidVersion || 'N/A';
@@ -129,9 +128,10 @@ const AndroidManagementPage = () => {
 
     return [
       { value: dev.sno || '' },
-      { value: role },
-      { value: dev.userId },
       { value: modelName },
+      { value: `${dev?.userData?.firstName || "-"} ${dev?.userData?.lastName || "-"}`},
+      { value: role },
+      { value: dev?.deviceData?.locationData?.formattedAddress},
       { value: dev?.token },
       { value: `Android ${osVersion}` },
       { value: <Badge type={dev.token ? 'dark' : 'light'} title={dev.token ? 'Active Token' : 'No Token'} /> },
