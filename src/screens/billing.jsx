@@ -290,7 +290,7 @@ const BillingPage = () => {
     const inlinePrintObject = {
       ...populatedInvoicePayload,
       customer: {
-        name: currentCustomer?.name || "Walk-in Customer",
+        name: (currentCustomer.name || `${currentCustomer.firstName || ''} ${currentCustomer.lastName || ''}`) || "Walk-in Customer",
         phone: currentCustomer?.phone || "N/A",
         address: currentCustomer?.address || "",
         customerType: currentCustomer?.customerType || "Individual"
@@ -351,6 +351,7 @@ const BillingPage = () => {
                     </option>
                   );
                 })}
+
             </select>
           </div>
           <div>

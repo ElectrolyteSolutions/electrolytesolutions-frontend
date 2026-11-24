@@ -59,7 +59,7 @@ const BillReceiptCore = ({
             <div>
               <span className="txt-nine font-bold text-zinc-400 uppercase tracking-wider block mb-0.5">Billed To:</span>
               <div className="font-bold text-zinc-900 txt-xs flex items-center gap-1.5">
-                {resolvedCustomer?.name || 'Walk-in Client'}
+                {resolvedCustomer?.name || `${resolvedCustomer?.firstName ?? ''} ${resolvedCustomer?.lastName ?? ''}`.trim() || 'Walk-in Client'}
                 <span className="txt-eight bg-zinc-100 text-zinc-600 border px-1 rounded font-normal uppercase tracking-tight">
                   {resolvedCustomer?.customerType || 'Individual'}
                 </span>

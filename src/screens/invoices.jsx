@@ -95,7 +95,8 @@ function handleClose(){
     return [
       { value: bill.sno || ''},
       { value: bill?.billNumber || "-"},
-      { value: bill.customer?.name || 'Walk-in',},
+      { value: bill.customer?.name || `${bill.customer?.firstName ?? ''} ${bill.customer?.lastName ?? ''}`.trim() || 
+         'Walk-in',},
       { value: `+91-${bill.customer?.phone}` || bill.customer?.email},
       { value: bill.purpose },
       { value: <Badge type={bill.isPaid ?"dark":"light"} title={bill.isPaid ? 'Paid' : 'Unpaid'}></Badge>},
