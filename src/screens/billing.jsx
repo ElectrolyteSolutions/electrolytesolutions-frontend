@@ -343,7 +343,14 @@ const BillingPage = () => {
             <label>Target Customer</label>
             <select value={selectedCustomerId} disabled={!!editingBillId} onChange={(e) => { setSelectedCustomerId(e.target.value); setCart([]); setSelectedDeviceId(''); setDuplicateBillMatch(null); }}>
               <option value="">Select Customer / Party Profile</option>
-              {customers.map(c => <option key={c._id} value={c._id}>{c.name} ({c.phone})</option>)}
+              {customers.map((c) => {
+                  const fullName = c.name || [c?.firstName, c?.lastName].filter(Boolean).join(' ');
+                  return (
+                    <option key={c._id} value={c._id}>
+                      {fullName} {c.phone ? `(${c.phone})` : ''}
+                    </option>
+                  );
+                })}
             </select>
           </div>
           <div>
