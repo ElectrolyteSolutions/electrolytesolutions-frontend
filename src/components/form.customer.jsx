@@ -77,7 +77,7 @@ const CustomerDetails = ({
         <div className="flex gap-2">
           <Button
             loading={loading}
-            buttontType="submit"
+            buttontype="submit"
             disabled={isFormInvalid}
             type="button"
             className={`transition-colors ${

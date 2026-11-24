@@ -28,6 +28,7 @@ const CustomersPage = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [addNewLoading,setAddNewLoading]=useState(false)
 
   // Device Registration states
 
@@ -95,6 +96,7 @@ const CustomersPage = () => {
   };
 
   const handleSave = (e) => {
+    setAddNewLoading(true)
     e.preventDefault();
 
     try{
@@ -137,6 +139,9 @@ const CustomersPage = () => {
   }
   catch(err){
     addToast(err.message || error || "Failed to Complete Operation")
+  }
+  finally{
+    setAddNewLoading(false)
   }
   };
 
@@ -283,7 +288,7 @@ const CustomersPage = () => {
         rightPane={
           (selectedCustomer !== undefined || isAddingNew) ? (
             <CustomerDetails
-              loading={loading}
+              loading={addNewLoading}
               customer={selectedCustomer}
               form={form}
               setForm={setForm}
