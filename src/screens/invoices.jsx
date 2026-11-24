@@ -119,7 +119,7 @@ function handleClose(){
         />
 
       <GlobalTable
-        title="Invoice "
+        title="Invoice"
         tableHead={billsTableHead}
         filteredList={filteredAndSortedBills.map((b, idx) => ({ ...b, sno: idx + 1 }))}
         status={status}
