@@ -106,6 +106,7 @@ const ProductsPage = () => {
         ...(stockFilter.value === 'low-stock' && { alert: 'low-stock' })
       })
     );
+
   }, [dispatch, searchTerm, currentSortBy, currentSortOrder, stockFilter]);
 
   const fetchLookups = useCallback(async () => {
@@ -126,7 +127,7 @@ const ProductsPage = () => {
   useEffect(() => {
     refreshDataLogs();
     fetchLookups();
-  }, [searchTerm]);
+  }, [searchTerm,currentSortBy,stockFilter]);
 
   // Persist "Add New" draft to localStorage (debounced)
   useEffect(() => {
@@ -297,6 +298,7 @@ const ProductsPage = () => {
         await dispatch(updateProduct({ id: editId, data: payload })).unwrap();
         addToast('Product updated successfully!', 'success');
         refreshDataLogs();
+        fetchLookups()
       } else {
         await dispatch(addProduct(payload)).unwrap();
         localStorage.removeItem(DRAFT_STORAGE_KEY);
@@ -305,6 +307,7 @@ const ProductsPage = () => {
         setIsAddingNew(false);
         addToast('Product created successfully!', 'success');
         refreshDataLogs();
+        fetchLookups()
       }
     } catch (err) {
       addToast(err?.message || error || 'Failed to save product.', 'error');
@@ -331,6 +334,7 @@ const ProductsPage = () => {
         setEditId(null);
       }
       refreshDataLogs();
+      fetchLookups()
     } catch (err) {
       addToast(err?.message || error || 'Failed to delete product record.', 'error');
     } finally {
