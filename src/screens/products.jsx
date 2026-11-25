@@ -126,7 +126,7 @@ const ProductsPage = () => {
   useEffect(() => {
     refreshDataLogs();
     fetchLookups();
-  }, [refreshDataLogs, fetchLookups]);
+  }, [searchTerm]);
 
   // Persist "Add New" draft to localStorage (debounced)
   useEffect(() => {

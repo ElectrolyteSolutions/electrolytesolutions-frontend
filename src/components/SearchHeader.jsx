@@ -24,7 +24,7 @@ const Header = ({placeholder, searchTerm, setSearchTerm, statusFilter, setStatus
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full bg-vercel-card min-w-48 text-zinc-100 placeholder-zinc-500 pl-10 pr-4 py-2 rounded-md border-1 border-zinc-800 focus:outline-none focus:border-white txt-sm transition-all hover:border-white"
         />
-        <div className="d-flex gap-2 absolute end-3 top-3">
+        <div className="d-flex gap-2 absolute end-3 top-1">
         {loading && <div className="loader"></div>}
         {searchTerm && <X onClick={()=>{setSearchTerm("")}} size={20} color="white"></X>}
         </div>
@@ -33,6 +33,7 @@ const Header = ({placeholder, searchTerm, setSearchTerm, statusFilter, setStatus
       {statusFilter.map((val,index)=>{
 
         return <VercelDropdown 
+          key={index}
           value={val || val.value} 
           onSelect={setStatusFilter[index]} 
           rightOptions={statusOptions[index]} 

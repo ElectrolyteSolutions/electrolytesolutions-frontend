@@ -25,9 +25,10 @@ const VercelDropdown = ({loading=false, value, onSelect ,rightOptions=[],type="l
   };
 
   return (
-    <div className="relative inline-block text-left" ref={dropdownRef}>
+    <div id={value} className="relative inline-block text-left" ref={dropdownRef}>
       {/* Trigger Button matching your screenshot */}
       <Button
+      
         type="button"
         onClick={()=> setIsOpen(!isOpen)}
         loading={loading}
